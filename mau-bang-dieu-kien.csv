@@ -1,9 +1,9 @@
-﻿Ngân hàng,Tên gọi khác,Áp dụng,Hình thức mở,Điều kiện mở online,Điều kiện mở offline,Công việc (online),Công việc (offline),Tỷ lệ sử dụng,Số thẻ tối đa,Số CTTC tối đa,Cần thẻ cũ,HM thẻ cũ tối thiểu (tr),Ghi chú
-VPBank,VPB,Có,Online + Offline,"Có thẻ TD ngân hàng khác từ 6 tháng, HM từ 20tr",CCCD + sao kê lương 3 tháng,Không,"HĐLĐ, HKD",Dưới 80%,5,2,Có,20,Mẫu
-TPBank,TPB,Có,Online,"Mở qua thẻ, xét HM thẻ cũ",,Không,,Dưới 80%,5,2,Có,15,Mẫu
-VIB,,Có,Online + Offline,Có thẻ TD HM từ 30tr,HĐLĐ + sao kê lương,Không,HĐLĐ,Dưới 70%,4,1,Không,,Mẫu
-HDBank,HDB,Có,Offline,,Chứng minh thu nhập,,Có,Không yêu cầu,6,3,Không,,Mẫu
-Techcombank,TCB,Có,Offline,,Lương chuyển khoản qua TCB,,HĐLĐ,Dưới 60%,3,0,Không,,Mẫu
-MB Bank,"MB, MBBank",Có,Online + Offline,Duyệt trên app MB,Sao kê tài khoản 6 tháng,Không,"HĐLĐ, HKD",Dưới 70%,4,1,Không,,Mẫu
-Sacombank,STB,Có,Online + Offline,Mở qua thẻ HM từ 10tr,Chứng minh thu nhập,Không,"HĐLĐ, HKD","Trên 20%, dưới 85%",6,2,Có,10,Mẫu
-Cake by VPBank,Cake,Có,Online,eKYC trên app Cake,,Không,,Dưới 90%,,3,Không,,Mẫu: ngân hàng số
+﻿Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,HM thẻ cũ tối thiểu (tr),Ghi chú
+VPBank,VPB,Có,80,5,2,Không,Có,20,Mẫu
+TPBank,TPB,Có,80,5,2,Không,Có,15,Mẫu
+VIB,,Có,70,4,1,Không,Có,30,Mẫu
+HDBank,HDB,Có,,6,3,Có,Không,,Mẫu
+Techcombank,TCB,Có,60,3,0,HĐLĐ,Không,,Mẫu
+MB Bank,"MB, MBBank",Có,70,4,1,Không,Không,,Mẫu
+Sacombank,STB,Có,85,6,2,Không,Có,10,Mẫu
+Cake by VPBank,Cake,Có,90,,3,Không,Không,,Mẫu: ngân hàng số

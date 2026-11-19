@@ -207,15 +207,6 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
     </section>
 
     <section>
-      <h2>Khách muốn mở</h2>
-      <div class="seg" id="channel" role="group" aria-label="Hình thức mở">
-        <button type="button" data-ch="all" aria-pressed="true">Cả hai</button>
-        <button type="button" data-ch="online" aria-pressed="false">Online</button>
-        <button type="button" data-ch="offline" aria-pressed="false">Offline</button>
-      </div>
-    </section>
-
-    <section>
       <div class="panel">
         <label class="switch" for="badDebt"><span><span style="font-weight:600">Đang có nợ quá hạn / nợ xấu</span><br><span class="note">Nợ nhóm 2 trở lên trên CIC</span></span><input type="checkbox" id="badDebt"></label>
       </div>
@@ -272,16 +263,16 @@ const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank"
 
 /* ĐIỀU KIỆN MẪU – cùng định dạng với bảng Google Sheet. Chưa phải điều kiện thật của ngân hàng. */
 const SAMPLE_RULES=[
- {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Hình thức mở":"Online + Offline","Điều kiện mở online":"Có thẻ TD ngân hàng khác từ 6 tháng, HM từ 20tr","Điều kiện mở offline":"CCCD + sao kê lương 3 tháng","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Dưới 80%","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"20","Ghi chú":"Mẫu"},
- {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Hình thức mở":"Online","Điều kiện mở online":"Mở qua thẻ, xét HM thẻ cũ","Điều kiện mở offline":"","Công việc (online)":"Không","Công việc (offline)":"","Tỷ lệ sử dụng":"Dưới 80%","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"15","Ghi chú":"Mẫu"},
- {"Ngân hàng":"VIB","Tên gọi khác":"","Hình thức mở":"Online + Offline","Điều kiện mở online":"Có thẻ TD HM từ 30tr","Điều kiện mở offline":"HĐLĐ + sao kê lương","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ","Tỷ lệ sử dụng":"Dưới 70%","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Hình thức mở":"Offline","Điều kiện mở online":"","Điều kiện mở offline":"Chứng minh thu nhập","Công việc (online)":"","Công việc (offline)":"Có","Tỷ lệ sử dụng":"Không yêu cầu","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Hình thức mở":"Offline","Điều kiện mở online":"","Điều kiện mở offline":"Lương chuyển khoản qua TCB","Công việc (online)":"","Công việc (offline)":"HĐLĐ","Tỷ lệ sử dụng":"Dưới 60%","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Hình thức mở":"Online + Offline","Điều kiện mở online":"Duyệt trên app MB","Điều kiện mở offline":"Sao kê tài khoản 6 tháng","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Dưới 70%","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Hình thức mở":"Online + Offline","Điều kiện mở online":"Mở qua thẻ HM từ 10tr","Điều kiện mở offline":"Chứng minh thu nhập","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Trên 20%, dưới 85%","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"10","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Hình thức mở":"Online","Điều kiện mở online":"eKYC trên app Cake","Điều kiện mở offline":"","Công việc (online)":"Không","Công việc (offline)":"","Tỷ lệ sử dụng":"Dưới 90%","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu: ngân hàng số"}
+ {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"20","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"15","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"VIB","Tên gọi khác":"","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"30","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Tỷ lệ sử dụng tối đa (%)":"","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần công việc":"Có","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Tỷ lệ sử dụng tối đa (%)":"60","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần công việc":"HĐLĐ","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Tỷ lệ sử dụng tối đa (%)":"85","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"10","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Tỷ lệ sử dụng tối đa (%)":"90","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần công việc":"Không","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu: ngân hàng số"}
 ];
-const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",channel:"all",badDebt:false,example:true};
+const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",badDebt:false,example:true};
 const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",none:"Không chứng minh được công việc"};
 const K_CONN="kmt.conn.v1",K_CACHE="kmt.rulesCache.v2",K_CUST="kmt.customer.v2";
 
@@ -302,13 +293,8 @@ const COLS=[
  ["name",k=>k==="nganhang"||k==="tennganhang"||k==="bank"],
  ["aliases",k=>k.includes("tengoikhac")||k.includes("vietat")],
  ["active",k=>k.startsWith("apdung")||k==="dangapdung"],
- ["channel",k=>k.includes("hinhthuc")],
- ["onlineCond",k=>k.includes("dieukien")&&k.includes("online")],
- ["offlineCond",k=>k.includes("dieukien")&&k.includes("offline")],
  ["jobsAccepted",k=>k.includes("congviecchapnhan")||k.includes("congviecduocnhan")],
- ["jobOnline",k=>k.includes("congviec")&&k.includes("online")],
- ["jobOffline",k=>k.includes("congviec")&&k.includes("offline")],
- ["needJob",k=>k.includes("congviec")],
+ ["needJob",k=>k.includes("congviec")&&!k.includes("offline")],
  ["util",k=>k.includes("tylesudung")||k.includes("tilesudung")||k.includes("sudunghanmuc")],
  ["maxCards",k=>k.includes("sothe")],
  ["maxFinCos",k=>k.includes("cttc")||k.includes("congtytaichinh")],
@@ -325,16 +311,7 @@ function parseJobs(text){
   const j={hdld:/hdld|hop dong|di lam|luong|nhan vien/.test(p),hkd:/hkd|ho kinh doanh|chu ho|giay phep/.test(p),online:/online|kdol|ban hang/.test(p)};
   return (j.hdld||j.hkd||j.online)?j:null;
 }
-function parseUtil(text){
-  const p=plain(text).trim();if(!p||/khong yeu cau|khong gioi han|^-$/.test(p))return{min:null,max:null};
-  const ns=(p.match(/\d+(\.\d+)?/g)||[]).map(Number);if(!ns.length)return{min:null,max:null};
-  const lo=/(tren|>|toi thieu|it nhat|tu \d|>=|≥|lon hon)/.test(p),hi=/(duoi|<|toi da|khong qua|<=|≤|nho hon)/.test(p);
-  if(lo&&hi&&ns.length>=2)return{min:Math.min(ns[0],ns[1]),max:Math.max(ns[0],ns[1])};
-  if(ns.length>=2&&/-|den/.test(p))return{min:Math.min(ns[0],ns[1]),max:Math.max(ns[0],ns[1])};
-  if(lo&&!hi)return{min:ns[0],max:null};
-  return{min:null,max:ns[0]};
-}
-/* Yêu cầu công việc của một hình thức mở: req = có cần chứng minh công việc, jobs = loại công việc được nhận (null = loại nào cũng được) */
+/* Yêu cầu công việc: req = có cần chứng minh công việc, jobs = loại công việc được nhận (null = loại nào cũng được) */
 function jobRule(need,acc){
   const a=parseJobs(acc),n=parseJobs(need);
   let req=!!a||!!n||isYes(need),jobs=a||n||null;
@@ -344,15 +321,8 @@ function jobRule(need,acc){
 function normRule(raw){
   const r={raw};
   Object.keys(raw).forEach(h=>{const k=hkey(h);const c=COLS.find(([,t])=>t(k));if(c&&r[c[0]]===undefined)r[c[0]]=raw[h]});
-  const ch=plain(r.channel);
-  const both=/ca hai|ca 2|both|\+|va /.test(ch);
-  r.online=both||ch.includes("online");r.offline=both||/offline|quay|truc tiep|chi nhanh/.test(ch);
-  if(!ch.trim()){r.online=r.offline=null}
-  const generic=jobRule(r.needJob,r.jobsAccepted);
-  const filled=v=>v!=null&&String(v).trim()!=="";
-  r.jobOn=filled(r.jobOnline)?jobRule(r.jobOnline):generic;
-  r.jobOff=filled(r.jobOffline)?jobRule(r.jobOffline):generic;
-  const u=parseUtil(r.util);r.minUtil=u.min;r.maxUtil=u.max;
+  r.job=jobRule(r.needJob,r.jobsAccepted);
+  r.maxUtil=num(r.util);
   r.maxCardsN=num(r.maxCards);r.maxFinCosN=num(r.maxFinCos);r.maxBanksN=num(r.maxBanks);r.minLimitN=num(r.minLimit);
   r.needCard=isYes(r.requireCard);
   r.isActive=!(r.active!=null&&String(r.active).trim()&&isNo(r.active));
@@ -406,32 +376,27 @@ $("#connSave").addEventListener("click",()=>{
 });
 
 /* ---------- Bảng điều kiện (xem) ---------- */
-function utilText(r){if(r.minUtil!=null&&r.maxUtil!=null)return`${r.minUtil}–${r.maxUtil}%`;if(r.maxUtil!=null)return`≤ ${r.maxUtil}%`;if(r.minUtil!=null)return`≥ ${r.minUtil}%`;return"—"}
-function chText(r){return r.online==null?"—":[r.online&&"Online",r.offline&&"Offline"].filter(Boolean).join(" + ")||"—"}
 function jobText(j){if(!j.req)return"Không cần";if(!j.jobs)return"Cần";return Object.keys(j.jobs).filter(k=>j.jobs[k]).map(k=>({hdld:"HĐLĐ",hkd:"HKD",online:"KD online"}[k])).join(", ")}
-const CH={online:"Online",offline:"Offline"};
-function dash(v){return v==null?"—":v}
+function le(v,unit){return v==null?"Không giới hạn":`≤ ${fmt(v)}${unit||""}`}
 function renderRules(){
   $("#rulesSample").hidden=!usingSample;
   $("#rulesCount").textContent=`${rules.length} ngân hàng`;
   $("#rules").innerHTML=rules.map(r=>`
    <div class="rule${r.isActive?"":" off"}">
-     <div class="rhead"><span class="nm">${esc(r.name)}</span><span class="chips"><span class="chip ch">${esc(chText(r))}</span>${r.isActive?"":`<span class="chip own">Tạm dừng</span>`}</span></div>
+     <div class="rhead"><span class="nm">${esc(r.name)}</span>${r.isActive?"":`<span class="chip own">Tạm dừng</span>`}</div>
      <div class="kv">
-       <div><span>Công việc online</span><strong>${r.online===false?"Không mở":esc(jobText(r.jobOn))}</strong></div>
-       <div><span>Công việc offline</span><strong>${r.offline===false?"Không mở":esc(jobText(r.jobOff))}</strong></div>
-       <div><span>Tỷ lệ sử dụng</span><strong>${esc(utilText(r))}</strong></div>
-       <div><span>Số thẻ tối đa</span><strong>${esc(dash(r.maxCardsN))}</strong></div>
-       <div><span>CTTC tối đa</span><strong>${esc(dash(r.maxFinCosN))}</strong></div>
-       <div><span>Thẻ cũ</span><strong>${r.needCard?"Cần"+(r.minLimitN!=null?", HM từ "+esc(fmt(r.minLimitN))+" tr":""):"Không cần"}</strong></div>
+       <div><span>Tỷ lệ sử dụng</span><strong>${esc(le(r.maxUtil,"%"))}</strong></div>
+       <div><span>Số thẻ</span><strong>${esc(le(r.maxCardsN))}</strong></div>
+       <div><span>Công ty tài chính</span><strong>${esc(le(r.maxFinCosN))}</strong></div>
+       <div><span>Công việc</span><strong>${esc(jobText(r.job))}</strong></div>
+       <div><span>Cần thẻ cũ</span><strong>${r.needCard?"Có":"Không"}</strong></div>
+       <div><span>HM thẻ cũ từ</span><strong>${r.minLimitN!=null?esc(fmt(r.minLimitN))+" tr":"—"}</strong></div>
      </div>
      ${condHtml(r)}
    </div>`).join("");
 }
 function condHtml(r){
   const rows=[];
-  if(r.onlineCond)rows.push(`<b>Online</b><span>${esc(r.onlineCond)}</span>`);
-  if(r.offlineCond)rows.push(`<b>Offline</b><span>${esc(r.offlineCond)}</span>`);
   if(r.note)rows.push(`<b>Ghi chú</b><span>${esc(r.note)}</span>`);
   return rows.length?`<div class="cond">${rows.join("")}</div>`:"";
 }
@@ -479,7 +444,7 @@ function renderCust(){
   $("#cName").value=cust.name||"";$("#cPhone").value=cust.phone||"";$("#cNote").value=cust.note||"";
   renderRows();
   $("#finCos").value=cust.finCos;
-  setPressed("#job","job",cust.job);setPressed("#channel","ch",cust.channel||"all");
+  setPressed("#job","job",cust.job);
   $("#badDebt").checked=!!cust.badDebt;
 }
 ["cName:name","cPhone:phone","cNote:note"].forEach(p=>{const[id,f]=p.split(":");$("#"+id).addEventListener("input",e=>{cust[f]=e.target.value;edited()})});
@@ -489,12 +454,11 @@ $("#addRow").addEventListener("click",()=>{cust.rows.push({bank:"",cards:1,limit
 document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",()=>{cust.finCos=Math.max(0,(parseInt(cust.finCos)||0)+ +b.dataset.step);$("#finCos").value=cust.finCos;edited()}));
 $("#finCos").addEventListener("input",e=>{cust.finCos=Math.max(0,parseInt(e.target.value)||0);edited()});
 $("#job").addEventListener("click",e=>{const b=e.target.closest("[data-job]");if(!b)return;cust.job=b.dataset.job;setPressed("#job","job",cust.job);edited()});
-$("#channel").addEventListener("click",e=>{const b=e.target.closest("[data-ch]");if(!b)return;cust.channel=b.dataset.ch;setPressed("#channel","ch",cust.channel);edited()});
 $("#badDebt").addEventListener("change",e=>{cust.badDebt=e.target.checked;edited()});
 $("#newCustomer").addEventListener("click",()=>{showTab("check");$("#newConfirm").hidden=false});
 $("#newNo").addEventListener("click",()=>$("#newConfirm").hidden=true);
 $("#newYes").addEventListener("click",()=>{
-  cust={name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",channel:"all",badDebt:false,example:false};
+  cust={name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",badDebt:false,example:false};
   $("#newConfirm").hidden=true;$("#results").hidden=true;renderCust();saveCust();toast("Đã tạo hồ sơ khách mới");
 });
 
@@ -507,25 +471,20 @@ function jobFail(j,job){
 }
 function evalRule(r,c,s){
   const fails=[],warns=[];
-  if(ownsAt(r,s))return{status:"own",fails:["Khách đã có thẻ tại ngân hàng này"],warns,channels:[]};
+  if(ownsAt(r,s))return{status:"own",fails:["Khách đã có thẻ tại ngân hàng này"],warns};
   if(c.badDebt)fails.push("Đang có nợ quá hạn / nợ xấu");
-  const pref=c.channel||"all";
-  const offered=["online","offline"].filter(k=>r[k]!==false);
-  const chans=offered.filter(k=>pref==="all"||pref===k);
-  if(!chans.length)fails.push(pref==="all"?"Chưa ghi rõ hình thức mở":`Ngân hàng không mở ${pref}`);
-  const channels=chans.map(k=>{const why=jobFail(k==="online"?r.jobOn:r.jobOff,c.job);return{ch:k,ok:!why,why}});
-  if(chans.length&&!channels.some(x=>x.ok))channels.forEach(x=>fails.push(`${CH[x.ch]}: ${x.why}`));
-  if(r.maxFinCosN!=null&&c.finCos>r.maxFinCosN)fails.push(`Dư nợ ${c.finCos} công ty tài chính, tối đa ${r.maxFinCosN}`);
-  if(r.maxCardsN!=null&&s.cards>r.maxCardsN)fails.push(`Đang có ${fmt(s.cards)} thẻ, tối đa ${r.maxCardsN}`);
+  const jf=jobFail(r.job,c.job);if(jf)fails.push(jf.charAt(0).toUpperCase()+jf.slice(1));
+  if(r.maxFinCosN!=null&&c.finCos>r.maxFinCosN)fails.push(`Đang có dư nợ ${c.finCos} công ty tài chính, ngân hàng chỉ nhận ≤ ${r.maxFinCosN}`);
+  if(r.maxCardsN!=null&&s.cards>r.maxCardsN)fails.push(`Đang có ${fmt(s.cards)} thẻ, ngân hàng chỉ nhận ≤ ${r.maxCardsN} thẻ`);
   if(r.maxBanksN!=null&&s.bankCount>r.maxBanksN)fails.push(`Đã có thẻ ${s.bankCount} ngân hàng, tối đa ${r.maxBanksN}`);
   if(r.needCard&&s.cards<=0)fails.push("Cần có sẵn thẻ tín dụng ngân hàng khác");
   if(r.minLimitN!=null&&r.minLimitN>0&&s.cards>0&&s.maxLimit<r.minLimitN)fails.push(`HM thẻ cũ cao nhất ${fmt(s.maxLimit)} tr, cần từ ${fmt(r.minLimitN)} tr`);
-  if(s.limit>0&&r.maxUtil!=null&&s.util>r.maxUtil)warns.push(`Đang dùng ${Math.round(s.util)}% hạn mức, cần dưới ${r.maxUtil}%`);
-  if(s.limit>0&&r.minUtil!=null&&s.util<r.minUtil)warns.push(`Đang dùng ${Math.round(s.util)}% hạn mức, ngân hàng muốn từ ${r.minUtil}%`);
-  return{status:fails.length?"bad":warns.length?"warn":"ok",fails,warns,channels};
+  if(s.limit>0&&r.maxUtil!=null&&s.util>r.maxUtil){
+    const need=s.used-s.limit*r.maxUtil/100;
+    warns.push(`Đang dùng ${Math.round(s.util)}% hạn mức, ngân hàng chỉ nhận ≤ ${r.maxUtil}% → cần trả bớt khoảng ${fmt(Math.ceil(need*10)/10)} tr`);
+  }
+  return{status:fails.length?"bad":warns.length?"warn":"ok",fails,warns};
 }
-const okChannels=x=>x.channels.filter(c=>c.ok).map(c=>c.ch);
-function withChannels(x){const o=okChannels(x);return o.length===1&&x.rule.online!==null?`${x.rule.name} (${CH[o[0]].toLowerCase()})`:x.rule.name}
 function evaluate(c){const s=stats(c);return{s,list:rules.filter(r=>r.isActive).map(r=>({rule:r,...evalRule(r,c,s)}))}}
 const passes=x=>x.status==="ok"||x.status==="warn";
 function scenario(mod){const c2=clone(cust);mod(c2);return evaluate(c2)}
@@ -538,12 +497,9 @@ function runCheck(scroll){
   const sorted=[...base.list].sort((a,b)=>ord[a.status]-ord[b.status]||a.rule.name.localeCompare(b.rule.name));
   const n=k=>base.list.filter(x=>x.status===k).length;
   const card=x=>{
-    const chip={ok:"Có thể mở",warn:"Cân nhắc",bad:"Không phù hợp",own:"Đã có thẻ"}[x.status];
-    const r=x.rule,ok=passes(x);
-    const blocked=ok?x.channels.filter(c=>!c.ok).map(c=>`${CH[c.ch]}: không mở được – ${c.why}`):[];
-    const items=[...blocked,...x.fails,...x.warns];
-    const chTxt=ok?okChannels(x).map(k=>CH[k]).join(" + "):chText(r);
-    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${r.online!=null&&chTxt?`<span class="chip ch">${esc(chTxt)}</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
+    const chip={ok:"Có thể mở",warn:"Cần giảm dư nợ",bad:"Không phù hợp",own:"Đã có thẻ"}[x.status];
+    const r=x.rule,items=[...x.fails,...x.warns];
+    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chip ${x.status}">${chip}</span></div>
       ${items.length?`<ul class="why">${items.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
       ${x.status==="own"?"":condHtml(r)}</div>`;
   };
@@ -551,11 +507,6 @@ function runCheck(scroll){
 
   const tips=[];
   if(cust.badDebt)tips.push(["!","w","Khách đang có <b>nợ quá hạn</b>. Cần tất toán và chờ CIC cập nhật trước khi nộp hồ sơ."]);
-  if(cust.job==="none"&&good.length){
-    const by=k=>good.filter(x=>okChannels(x).includes(k)).map(x=>x.rule.name);
-    const on=by("online"),off=by("offline");
-    tips.push(["CV","",`Khách chưa có công việc → mở <b>online</b> được ở: <b>${esc(on.join(", ")||"không có")}</b>; mở <b>offline</b> được ở: <b>${esc(off.join(", ")||"không có")}</b>.`]);
-  }
   if(cust.finCos>0){
     let found=false;
     for(let k=1;k<=cust.finCos;k++){
@@ -573,22 +524,18 @@ function runCheck(scroll){
     const g=gained(base,scenario(c=>c.job="hdld"));
     if(g.length)tips.push(["HĐ","",`Nếu chứng minh được thu nhập theo diện <b>đi làm có HĐLĐ</b> → mở thêm được: <b>${esc(g.join(", "))}</b>.`]);
   }
-  if((cust.channel||"all")!=="all"){
-    const g=gained(base,scenario(c=>c.channel="all"));
-    if(g.length)tips.push(["⇄","",`Nếu khách chấp nhận mở ${cust.channel==="online"?"offline":"online"} → thêm: <b>${esc(g.join(", "))}</b>.`]);
-  }
   if(s.cards<=0){
     const need=base.list.filter(x=>x.rule.needCard).map(x=>x.rule.name);
     tips.push(["1","",`Khách chưa có thẻ tín dụng. Nên mở trước ở ngân hàng không yêu cầu thẻ cũ, sau vài tháng dùng tốt có thể mở qua thẻ${need.length?` ở: <b>${esc(need.join(", "))}</b>`:""}.`]);
   }else tips.push(["HM","",`Hạn mức thẻ cao nhất hiện có <b>${fmt(s.maxLimit)} triệu</b> – căn cứ khi mở thẻ qua thẻ.`]);
   if(s.bankCount>=4)tips.push(["!","w",`Khách đã có thẻ ở <b>${s.bankCount} ngân hàng</b>. Nên nộp lần lượt 1–2 ngân hàng, tránh nộp dồn dập.`]);
 
-  lastResult={s,ok:sorted.filter(x=>x.status==="ok").map(withChannels),warn:sorted.filter(x=>x.status==="warn").map(withChannels),bad:bad.map(x=>x.rule.name)};
+  lastResult={s,ok:sorted.filter(x=>x.status==="ok").map(x=>x.rule.name),warn:sorted.filter(x=>x.status==="warn").map(x=>x.rule.name),bad:bad.map(x=>x.rule.name)};
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
     ${usingSample?`<span class="sample">Đang so với điều kiện mẫu – kết nối Drive ở tab Điều kiện</span>`:""}
-    <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cân nhắc</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
+    <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
     ${tips.length?`<h2 style="margin-top:6px">Gợi ý</h2><div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`:""}
     ${bad.length?`<details class="grp"><summary>Không phù hợp (${bad.length})</summary><div class="res">${bad.map(card).join("")}</div></details>`:""}
@@ -633,7 +580,7 @@ $("#histReload").addEventListener("click",loadHist);
 $("#histSearch").addEventListener("input",renderHist);
 $("#hist").addEventListener("click",e=>{
   const b=e.target.closest("[data-h]");if(!b)return;const h=histItems[+b.dataset.h];
-  cust=Object.assign({name:"",phone:"",note:"",rows:[],finCos:0,job:"hdld",channel:"all",badDebt:false},h.customer||{},{id:h.id,example:false});
+  cust=Object.assign({name:"",phone:"",note:"",rows:[],finCos:0,job:"hdld",badDebt:false},h.customer||{},{id:h.id,example:false});
   if(!cust.rows.length)cust.rows.push({bank:"",cards:1,limit:"",used:""});
   saveCust();renderCust();showTab("check");runCheck(true);toast(`Đã mở hồ sơ ${h.name||""}`);
 });

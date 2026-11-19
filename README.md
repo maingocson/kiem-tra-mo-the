@@ -19,32 +19,30 @@ Dữ liệu khách **không** nằm trên GitHub. Ứng dụng nói chuyện v�
 
 ### Các cột trong bảng
 
+App chỉ xét **mở thẻ online**. Ba điều kiện chính là con số, khách đạt khi **nhỏ hơn hoặc bằng** con số đó:
+
 | Cột | Cách ghi | Ví dụ |
 |---|---|---|
 | Ngân hàng | Tên ngân hàng | VPBank |
 | Tên gọi khác | Tên viết tắt, cách nhau dấu phẩy (để nhận ra khi khách đã có thẻ) | VPB, VP |
 | Áp dụng | `Có` / `Không` (Không = tạm bỏ qua ngân hàng này) | Có |
-| Hình thức mở | `Online`, `Offline` hoặc `Online + Offline` | Online + Offline |
-| Điều kiện mở online | Ghi chữ tự do, hiện trong kết quả | Có thẻ TD NH khác từ 6 tháng |
-| Điều kiện mở offline | Ghi chữ tự do, hiện trong kết quả | CCCD + sao kê lương 3 tháng |
-| Công việc (online) | Yêu cầu công việc khi mở **online**. `Không` = không cần. `Có` = cần chứng minh công việc (loại nào cũng được). Hoặc ghi rõ loại nhận: `HĐLĐ`, `HKD`, `Online`, `Tất cả` (ghi nhiều thì cách dấu phẩy). Để trống = không cần | Không |
-| Công việc (offline) | Giống cột trên, cho hình thức mở **offline** | HĐLĐ, HKD |
-| Tỷ lệ sử dụng | `Dưới 70%`, `Trên 20%`, `Trên 20%, dưới 85%`, hoặc `Không yêu cầu` | Dưới 80% |
-| Số thẻ tối đa | Số thẻ khách **đang có** tối đa. Để trống = không giới hạn | 5 |
-| Số CTTC tối đa | Số công ty tài chính đang có dư nợ tối đa. `0` = không nhận khách có CTTC | 2 |
+| Tỷ lệ sử dụng tối đa (%) | Khách đạt khi tỷ lệ dùng hạn mức **≤** số này. Để trống = không giới hạn | 80 |
+| Số thẻ tối đa | Khách đạt khi số thẻ **đang có ≤** số này. Để trống = không giới hạn | 5 |
+| Số CTTC tối đa | Khách đạt khi số công ty tài chính đang có dư nợ **≤** số này. `0` = không nhận khách có CTTC | 2 |
+| Cần công việc | `Không` = không cần. `Có` = cần chứng minh công việc (loại nào cũng được). Hoặc ghi rõ loại nhận: `HĐLĐ`, `HKD`, `Online` (ghi nhiều thì cách dấu phẩy) | Không |
 | Cần thẻ cũ | `Có` nếu chỉ mở qua thẻ (khách phải có sẵn thẻ tín dụng) | Có |
 | HM thẻ cũ tối thiểu (tr) | Hạn mức thẻ cũ cao nhất phải từ bao nhiêu triệu | 20 |
 | Ghi chú | Hiện trong kết quả | |
 
-Hai cột cuối (`Cần thẻ cũ`, `HM thẻ cũ tối thiểu`) là tuỳ chọn, xoá đi cũng được. Có thể thêm cột `Số ngân hàng tối đa` nếu ngân hàng giới hạn số ngân hàng khách đã có thẻ.
+Các cột `Cần công việc`, `Cần thẻ cũ`, `HM thẻ cũ tối thiểu` là tuỳ chọn, xoá đi cũng được. Có thể thêm cột `Số ngân hàng tối đa` nếu ngân hàng giới hạn số ngân hàng khách đã có thẻ.
 
 ### Cách ứng dụng chấm
 
-- **Từng hình thức mở:** app xét riêng online và offline theo hai cột công việc. Ví dụ khách chưa có công việc có thể ra "Online: mở được · Offline: không mở được – cần chứng minh công việc".
-- **Không phù hợp:** có nợ xấu, khác hình thức mở khách muốn, công việc không được nhận ở cả online lẫn offline, vượt số CTTC tối đa, vượt số thẻ tối đa, cần thẻ cũ mà khách chưa có, hạn mức thẻ cũ thấp hơn yêu cầu.
-- **Cân nhắc:** chỉ lệch về tỷ lệ sử dụng (khách có thể thanh toán bớt để đạt).
+- **Có thể mở:** đạt hết điều kiện.
+- **Cần giảm dư nợ:** chỉ vượt tỷ lệ sử dụng. App ghi rõ khách cần trả bớt khoảng bao nhiêu triệu để đạt.
+- **Không phù hợp:** có nợ xấu, vượt số thẻ hoặc số CTTC, công việc không được nhận, cần thẻ cũ mà khách chưa có, hoặc hạn mức thẻ cũ thấp hơn yêu cầu.
 - **Đã có thẻ:** khách đã có thẻ tại ngân hàng đó.
-- **Gợi ý:** ứng dụng thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, đổi online/offline, và báo ngân hàng nào mở thêm được.
+- **Gợi ý:** app thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, và báo ngân hàng nào mở thêm được.
 
 ## Bước 2 – Gắn Apps Script vào Google Sheet
 
