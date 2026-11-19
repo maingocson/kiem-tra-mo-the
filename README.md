@@ -3,17 +3,18 @@
 Ứng dụng web cho iPhone: nhập thẻ tín dụng khách đang có, số công ty tài chính đang có dư nợ và công việc của khách. Ứng dụng so với bảng điều kiện mở thẻ online của các ngân hàng và cho biết khách có thể mở thẻ ở ngân hàng nào, kèm gợi ý cải thiện hồ sơ.
 
 - **Ứng dụng:** https://maingocson.github.io/kiem-tra-mo-the/
-- **Bảng điều kiện:** một Google Sheet được công bố dạng CSV. Ứng dụng tự tải mỗi lần mở.
-- **Thông tin khách:** chỉ nằm trên điện thoại đang dùng, không gửi đi đâu và không lưu lên mạng.
+- **Bảng điều kiện (chính sách):** một file CSV trên Google Drive của bạn.
+- **Người quản trị** (có mã quản trị) sửa điều kiện ngay trong app, bấm **Lưu lên file** là file trên Drive được cập nhật.
+- **Người dùng khác** bấm **Cập nhật chính sách** để tải bản mới. Khi có bản mới, thanh chính sách đổi màu để nhắc.
+- **Thông tin khách** chỉ nằm trên điện thoại đang dùng, không gửi đi đâu.
+
+App đọc và ghi file qua một **Apps Script** chạy bằng tài khoản Google của bạn, vì Google Drive không cho trang web đọc hay ghi file trực tiếp.
 
 ---
 
-## Bước 1 – Tạo bảng điều kiện trên Google Sheet
+## Bước 1 – File điều kiện trên Drive
 
-1. Tải file mẫu `mau-bang-dieu-kien.csv` (trên GitHub bấm **Download raw file**).
-2. Vào Google Drive → **Mới → Google Trang tính**.
-3. **Tệp → Nhập → Tải lên** file CSV → chọn **Thay thế trang tính hiện tại**.
-4. Thay dữ liệu mẫu bằng điều kiện thật.
+File CSV điều kiện đã có trên Drive. Có thể sửa bằng app (khuyên dùng) hoặc tải về, sửa, rồi tải lên **thay thế** file cũ (giữ nguyên file, không tạo file mới).
 
 ### Các cột trong bảng
 
@@ -42,36 +43,45 @@ Các cột `Cần công việc`, `Cần thẻ cũ` là tuỳ chọn, xoá đi c�
 - **Đã có thẻ:** khách đã có thẻ tại ngân hàng đó.
 - **Gợi ý:** app thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, và báo ngân hàng nào mở thêm được.
 
-## Bước 2 – Công bố bảng điều kiện thành link CSV
+## Bước 2 – Tạo Apps Script
 
-1. Trong Google Sheet: **Tệp → Chia sẻ → Công bố lên web**.
-2. Chọn trang tính chứa điều kiện, định dạng **Giá trị được phân tách bằng dấu phẩy (.csv)** → **Công bố**.
-3. Sao chép link (dạng `https://docs.google.com/spreadsheets/d/e/…/pub?…&output=csv`).
+1. Vào https://script.google.com bằng **tài khoản Google đang sở hữu file CSV** → **Dự án mới**.
+2. Xoá nội dung có sẵn, dán toàn bộ file `google-apps-script/Code.gs`.
+3. Kiểm tra dòng `FILE_ID` (đã điền sẵn ID file của bạn) và đổi `MA_QUAN_TRI` thành mã riêng, ít nhất 8 ký tự.
+4. Bấm **Lưu**.
+5. **Triển khai → Tùy chọn triển khai mới** → bánh răng → **Ứng dụng web**:
+   - *Thực thi với tư cách:* **Tôi**
+   - *Người có quyền truy cập:* **Bất kỳ ai**
+6. Bấm **Triển khai** và cấp quyền. Nếu hiện cảnh báo "ứng dụng chưa được xác minh": chọn *Nâng cao → Đi tới … (không an toàn)*. Đây là script của chính bạn.
+7. Sao chép **URL ứng dụng web** (kết thúc bằng `/exec`).
 
-Link này **ai có cũng xem được**, nên chỉ để bảng điều kiện trong file này, không để thông tin khách.
+Ai có link `/exec` cũng **đọc** được bảng điều kiện, nhưng chỉ người có **mã quản trị** mới **sửa** được.
 
-Sửa Sheet xong thì Google tự cập nhật link CSV, thường chậm khoảng 5 phút.
+Trước mỗi lần lưu, script tự sao lưu bản cũ vào thư mục **"Sao lưu điều kiện mở thẻ"** trên Drive (giữ 30 bản gần nhất).
 
-## Bước 3 – Gắn link vào ứng dụng
+Khi sửa `Code.gs` sau này: **Triển khai → Quản lý các bản triển khai → bút chì → Phiên bản: Mới → Triển khai**, để giữ nguyên link.
 
-**Cho mọi người dùng chung (khuyên dùng):** mở `index.html`, dán link vào dòng
+## Bước 3 – Gắn link vào app
+
+Dán link `/exec` vào dòng này trong `index.html` rồi đẩy lên GitHub:
 
 ```js
-const CSV_URL="";
+const SCRIPT_URL="";
 ```
 
-rồi đẩy lên GitHub. Ai mở app cũng tự dùng bảng điều kiện này, không cần cài gì.
+Sau bước này, ai mở app cũng đọc được chính sách.
 
-**Chỉ trên một máy:** mở app → tab **Điều kiện** → **Đổi link file điều kiện** → dán link → **Lưu link**.
+## Cách dùng
 
-## Bước 4 – Thêm vào màn hình chính iPhone
-
-Mở link app bằng **Safari** → nút **Chia sẻ** → **Thêm vào MH chính**.
+- **Người dùng:** mở app → bấm **Cập nhật chính sách** khi thanh trên cùng báo "Có chính sách mới" (hoặc bất cứ lúc nào).
+- **Quản trị:** tab **Điều kiện** → **Quản trị – sửa điều kiện** → nhập link `/exec` và mã quản trị → **Bật chế độ sửa** → sửa / thêm / xoá ngân hàng → **Lưu lên file**.
+- **Thêm vào màn hình chính iPhone:** mở link app bằng Safari → **Chia sẻ** → **Thêm vào MH chính**.
 
 ## Cấu trúc thư mục
 
 ```
-index.html               ứng dụng (GitHub Pages)
-icon.png                 biểu tượng trên màn hình chính
-mau-bang-dieu-kien.csv   bảng điều kiện mẫu để nhập vào Google Sheet
+index.html                    ứng dụng (GitHub Pages)
+icon.png                      biểu tượng trên màn hình chính
+mau-bang-dieu-kien.csv        bảng điều kiện mẫu
+google-apps-script/Code.gs    script đọc/ghi file điều kiện trên Drive
 ```
