@@ -663,20 +663,25 @@ function gained(base,alt,strict){return alt.list.filter((x,i)=>{const b=base.lis
 function runCheck(scroll){
   const base=evaluate(cust),s=base.s;
   const ord={ok:0,warn:1,bad:2,own:3};
-  const sorted=[...base.list].sort((a,b)=>ord[a.status]-ord[b.status]||a.rule.name.localeCompare(b.rule.name));
+  const dbLast=x=>x.status==="ok"&&x.rule.special?1:0;
+  const sorted=[...base.list].sort((a,b)=>ord[a.status]-ord[b.status]||dbLast(a)-dbLast(b)||a.rule.name.localeCompare(b.rule.name));
   const n=k=>base.list.filter(x=>x.status===k).length;
   const card=x=>{
     const chip={ok:"Có thể mở",warn:"Cần giảm dư nợ",bad:"Không phù hợp",own:"Đã có thẻ"}[x.status];
     const r=x.rule,items=[...x.fails,...x.warns];
-    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${r.special&&x.status!=="own"?`<span class="chip warn">ĐB</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
+    /* ĐB chỉ xét ở bước cuối: khi mọi điều kiện khác đã thoả */
+    const db=r.special&&x.status==="ok";
+    const extra=db?`<div class="db"><b>⚠ Bước cuối: kiểm tra điều kiện đặc biệt</b><span>Các điều kiện khác đã thoả. Khách mở được nếu thoả thêm: ${esc(r.note)}</span></div>`
+      :(x.status==="own"||r.special)?"":condHtml(r);
+    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${db?`<span class="chip warn">Kiểm tra ĐB</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
       ${items.length?`<ul class="why">${items.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
-      ${x.status==="own"?"":condHtml(r)}</div>`;
+      ${extra}</div>`;
   };
   const good=sorted.filter(passes),bad=sorted.filter(x=>x.status==="bad"),own=sorted.filter(x=>x.status==="own");
 
   const tips=[];
-  const sp=good.filter(x=>x.rule.special).map(x=>x.rule.name);
-  if(sp.length)tips.push(["ĐB","w",`<b>${esc(sp.join(", "))}</b> có điều kiện đặc biệt (ĐB). Đọc ghi chú và tự kiểm tra khách có thoả không trước khi nộp hồ sơ.`]);
+  const sp=good.filter(x=>x.status==="ok"&&x.rule.special).map(x=>x.rule.name);
+  if(sp.length)tips.push(["ĐB","w",`<b>${esc(sp.join(", "))}</b> đã thoả các điều kiện khác, chỉ còn <b>điều kiện đặc biệt (ĐB)</b>. Tự kiểm tra khách có thoả không trước khi nộp hồ sơ.`]);
   if(cust.badDebt)tips.push(["!","w","Khách đang có <b>nợ quá hạn</b>. Cần tất toán và chờ CIC cập nhật trước khi nộp hồ sơ."]);
   if(cust.finCos>0){
     let found=false;

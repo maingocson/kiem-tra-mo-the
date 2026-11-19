@@ -38,7 +38,7 @@ App chỉ xét **mở thẻ online**. Ba điều kiện chính là con số, kh�
 | Số CTTC tối đa | Khách đạt khi số công ty tài chính đang có dư nợ **≤** số này. `0` = không nhận khách có CTTC | 2 |
 | Cần công việc | `Không` = không cần. `Có` = cần chứng minh công việc (loại nào cũng được). Hoặc ghi rõ loại nhận: `HĐLĐ`, `HKD`, `Online`, `Tự do` (ghi nhiều thì cách dấu phẩy) | Không |
 | Cần thẻ cũ | `Có` nếu chỉ mở qua thẻ (khách phải có sẵn thẻ tín dụng) | Có |
-| Ghi chú | Hiện trong kết quả. Nếu có chữ **ĐB** (điều kiện đặc biệt), app gắn nhãn ĐB và nhắc tự kiểm tra khách có thoả không | ĐB: thẻ cũ phải mở trên 6 tháng |
+| Ghi chú | Hiện trong kết quả. Nếu có chữ **ĐB** (điều kiện đặc biệt): app chỉ nhắc kiểm tra ĐB ở **bước cuối**, khi khách đã thoả mọi điều kiện khác. Không thoả điều kiện khác thì báo Không phù hợp, không nhắc ĐB | ĐB: thẻ cũ phải mở trên 6 tháng |
 
 Các cột `Cần công việc`, `Cần thẻ cũ` là tuỳ chọn, xoá đi cũng được. Có thể thêm cột `Số ngân hàng tối đa` nếu ngân hàng giới hạn số ngân hàng khách đã có thẻ.
 
