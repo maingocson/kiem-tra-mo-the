@@ -128,11 +128,6 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 .tip .k{flex:none;min-width:26px;height:26px;padding:0 4px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--accent-soft);color:var(--accent)}
 .tip.w .k{background:var(--warn-soft);color:var(--warn)}
 
-.hist{display:flex;flex-direction:column;gap:8px}
-.hitem{text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:3px;cursor:pointer;width:100%}
-.hitem .t{display:flex;justify-content:space-between;gap:8px}
-.hitem b{font-size:15px}
-.hitem small{color:var(--muted);font-size:12px}
 
 .rule{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .rule.off{opacity:.6}
@@ -144,7 +139,7 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
-nav.tabs .in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:560px}
+nav.tabs .in{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%;max-width:560px}
 nav.tabs button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-radius:10px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-selected=true]{color:var(--accent)}
@@ -168,15 +163,7 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
       <button class="btn2 danger" id="newYes" type="button">Xoá</button><button class="btn2" id="newNo" type="button">Huỷ</button></div>
 
     <section>
-      <div class="sec-head"><h2>Khách hàng</h2><span class="sample" id="exampleTag" hidden>Ví dụ</span></div>
-      <div class="grid2">
-        <label class="f" for="cName">Tên khách<input id="cName" type="text" autocomplete="off" placeholder="Nguyễn Văn A"></label>
-        <label class="f" for="cPhone">Số điện thoại<input id="cPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="09xx xxx xxx"></label>
-      </div>
-    </section>
-
-    <section>
-      <h2>Thẻ tín dụng đang có</h2>
+      <div class="sec-head"><h2>Thẻ tín dụng đang có</h2><span class="sample" id="exampleTag" hidden>Ví dụ</span></div>
       <div class="cards" id="cards"></div>
       <button class="add" id="addRow" type="button"><b>+</b> Thêm ngân hàng</button>
       <div class="totals">
@@ -215,7 +202,6 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
       <div class="panel">
         <label class="switch" for="badDebt"><span><span style="font-weight:600">Đang có nợ quá hạn / nợ xấu</span><br><span class="note">Nợ nhóm 2 trở lên trên CIC</span></span><input type="checkbox" id="badDebt"></label>
       </div>
-      <label class="f" for="cNote">Ghi chú hồ sơ<textarea id="cNote" placeholder="Thu nhập, thời gian dùng thẻ, mong muốn của khách…"></textarea></label>
     </section>
 
     <button class="primary" id="runCheck" type="button">Kiểm tra ngân hàng có thể mở</button>
@@ -223,26 +209,27 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
     <section id="results" hidden></section>
   </div>
 
-  <!-- ===== HỒ SƠ ===== -->
-  <div class="view" id="v-hist" hidden>
-    <div class="sec-head"><h2>Hồ sơ đã lưu trên Drive</h2><button class="ghost" id="histReload" type="button">Tải lại</button></div>
-    <label class="f" for="histSearch">Tìm theo tên hoặc số điện thoại<input id="histSearch" type="text" autocomplete="off" placeholder="Nhập tên hoặc SĐT"></label>
-    <div class="hist" id="hist"></div>
-  </div>
-
   <!-- ===== ĐIỀU KIỆN ===== -->
   <div class="view" id="v-rules" hidden>
     <section>
-      <h2>Kết nối Google Drive</h2>
+      <h2>Nguồn điều kiện</h2>
       <div class="panel stack">
-        <div class="status"><span class="dot" id="connDot"></span><span id="connText">Chưa kết nối</span></div>
-        <label class="f" for="connUrl">Link Apps Script (kết thúc bằng /exec)<input id="connUrl" type="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec"></label>
-        <label class="f" for="connKey">Mã bí mật<input id="connKey" type="password" autocomplete="off" placeholder="Mã đã đặt trong Apps Script"></label>
+        <div class="status"><span class="dot" id="connDot"></span><span id="connText">Đang tải…</span></div>
         <div class="row-btns">
-          <button class="btn2 acc" id="connSave" type="button">Lưu &amp; tải điều kiện</button>
-          <a class="ghost" id="sheetLink" href="#" target="_blank" rel="noopener" hidden>Mở bảng điều kiện ↗</a>
+          <button class="btn2 acc" id="reloadRules" type="button">Tải lại điều kiện</button>
+          <a class="ghost" id="sheetLink" href="#" target="_blank" rel="noopener" hidden>Mở file điều kiện ↗</a>
         </div>
-        <p class="note" style="margin:0">Link và mã chỉ lưu trên máy này. Sửa điều kiện trong Google Sheet, sau đó bấm <b>Lưu &amp; tải điều kiện</b> để cập nhật.</p>
+        <details class="grp">
+          <summary>Đổi link file điều kiện</summary>
+          <div class="stack">
+            <label class="f" for="csvUrl">Link CSV công khai (hoặc link Google Sheet đã chia sẻ)<input id="csvUrl" type="url" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv"></label>
+            <div class="row-btns">
+              <button class="btn2 acc" id="csvSave" type="button">Lưu link</button>
+              <button class="btn2" id="csvReset" type="button">Dùng link mặc định</button>
+            </div>
+            <p class="note" style="margin:0">Link đổi ở đây chỉ áp dụng cho máy này.</p>
+          </div>
+        </details>
       </div>
     </section>
     <section>
@@ -255,7 +242,6 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
 
 <nav class="tabs"><div class="in" role="tablist">
   <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Kiểm tra</button>
-  <button role="tab" aria-selected="false" data-tab="hist" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11l5 5v11H4z"/><path d="M15 4v5h5M8 13h8M8 17h5"/></svg>Hồ sơ</button>
   <button role="tab" aria-selected="false" data-tab="rules" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện</button>
 </div></nav>
 <div class="toast" id="toast"></div>
@@ -264,6 +250,11 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
 <script>
 (function(){
 "use strict";
+/* ===== CẤU HÌNH =====
+   Link CSV công khai của bảng điều kiện (Google Sheet → Tệp → Chia sẻ → Công bố lên web → CSV).
+   Mọi người mở app sẽ dùng link này. */
+const CSV_URL="";
+
 const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank","MB Bank","ACB","Sacombank","TPBank","VIB","HDBank","SHB","OCB","MSB","SeABank","Eximbank","LPBank","Nam A Bank","Bac A Bank","PVcomBank","Kienlongbank","ABBANK","BVBank","Shinhan Bank","HSBC","Standard Chartered","UOB","Woori Bank","Cake by VPBank"];
 
 /* ĐIỀU KIỆN MẪU – cùng định dạng với bảng Google Sheet. Chưa phải điều kiện thật của ngân hàng. */
@@ -279,7 +270,7 @@ const SAMPLE_RULES=[
 ];
 const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",badDebt:false,example:true};
 const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",tudo:"Làm tự do",none:"Không chứng minh được công việc"};
-const K_CONN="kmt.conn.v1",K_CACHE="kmt.rulesCache.v2",K_CUST="kmt.customer.v2";
+const K_CSV="kmt.csvUrl.v1",K_CACHE="kmt.rulesCache.v3",K_CUST="kmt.customer.v2";
 
 const $=s=>document.querySelector(s);
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -335,9 +326,10 @@ function normRule(raw){
   return r;
 }
 
-let conn=load(K_CONN)||{url:"",key:""};
+let customUrl=load(K_CSV)||"";
+const csvUrl=()=>customUrl||CSV_URL;
 let cache=load(K_CACHE);
-let rules=[],usingSample=true,histItems=[];
+let rules=[],usingSample=true;
 function setRules(rawList,fromDrive){
   rules=rawList.map(normRule).filter(r=>r.name);
   usingSample=!fromDrive;
@@ -345,40 +337,68 @@ function setRules(rawList,fromDrive){
   $("#bankList").innerHTML=names.map(b=>`<option value="${esc(b)}">`).join("");
   renderRules();
 }
-if(cache&&Array.isArray(cache.rules)&&cache.rules.length)setRules(cache.rules,true);else setRules(SAMPLE_RULES,false);
+if(cache&&cache.url&&cache.url===csvUrl()&&Array.isArray(cache.rules)&&cache.rules.length)setRules(cache.rules,true);else setRules(SAMPLE_RULES,false);
 
-/* ---------- Kết nối Apps Script ---------- */
-async function api(action,extra){
-  if(!conn.url)throw new Error("Chưa nhập link Apps Script");
-  const res=await fetch(conn.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({key:conn.key,action},extra||{}))});
-  if(!res.ok)throw new Error("Máy chủ trả lỗi "+res.status);
-  let data;try{data=await res.json()}catch(e){throw new Error("Link không đúng hoặc Apps Script chưa cấp quyền \"Bất kỳ ai\"")}
-  if(!data.ok)throw new Error(data.error||"Lỗi không rõ");
-  return data;
+/* ---------- Tải bảng điều kiện từ link CSV ---------- */
+function parseCSV(text){
+  text=String(text).replace(/^\uFEFF/,"");
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===","){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}
+    else f+=c;
+  }
+  if(f!==""||row.length){row.push(f);rows.push(row)}
+  const clean=rows.filter(r=>r.some(c=>String(c).trim()!==""));
+  if(clean.length<2)return[];
+  const head=clean[0].map(h=>String(h).trim());
+  return clean.slice(1).map(r=>{const o={};head.forEach((h,i)=>{if(h)o[h]=String(r[i]??"").trim()});return o});
+}
+/* Nhận cả link Google Sheet thường: đổi sang link xuất CSV */
+function toCsvUrl(u){
+  u=String(u||"").trim();
+  if(/docs\.google\.com\/spreadsheets\/d\/e\//.test(u)){
+    if(/output=csv/.test(u))return u;
+    const gid=(u.match(/[#&?]gid=(\d+)/)||[])[1];
+    return u.replace(/\/pub(html)?.*$/,"/pub?output=csv"+(gid?"&gid="+gid+"&single=true":""));
+  }
+  const m=u.match(/docs\.google\.com\/spreadsheets\/d\/([\w-]+)/);
+  if(m){const gid=(u.match(/[#&?]gid=(\d+)/)||[])[1]||"0";return`https://docs.google.com/spreadsheets/d/${m[1]}/gviz/tq?tqx=out:csv&gid=${gid}`}
+  return u;
 }
 function setConn(state,text){$("#connDot").className="dot "+state;$("#connText").textContent=text}
 function showConnState(){
-  if(!conn.url){setConn("","Chưa kết nối – đang dùng điều kiện mẫu");return}
-  if(cache&&cache.at)setConn("on",`Đã kết nối · cập nhật ${new Date(cache.at).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"})}`);
-  else setConn("wait","Đã lưu link, chưa tải được điều kiện");
-  if(cache&&cache.sheetUrl){$("#sheetLink").href=cache.sheetUrl;$("#sheetLink").hidden=false}
+  const u=csvUrl();
+  $("#sheetLink").hidden=!u;if(u)$("#sheetLink").href=u;
+  if(!u){setConn("","Chưa có link file điều kiện – đang dùng điều kiện mẫu");return}
+  if(cache&&cache.at&&cache.url===u)setConn("on",`Đã tải ${rules.length} ngân hàng · ${new Date(cache.at).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"})}`);
 }
 async function loadRules(silent){
-  if(!conn.url){showConnState();return}
-  setConn("wait","Đang tải điều kiện từ Drive…");
+  const u=csvUrl();
+  if(!u){setRules(SAMPLE_RULES,false);showConnState();return}
+  setConn("wait","Đang tải điều kiện…");
   try{
-    const d=await api("rules");
-    if(!d.rules.length)throw new Error("Tab DieuKien chưa có dòng nào");
-    cache={rules:d.rules,at:d.at||new Date().toISOString(),sheetUrl:d.sheetUrl};save(K_CACHE,cache);
-    setRules(d.rules,true);showConnState();if(!silent)toast(`Đã tải ${rules.length} ngân hàng từ Drive`);
+    const res=await fetch(toCsvUrl(u),{cache:"no-store"});
+    if(!res.ok)throw new Error("Không mở được link (mã "+res.status+")");
+    const text=await res.text();
+    if(/^\s*</.test(text))throw new Error("Link chưa công khai hoặc không phải file CSV");
+    const list=parseCSV(text);
+    const ok=list.map(normRule).filter(r=>r.name);
+    if(!ok.length)throw new Error("Không thấy cột \"Ngân hàng\" hoặc file chưa có dòng nào");
+    cache={rules:list,at:new Date().toISOString(),url:u};save(K_CACHE,cache);
+    setRules(list,true);showConnState();if(!silent)toast(`Đã tải ${rules.length} ngân hàng`);
   }catch(e){
-    setConn("err","Lỗi: "+e.message+(cache?" · đang dùng bản đã lưu":""));if(!silent)toast(e.message);
+    const msg=e instanceof TypeError?"Không tải được – kiểm tra mạng hoặc link chưa công khai":e.message;
+    setConn("err",msg+(cache&&cache.url===u?" · đang dùng bản đã lưu":" · đang dùng điều kiện mẫu"));if(!silent)toast(msg);
   }
 }
-$("#connUrl").value=conn.url;$("#connKey").value=conn.key;
-$("#connSave").addEventListener("click",()=>{
-  conn={url:$("#connUrl").value.trim(),key:$("#connKey").value.trim()};save(K_CONN,conn);loadRules(false);
-});
+$("#csvUrl").value=customUrl;
+$("#reloadRules").addEventListener("click",()=>loadRules(false));
+$("#csvSave").addEventListener("click",()=>{customUrl=$("#csvUrl").value.trim();save(K_CSV,customUrl);loadRules(false)});
+$("#csvReset").addEventListener("click",()=>{customUrl="";$("#csvUrl").value="";try{localStorage.removeItem(K_CSV)}catch(e){}loadRules(false)});
 
 /* ---------- Bảng điều kiện (xem) ---------- */
 function jobText(j){if(!j.req)return"Không cần";if(!j.jobs)return"Cần";return Object.keys(j.jobs).filter(k=>j.jobs[k]).map(k=>({hdld:"HĐLĐ",hkd:"HKD",online:"KD online",tudo:"Tự do"}[k])).join(", ")}
@@ -448,13 +468,11 @@ function updateTotals(){
 function setPressed(sel,attr,val){document.querySelectorAll(sel+" button").forEach(b=>b.setAttribute("aria-pressed",b.dataset[attr]===val))}
 function renderCust(){
   $("#exampleTag").hidden=!cust.example;
-  $("#cName").value=cust.name||"";$("#cPhone").value=cust.phone||"";$("#cNote").value=cust.note||"";
   renderRows();
   $("#finCos").value=cust.finCos;
   setPressed("#job","job",cust.job);
   $("#badDebt").checked=!!cust.badDebt;
 }
-["cName:name","cPhone:phone","cNote:note"].forEach(p=>{const[id,f]=p.split(":");$("#"+id).addEventListener("input",e=>{cust[f]=e.target.value;edited()})});
 $("#cards").addEventListener("input",e=>{const f=e.target.dataset.f;if(!f)return;cust.rows[+e.target.closest(".crow").dataset.i][f]=e.target.value;updateTotals();edited()});
 $("#cards").addEventListener("click",e=>{const d=e.target.closest("[data-del]");if(!d)return;cust.rows.splice(+d.dataset.del,1);renderRows();edited()});
 $("#addRow").addEventListener("click",()=>{cust.rows.push({bank:"",cards:1,limit:"",used:""});renderRows();edited();const el=document.getElementById(`r${cust.rows.length-1}-bank`);el&&el.focus()});
@@ -496,7 +514,6 @@ const passes=x=>x.status==="ok"||x.status==="warn";
 function scenario(mod){const c2=clone(cust);mod(c2);return evaluate(c2)}
 function gained(base,alt,strict){return alt.list.filter((x,i)=>{const b=base.list[i];return strict?(x.status==="ok"&&b.status!=="ok"):(passes(x)&&!passes(b))}).map(x=>x.rule.name)}
 
-let lastResult=null;
 function runCheck(scroll){
   const base=evaluate(cust),s=base.s;
   const ord={ok:0,warn:1,bad:2,own:3};
@@ -538,73 +555,31 @@ function runCheck(scroll){
   }
   if(s.bankCount>=4)tips.push(["!","w",`Khách đã có thẻ ở <b>${s.bankCount} ngân hàng</b>. Nên nộp lần lượt 1–2 ngân hàng, tránh nộp dồn dập.`]);
 
-  lastResult={s,ok:sorted.filter(x=>x.status==="ok").map(x=>x.rule.name),warn:sorted.filter(x=>x.status==="warn").map(x=>x.rule.name),bad:bad.map(x=>x.rule.name)};
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
-    ${usingSample?`<span class="sample">Đang so với điều kiện mẫu – kết nối Drive ở tab Điều kiện</span>`:""}
+    ${usingSample?`<span class="sample">Đang so với điều kiện mẫu – thêm link file điều kiện ở tab Điều kiện</span>`:""}
     <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
     ${tips.length?`<h2 style="margin-top:6px">Gợi ý</h2><div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`:""}
     ${bad.length?`<details class="grp"><summary>Không phù hợp (${bad.length})</summary><div class="res">${bad.map(card).join("")}</div></details>`:""}
-    ${own.length?`<details class="grp"><summary>Đã có thẻ (${own.length})</summary><div class="res">${own.map(card).join("")}</div></details>`:""}
-    <button class="primary" id="saveRecord" type="button">${cust.id?"Cập nhật hồ sơ trên Drive":"Lưu hồ sơ vào Drive"}</button>`;
+    ${own.length?`<details class="grp"><summary>Đã có thẻ (${own.length})</summary><div class="res">${own.map(card).join("")}</div></details>`:""}`;
   R.hidden=false;
-  $("#saveRecord").addEventListener("click",saveRecord);
   if(scroll!==false)R.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
 }
 $("#runCheck").addEventListener("click",()=>runCheck(true));
 
-async function saveRecord(){
-  if(!conn.url){toast("Chưa kết nối Drive – vào tab Điều kiện để nhập link");return}
-  if(!String(cust.name||"").trim()&&!String(cust.phone||"").trim()){toast("Nhập tên hoặc SĐT khách trước khi lưu");$("#cName").focus();return}
-  runCheck(false);
-  const btn=$("#saveRecord");btn.disabled=true;btn.textContent="Đang lưu…";
-  const s=lastResult.s;
-  const c=clone(cust);delete c.example;
-  try{
-    const d=await api("save",{record:{id:cust.id||"",name:cust.name,phone:cust.phone,note:cust.note,job:JOBS[cust.job],finCos:cust.finCos,bankCount:s.bankCount,cards:s.cards,limit:s.limit,util:Math.round(s.util),badDebt:cust.badDebt,ok:lastResult.ok,warn:lastResult.warn,bad:lastResult.bad,customer:c}});
-    cust.id=d.id;saveCust();btn.textContent="Đã lưu ✓ · bấm để cập nhật";toast("Đã lưu hồ sơ vào Drive");histItems=[];
-  }catch(e){btn.textContent="Lưu hồ sơ vào Drive";toast("Chưa lưu được: "+e.message)}
-  btn.disabled=false;
-}
-
-/* ---------- Hồ sơ ---------- */
-function renderHist(){
-  const q=plain($("#histSearch").value).trim();
-  const list=histItems.filter(h=>!q||plain(h.name).includes(q)||String(h.phone).replace(/\D/g,"").includes(q.replace(/\D/g,"")||"\u0000"));
-  $("#hist").innerHTML=!conn.url?`<div class="panel note">Chưa kết nối Google Drive. Vào tab <b>Điều kiện</b> để nhập link Apps Script.</div>`
-    :!histItems.length?`<div class="panel note">Chưa có hồ sơ nào. Kiểm tra một khách rồi bấm <b>Lưu hồ sơ vào Drive</b>.</div>`
-    :!list.length?`<div class="panel note">Không tìm thấy hồ sơ phù hợp.</div>`
-    :list.map((h,i)=>`<button class="hitem" type="button" data-h="${histItems.indexOf(h)}"><span class="t"><b>${esc(h.name||"(chưa có tên)")}</b><small>${esc(new Date(h.at).toLocaleDateString("vi-VN"))}</small></span><small>${esc(h.phone||"")}${h.phone?" · ":""}${esc(h.job)}</small><small>Có thể mở: ${esc(h.ok||"—")}</small></button>`).join("");
-}
-async function loadHist(){
-  if(!conn.url){renderHist();return}
-  $("#hist").innerHTML=`<div class="panel note">Đang tải hồ sơ từ Drive…</div>`;
-  try{const d=await api("history",{limit:200});histItems=d.items||[];renderHist()}
-  catch(e){$("#hist").innerHTML=`<div class="panel note">Không tải được hồ sơ: ${esc(e.message)}</div>`}
-}
-$("#histReload").addEventListener("click",loadHist);
-$("#histSearch").addEventListener("input",renderHist);
-$("#hist").addEventListener("click",e=>{
-  const b=e.target.closest("[data-h]");if(!b)return;const h=histItems[+b.dataset.h];
-  cust=Object.assign({name:"",phone:"",note:"",rows:[],finCos:0,job:"hdld",badDebt:false},h.customer||{},{id:h.id,example:false});
-  if(!cust.rows.length)cust.rows.push({bank:"",cards:1,limit:"",used:""});
-  saveCust();renderCust();showTab("check");runCheck(true);toast(`Đã mở hồ sơ ${h.name||""}`);
-});
-
 /* ---------- Tabs ---------- */
 function showTab(t){
-  ["check","hist","rules"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  ["check","rules"].forEach(v=>$("#v-"+v).hidden=v!==t);
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   window.scrollTo(0,0);
-  if(t==="hist"&&!histItems.length)loadHist();
 }
 document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 
 renderCust();showConnState();
 if(cust.example)runCheck(false);
-if(conn.url)loadRules(true);
+loadRules(true);
 })();
 </script>
 </body>
