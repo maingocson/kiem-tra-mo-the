@@ -27,7 +27,8 @@ Dữ liệu khách **không** nằm trên GitHub. Ứng dụng nói chuyện v�
 | Hình thức mở | `Online`, `Offline` hoặc `Online + Offline` | Online + Offline |
 | Điều kiện mở online | Ghi chữ tự do, hiện trong kết quả | Có thẻ TD NH khác từ 6 tháng |
 | Điều kiện mở offline | Ghi chữ tự do, hiện trong kết quả | CCCD + sao kê lương 3 tháng |
-| Cần công việc | `Không` = không cần. `Có` = cần chứng minh công việc. Hoặc ghi rõ loại nhận: `HĐLĐ`, `HKD`, `Online`, `Tất cả` (có thể ghi nhiều, cách dấu phẩy) | HĐLĐ, HKD |
+| Công việc (online) | Yêu cầu công việc khi mở **online**. `Không` = không cần. `Có` = cần chứng minh công việc (loại nào cũng được). Hoặc ghi rõ loại nhận: `HĐLĐ`, `HKD`, `Online`, `Tất cả` (ghi nhiều thì cách dấu phẩy). Để trống = không cần | Không |
+| Công việc (offline) | Giống cột trên, cho hình thức mở **offline** | HĐLĐ, HKD |
 | Tỷ lệ sử dụng | `Dưới 70%`, `Trên 20%`, `Trên 20%, dưới 85%`, hoặc `Không yêu cầu` | Dưới 80% |
 | Số thẻ tối đa | Số thẻ khách **đang có** tối đa. Để trống = không giới hạn | 5 |
 | Số CTTC tối đa | Số công ty tài chính đang có dư nợ tối đa. `0` = không nhận khách có CTTC | 2 |
@@ -39,7 +40,8 @@ Hai cột cuối (`Cần thẻ cũ`, `HM thẻ cũ tối thiểu`) là tuỳ ch�
 
 ### Cách ứng dụng chấm
 
-- **Không phù hợp:** có nợ xấu, khác hình thức mở khách muốn, công việc không được nhận, vượt số CTTC tối đa, vượt số thẻ tối đa, cần thẻ cũ mà khách chưa có, hạn mức thẻ cũ thấp hơn yêu cầu.
+- **Từng hình thức mở:** app xét riêng online và offline theo hai cột công việc. Ví dụ khách chưa có công việc có thể ra "Online: mở được · Offline: không mở được – cần chứng minh công việc".
+- **Không phù hợp:** có nợ xấu, khác hình thức mở khách muốn, công việc không được nhận ở cả online lẫn offline, vượt số CTTC tối đa, vượt số thẻ tối đa, cần thẻ cũ mà khách chưa có, hạn mức thẻ cũ thấp hơn yêu cầu.
 - **Cân nhắc:** chỉ lệch về tỷ lệ sử dụng (khách có thể thanh toán bớt để đạt).
 - **Đã có thẻ:** khách đã có thẻ tại ngân hàng đó.
 - **Gợi ý:** ứng dụng thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, đổi online/offline, và báo ngân hàng nào mở thêm được.

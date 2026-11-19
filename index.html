@@ -272,14 +272,14 @@ const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank"
 
 /* ĐIỀU KIỆN MẪU – cùng định dạng với bảng Google Sheet. Chưa phải điều kiện thật của ngân hàng. */
 const SAMPLE_RULES=[
- {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Hình thức mở":"Online + Offline","Điều kiện mở online":"Có thẻ TD ngân hàng khác từ 6 tháng, HM từ 20tr","Điều kiện mở offline":"CCCD + sao kê lương 3 tháng","Cần công việc":"Không","Tỷ lệ sử dụng":"Dưới 80%","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"20","Ghi chú":"Mẫu"},
- {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Hình thức mở":"Online","Điều kiện mở online":"Mở qua thẻ, xét HM thẻ cũ","Điều kiện mở offline":"","Cần công việc":"Không","Tỷ lệ sử dụng":"Dưới 80%","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"15","Ghi chú":"Mẫu"},
- {"Ngân hàng":"VIB","Tên gọi khác":"","Hình thức mở":"Online + Offline","Điều kiện mở online":"Có thẻ TD HM từ 30tr","Điều kiện mở offline":"HĐLĐ + sao kê lương","Cần công việc":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Dưới 70%","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Hình thức mở":"Offline","Điều kiện mở online":"","Điều kiện mở offline":"Chứng minh thu nhập","Cần công việc":"Có","Tỷ lệ sử dụng":"Không yêu cầu","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Hình thức mở":"Offline","Điều kiện mở online":"","Điều kiện mở offline":"Lương chuyển khoản qua TCB","Cần công việc":"HĐLĐ","Tỷ lệ sử dụng":"Dưới 60%","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Hình thức mở":"Online + Offline","Điều kiện mở online":"Duyệt trên app MB","Điều kiện mở offline":"Sao kê tài khoản 6 tháng","Cần công việc":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Dưới 70%","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Hình thức mở":"Online + Offline","Điều kiện mở online":"Mở qua thẻ HM từ 10tr","Điều kiện mở offline":"Chứng minh thu nhập","Cần công việc":"Không","Tỷ lệ sử dụng":"Trên 20%, dưới 85%","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"10","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Hình thức mở":"Online","Điều kiện mở online":"eKYC trên app Cake","Điều kiện mở offline":"","Cần công việc":"Không","Tỷ lệ sử dụng":"Dưới 90%","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu: ngân hàng số"}
+ {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Hình thức mở":"Online + Offline","Điều kiện mở online":"Có thẻ TD ngân hàng khác từ 6 tháng, HM từ 20tr","Điều kiện mở offline":"CCCD + sao kê lương 3 tháng","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Dưới 80%","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"20","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Hình thức mở":"Online","Điều kiện mở online":"Mở qua thẻ, xét HM thẻ cũ","Điều kiện mở offline":"","Công việc (online)":"Không","Công việc (offline)":"","Tỷ lệ sử dụng":"Dưới 80%","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"15","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"VIB","Tên gọi khác":"","Hình thức mở":"Online + Offline","Điều kiện mở online":"Có thẻ TD HM từ 30tr","Điều kiện mở offline":"HĐLĐ + sao kê lương","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ","Tỷ lệ sử dụng":"Dưới 70%","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Hình thức mở":"Offline","Điều kiện mở online":"","Điều kiện mở offline":"Chứng minh thu nhập","Công việc (online)":"","Công việc (offline)":"Có","Tỷ lệ sử dụng":"Không yêu cầu","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Hình thức mở":"Offline","Điều kiện mở online":"","Điều kiện mở offline":"Lương chuyển khoản qua TCB","Công việc (online)":"","Công việc (offline)":"HĐLĐ","Tỷ lệ sử dụng":"Dưới 60%","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Hình thức mở":"Online + Offline","Điều kiện mở online":"Duyệt trên app MB","Điều kiện mở offline":"Sao kê tài khoản 6 tháng","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Dưới 70%","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Hình thức mở":"Online + Offline","Điều kiện mở online":"Mở qua thẻ HM từ 10tr","Điều kiện mở offline":"Chứng minh thu nhập","Công việc (online)":"Không","Công việc (offline)":"HĐLĐ, HKD","Tỷ lệ sử dụng":"Trên 20%, dưới 85%","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"10","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Hình thức mở":"Online","Điều kiện mở online":"eKYC trên app Cake","Điều kiện mở offline":"","Công việc (online)":"Không","Công việc (offline)":"","Tỷ lệ sử dụng":"Dưới 90%","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu: ngân hàng số"}
 ];
 const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",channel:"all",badDebt:false,example:true};
 const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",none:"Không chứng minh được công việc"};
@@ -306,6 +306,8 @@ const COLS=[
  ["onlineCond",k=>k.includes("dieukien")&&k.includes("online")],
  ["offlineCond",k=>k.includes("dieukien")&&k.includes("offline")],
  ["jobsAccepted",k=>k.includes("congviecchapnhan")||k.includes("congviecduocnhan")],
+ ["jobOnline",k=>k.includes("congviec")&&k.includes("online")],
+ ["jobOffline",k=>k.includes("congviec")&&k.includes("offline")],
  ["needJob",k=>k.includes("congviec")],
  ["util",k=>k.includes("tylesudung")||k.includes("tilesudung")||k.includes("sudunghanmuc")],
  ["maxCards",k=>k.includes("sothe")],
@@ -332,6 +334,13 @@ function parseUtil(text){
   if(lo&&!hi)return{min:ns[0],max:null};
   return{min:null,max:ns[0]};
 }
+/* Yêu cầu công việc của một hình thức mở: req = có cần chứng minh công việc, jobs = loại công việc được nhận (null = loại nào cũng được) */
+function jobRule(need,acc){
+  const a=parseJobs(acc),n=parseJobs(need);
+  let req=!!a||!!n||isYes(need),jobs=a||n||null;
+  if(isNo(need)&&!a){req=false;jobs=null}
+  return{req,jobs};
+}
 function normRule(raw){
   const r={raw};
   Object.keys(raw).forEach(h=>{const k=hkey(h);const c=COLS.find(([,t])=>t(k));if(c&&r[c[0]]===undefined)r[c[0]]=raw[h]});
@@ -339,10 +348,10 @@ function normRule(raw){
   const both=/ca hai|ca 2|both|\+|va /.test(ch);
   r.online=both||ch.includes("online");r.offline=both||/offline|quay|truc tiep|chi nhanh/.test(ch);
   if(!ch.trim()){r.online=r.offline=null}
-  const jobsA=parseJobs(r.jobsAccepted),jobsN=parseJobs(r.needJob);
-  r.jobs=jobsA||jobsN||null;
-  r.jobRequired=!!jobsN||!!jobsA||isYes(r.needJob);
-  if(isNo(r.needJob)&&!jobsA){r.jobRequired=false;r.jobs=null}
+  const generic=jobRule(r.needJob,r.jobsAccepted);
+  const filled=v=>v!=null&&String(v).trim()!=="";
+  r.jobOn=filled(r.jobOnline)?jobRule(r.jobOnline):generic;
+  r.jobOff=filled(r.jobOffline)?jobRule(r.jobOffline):generic;
   const u=parseUtil(r.util);r.minUtil=u.min;r.maxUtil=u.max;
   r.maxCardsN=num(r.maxCards);r.maxFinCosN=num(r.maxFinCos);r.maxBanksN=num(r.maxBanks);r.minLimitN=num(r.minLimit);
   r.needCard=isYes(r.requireCard);
@@ -399,7 +408,8 @@ $("#connSave").addEventListener("click",()=>{
 /* ---------- Bảng điều kiện (xem) ---------- */
 function utilText(r){if(r.minUtil!=null&&r.maxUtil!=null)return`${r.minUtil}–${r.maxUtil}%`;if(r.maxUtil!=null)return`≤ ${r.maxUtil}%`;if(r.minUtil!=null)return`≥ ${r.minUtil}%`;return"—"}
 function chText(r){return r.online==null?"—":[r.online&&"Online",r.offline&&"Offline"].filter(Boolean).join(" + ")||"—"}
-function jobText(r){if(!r.jobRequired)return"Không cần";if(!r.jobs)return"Cần";return Object.keys(r.jobs).filter(k=>r.jobs[k]).map(k=>({hdld:"HĐLĐ",hkd:"HKD",online:"KD online"}[k])).join(", ")}
+function jobText(j){if(!j.req)return"Không cần";if(!j.jobs)return"Cần";return Object.keys(j.jobs).filter(k=>j.jobs[k]).map(k=>({hdld:"HĐLĐ",hkd:"HKD",online:"KD online"}[k])).join(", ")}
+const CH={online:"Online",offline:"Offline"};
 function dash(v){return v==null?"—":v}
 function renderRules(){
   $("#rulesSample").hidden=!usingSample;
@@ -408,12 +418,12 @@ function renderRules(){
    <div class="rule${r.isActive?"":" off"}">
      <div class="rhead"><span class="nm">${esc(r.name)}</span><span class="chips"><span class="chip ch">${esc(chText(r))}</span>${r.isActive?"":`<span class="chip own">Tạm dừng</span>`}</span></div>
      <div class="kv">
-       <div><span>Công việc</span><strong>${esc(jobText(r))}</strong></div>
+       <div><span>Công việc online</span><strong>${r.online===false?"Không mở":esc(jobText(r.jobOn))}</strong></div>
+       <div><span>Công việc offline</span><strong>${r.offline===false?"Không mở":esc(jobText(r.jobOff))}</strong></div>
        <div><span>Tỷ lệ sử dụng</span><strong>${esc(utilText(r))}</strong></div>
        <div><span>Số thẻ tối đa</span><strong>${esc(dash(r.maxCardsN))}</strong></div>
        <div><span>CTTC tối đa</span><strong>${esc(dash(r.maxFinCosN))}</strong></div>
-       <div><span>Cần thẻ cũ</span><strong>${r.needCard?"Có":"Không"}</strong></div>
-       <div><span>HM thẻ cũ từ</span><strong>${r.minLimitN!=null?esc(fmt(r.minLimitN))+" tr":"—"}</strong></div>
+       <div><span>Thẻ cũ</span><strong>${r.needCard?"Cần"+(r.minLimitN!=null?", HM từ "+esc(fmt(r.minLimitN))+" tr":""):"Không cần"}</strong></div>
      </div>
      ${condHtml(r)}
    </div>`).join("");
@@ -490,15 +500,21 @@ $("#newYes").addEventListener("click",()=>{
 
 /* ---------- Đối chiếu ---------- */
 function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].map(bkey).filter(Boolean).some(k=>s.banks.has(k))}
+function jobFail(j,job){
+  if(j.req&&job==="none")return"cần chứng minh công việc";
+  if(j.jobs&&job!=="none"&&!j.jobs[job])return`không nhận ${JOBS[job].toLowerCase()} (nhận: ${jobText(j)})`;
+  return null;
+}
 function evalRule(r,c,s){
   const fails=[],warns=[];
-  if(ownsAt(r,s))return{status:"own",fails:["Khách đã có thẻ tại ngân hàng này"],warns};
+  if(ownsAt(r,s))return{status:"own",fails:["Khách đã có thẻ tại ngân hàng này"],warns,channels:[]};
   if(c.badDebt)fails.push("Đang có nợ quá hạn / nợ xấu");
-  const ch=c.channel||"all";
-  if(ch==="online"&&r.online===false)fails.push("Ngân hàng không mở online");
-  if(ch==="offline"&&r.offline===false)fails.push("Ngân hàng không mở offline");
-  if(r.jobRequired&&c.job==="none")fails.push("Cần chứng minh công việc");
-  else if(r.jobs&&c.job!=="none"&&!r.jobs[c.job])fails.push(`Không nhận hồ sơ ${JOBS[c.job].toLowerCase()} (nhận: ${jobText(r)})`);
+  const pref=c.channel||"all";
+  const offered=["online","offline"].filter(k=>r[k]!==false);
+  const chans=offered.filter(k=>pref==="all"||pref===k);
+  if(!chans.length)fails.push(pref==="all"?"Chưa ghi rõ hình thức mở":`Ngân hàng không mở ${pref}`);
+  const channels=chans.map(k=>{const why=jobFail(k==="online"?r.jobOn:r.jobOff,c.job);return{ch:k,ok:!why,why}});
+  if(chans.length&&!channels.some(x=>x.ok))channels.forEach(x=>fails.push(`${CH[x.ch]}: ${x.why}`));
   if(r.maxFinCosN!=null&&c.finCos>r.maxFinCosN)fails.push(`Dư nợ ${c.finCos} công ty tài chính, tối đa ${r.maxFinCosN}`);
   if(r.maxCardsN!=null&&s.cards>r.maxCardsN)fails.push(`Đang có ${fmt(s.cards)} thẻ, tối đa ${r.maxCardsN}`);
   if(r.maxBanksN!=null&&s.bankCount>r.maxBanksN)fails.push(`Đã có thẻ ${s.bankCount} ngân hàng, tối đa ${r.maxBanksN}`);
@@ -506,8 +522,10 @@ function evalRule(r,c,s){
   if(r.minLimitN!=null&&r.minLimitN>0&&s.cards>0&&s.maxLimit<r.minLimitN)fails.push(`HM thẻ cũ cao nhất ${fmt(s.maxLimit)} tr, cần từ ${fmt(r.minLimitN)} tr`);
   if(s.limit>0&&r.maxUtil!=null&&s.util>r.maxUtil)warns.push(`Đang dùng ${Math.round(s.util)}% hạn mức, cần dưới ${r.maxUtil}%`);
   if(s.limit>0&&r.minUtil!=null&&s.util<r.minUtil)warns.push(`Đang dùng ${Math.round(s.util)}% hạn mức, ngân hàng muốn từ ${r.minUtil}%`);
-  return{status:fails.length?"bad":warns.length?"warn":"ok",fails,warns};
+  return{status:fails.length?"bad":warns.length?"warn":"ok",fails,warns,channels};
 }
+const okChannels=x=>x.channels.filter(c=>c.ok).map(c=>c.ch);
+function withChannels(x){const o=okChannels(x);return o.length===1&&x.rule.online!==null?`${x.rule.name} (${CH[o[0]].toLowerCase()})`:x.rule.name}
 function evaluate(c){const s=stats(c);return{s,list:rules.filter(r=>r.isActive).map(r=>({rule:r,...evalRule(r,c,s)}))}}
 const passes=x=>x.status==="ok"||x.status==="warn";
 function scenario(mod){const c2=clone(cust);mod(c2);return evaluate(c2)}
@@ -521,8 +539,11 @@ function runCheck(scroll){
   const n=k=>base.list.filter(x=>x.status===k).length;
   const card=x=>{
     const chip={ok:"Có thể mở",warn:"Cân nhắc",bad:"Không phù hợp",own:"Đã có thẻ"}[x.status];
-    const items=[...x.fails,...x.warns];const r=x.rule;
-    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${r.online!=null?`<span class="chip ch">${esc(chText(r))}</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
+    const r=x.rule,ok=passes(x);
+    const blocked=ok?x.channels.filter(c=>!c.ok).map(c=>`${CH[c.ch]}: không mở được – ${c.why}`):[];
+    const items=[...blocked,...x.fails,...x.warns];
+    const chTxt=ok?okChannels(x).map(k=>CH[k]).join(" + "):chText(r);
+    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${r.online!=null&&chTxt?`<span class="chip ch">${esc(chTxt)}</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
       ${items.length?`<ul class="why">${items.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
       ${x.status==="own"?"":condHtml(r)}</div>`;
   };
@@ -530,6 +551,11 @@ function runCheck(scroll){
 
   const tips=[];
   if(cust.badDebt)tips.push(["!","w","Khách đang có <b>nợ quá hạn</b>. Cần tất toán và chờ CIC cập nhật trước khi nộp hồ sơ."]);
+  if(cust.job==="none"&&good.length){
+    const by=k=>good.filter(x=>okChannels(x).includes(k)).map(x=>x.rule.name);
+    const on=by("online"),off=by("offline");
+    tips.push(["CV","",`Khách chưa có công việc → mở <b>online</b> được ở: <b>${esc(on.join(", ")||"không có")}</b>; mở <b>offline</b> được ở: <b>${esc(off.join(", ")||"không có")}</b>.`]);
+  }
   if(cust.finCos>0){
     let found=false;
     for(let k=1;k<=cust.finCos;k++){
@@ -557,7 +583,7 @@ function runCheck(scroll){
   }else tips.push(["HM","",`Hạn mức thẻ cao nhất hiện có <b>${fmt(s.maxLimit)} triệu</b> – căn cứ khi mở thẻ qua thẻ.`]);
   if(s.bankCount>=4)tips.push(["!","w",`Khách đã có thẻ ở <b>${s.bankCount} ngân hàng</b>. Nên nộp lần lượt 1–2 ngân hàng, tránh nộp dồn dập.`]);
 
-  lastResult={s,ok:sorted.filter(x=>x.status==="ok").map(x=>x.rule.name),warn:sorted.filter(x=>x.status==="warn").map(x=>x.rule.name),bad:bad.map(x=>x.rule.name)};
+  lastResult={s,ok:sorted.filter(x=>x.status==="ok").map(withChannels),warn:sorted.filter(x=>x.status==="warn").map(withChannels),bad:bad.map(x=>x.rule.name)};
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
