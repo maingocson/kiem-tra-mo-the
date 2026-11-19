@@ -11,7 +11,7 @@
 ## Cách dùng
 
 1. Mở link app bằng **Safari** → nút **Chia sẻ** → **Thêm vào MH chính**.
-2. Lần đầu app dùng **điều kiện mẫu**. Vào tab **Điều kiện** → **Sửa điều kiện** để nhập điều kiện thật:
+2. Lần đầu app dùng **điều kiện mẫu**. Vào tab **Điều kiện** (cần mật khẩu; mở khoá một lần là dùng được đến khi tắt app, hoặc bấm **Khoá lại**) → **Sửa điều kiện** để nhập điều kiện thật:
    - sửa từng ngân hàng, **+ Thêm ngân hàng**, hoặc **Xoá ngân hàng này** (bấm 2 lần);
    - bấm **Lưu** ở thanh dưới cùng. **Huỷ** để bỏ thay đổi.
 3. Tab **Kiểm tra**: nhập thẻ khách đang có, số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**.

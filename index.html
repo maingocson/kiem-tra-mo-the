@@ -167,6 +167,7 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .vrow .t small{color:var(--muted);font-size:12px}
 .vrow .btn2{padding:7px 9px;font-size:12px}
 .vrow.cur{border-color:var(--accent);background:var(--accent-soft)}
+#lockErr{color:var(--bad);font-weight:600}
 .confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px}
 @media (max-width:380px){.rule.edit .grid3{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.grid3 label:first-child{grid-column:1/-1}.totals strong{font-size:13px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -234,6 +235,14 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 
   <!-- ===== ĐIỀU KIỆN ===== -->
   <div class="view" id="v-rules" hidden>
+    <form class="panel stack" id="lockBox" autocomplete="off">
+      <h2>Điều kiện ngân hàng</h2>
+      <p class="note" style="margin:0">Nhập mật khẩu để xem và sửa điều kiện.</p>
+      <label class="f" for="lockPass">Mật khẩu<input id="lockPass" type="password" inputmode="numeric" autocomplete="off"></label>
+      <div class="row-btns"><button class="btn2 acc" type="submit">Mở khoá</button><span class="note" id="lockErr" hidden>Sai mật khẩu</span></div>
+    </form>
+    <div class="view" id="rulesBody" hidden>
+    <div class="row-btns" style="justify-content:flex-end"><button class="ghost" id="lockAgain" type="button">Khoá lại</button></div>
     <section>
       <h2>Sao lưu &amp; phục hồi</h2>
       <div class="panel stack">
@@ -258,6 +267,7 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
       <div id="rules" class="stack"></div>
       <button class="add" id="addRule" type="button" hidden><b>+</b> Thêm ngân hàng</button>
     </section>
+    </div>
   </div>
 </div>
 
@@ -470,7 +480,7 @@ function showAdmin(){
   $("#saveBar").hidden=!editing||$("#v-rules").hidden;$("#addRule").hidden=!editing;$("#editBtn").hidden=editing;document.body.classList.toggle("editing",editing&&!$("#v-rules").hidden);
 }
 $("#editBtn").addEventListener("click",startEdit);
-$("#pEdit").addEventListener("click",()=>{showTab("rules");if(!editing)startEdit()});
+$("#pEdit").addEventListener("click",()=>{showTab("rules");if(unlocked){if(!editing)startEdit()}else wantEdit=true});
 $("#cancelEdit").addEventListener("click",()=>{
   const b=$("#cancelEdit");
   if(dirty&&!b.dataset.sure){b.dataset.sure="1";b.textContent="Bỏ thay đổi?";return}
@@ -706,15 +716,42 @@ function runCheck(scroll){
 $("#runCheck").addEventListener("click",()=>runCheck(true));
 
 /* ---------- Tabs ---------- */
+/* ---------- Mật khẩu tab Điều kiện ---------- */
+const PASS_HASH="d34df244fa221209ceec8a38ce6d1d64c598998aa502f6be9a88005cab83fe03";
+let unlocked=false,wantEdit=false;
+try{unlocked=sessionStorage.getItem("kmt.unlock")==="1"}catch(e){}
+async function hashPass(v){
+  const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("kmt:"+v));
+  return[...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function showLock(){
+  $("#lockBox").hidden=unlocked;$("#rulesBody").hidden=!unlocked;
+  if(!unlocked&&!$("#v-rules").hidden)setTimeout(()=>$("#lockPass").focus(),50);
+}
+$("#lockBox").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const ok=(await hashPass($("#lockPass").value.trim()))===PASS_HASH;
+  $("#lockPass").value="";$("#lockErr").hidden=ok;
+  if(!ok)return;
+  unlocked=true;try{sessionStorage.setItem("kmt.unlock","1")}catch(err){}
+  showLock();if(wantEdit&&!editing)startEdit();wantEdit=false;showAdmin();
+});
+$("#lockAgain").addEventListener("click",()=>{
+  if(editing&&dirty){toast("Đang có thay đổi chưa lưu – bấm Lưu hoặc Huỷ trước");return}
+  if(editing)stopEdit();
+  unlocked=false;try{sessionStorage.removeItem("kmt.unlock")}catch(err){}
+  showLock();showAdmin();
+});
 function showTab(t){
   ["check","rules"].forEach(v=>$("#v-"+v).hidden=v!==t);
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   window.scrollTo(0,0);
-  showAdmin();
+  if(t!=="rules")wantEdit=false;
+  showLock();showAdmin();
 }
 document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 
-renderCust();showPolicy();
+renderCust();showPolicy();showLock();
 if(cust.example)runCheck(false);
 renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
