@@ -82,6 +82,7 @@ input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(-
 .stepper input{width:64px;text-align:center;font-family:var(--mono);font-weight:600}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:4px}
 .seg.four{grid-template-columns:1fr 1fr}
+.seg.four button:last-child{grid-column:1/-1}
 .seg button{font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:9px;padding:10px 4px;cursor:pointer;line-height:1.25}
 .seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
@@ -117,6 +118,8 @@ button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{o
 .rcard ul.why{color:var(--ink)}
 .cond{font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:2px 8px;color:var(--muted)}
 .cond b{color:var(--ink);font-weight:600}
+.db{font-size:13px;display:flex;flex-direction:column;gap:2px;background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:8px 10px}
+.db span{color:var(--ink)}
 details.grp>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-weight:700;font-size:14px}
 details.grp>summary::-webkit-details-marker{display:none}
 details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>summary::after{content:"－"}
@@ -136,6 +139,7 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 .rule .nm{font-weight:700;font-size:16px}
 .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .kv div{background:var(--sunk);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;min-width:0}
+.kv.two{grid-template-columns:1fr 1fr}
 .kv span{font-size:11px;color:var(--muted)} .kv strong{font-size:13px;overflow-wrap:anywhere}
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
@@ -147,7 +151,7 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:14px;font-weight:600;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1}
 .confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px}
-@media (max-width:380px){.grid3{grid-template-columns:1fr 1fr}.grid3 label:first-child{grid-column:1/-1}.totals strong{font-size:13px}.kv{grid-template-columns:1fr 1fr}}
+@media (max-width:380px){.grid3{grid-template-columns:1fr 1fr}.grid3 label:first-child{grid-column:1/-1}.totals strong{font-size:13px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -202,6 +206,7 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
         <button type="button" data-job="hdld" aria-pressed="true">Đi làm có HĐLĐ</button>
         <button type="button" data-job="hkd" aria-pressed="false">Chủ hộ kinh doanh</button>
         <button type="button" data-job="online" aria-pressed="false">Kinh doanh online</button>
+        <button type="button" data-job="tudo" aria-pressed="false">Làm tự do</button>
         <button type="button" data-job="none" aria-pressed="false">Chưa có công việc</button>
       </div>
     </section>
@@ -263,17 +268,17 @@ const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank"
 
 /* ĐIỀU KIỆN MẪU – cùng định dạng với bảng Google Sheet. Chưa phải điều kiện thật của ngân hàng. */
 const SAMPLE_RULES=[
- {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"20","Ghi chú":"Mẫu"},
- {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"15","Ghi chú":"Mẫu"},
- {"Ngân hàng":"VIB","Tên gọi khác":"","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"30","Ghi chú":"Mẫu"},
- {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Tỷ lệ sử dụng tối đa (%)":"","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần công việc":"Có","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Tỷ lệ sử dụng tối đa (%)":"60","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần công việc":"HĐLĐ","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Tỷ lệ sử dụng tối đa (%)":"85","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","HM thẻ cũ tối thiểu (tr)":"10","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Tỷ lệ sử dụng tối đa (%)":"90","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần công việc":"Không","Cần thẻ cũ":"Không","HM thẻ cũ tối thiểu (tr)":"","Ghi chú":"Mẫu: ngân hàng số"}
+ {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"VIB","Tên gọi khác":"","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"ĐB: thẻ cũ phải mở trên 6 tháng"},
+ {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Tỷ lệ sử dụng tối đa (%)":"","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần công việc":"HĐLĐ, HKD, Tự do","Cần thẻ cũ":"Không","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Tỷ lệ sử dụng tối đa (%)":"60","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần công việc":"HĐLĐ","Cần thẻ cũ":"Không","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Không","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Tỷ lệ sử dụng tối đa (%)":"85","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"Mẫu"},
+ {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Tỷ lệ sử dụng tối đa (%)":"90","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần công việc":"Không","Cần thẻ cũ":"Không","Ghi chú":"Mẫu: ngân hàng số"}
 ];
 const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",badDebt:false,example:true};
-const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",none:"Không chứng minh được công việc"};
+const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",tudo:"Làm tự do",none:"Không chứng minh được công việc"};
 const K_CONN="kmt.conn.v1",K_CACHE="kmt.rulesCache.v2",K_CUST="kmt.customer.v2";
 
 const $=s=>document.querySelector(s);
@@ -299,7 +304,6 @@ const COLS=[
  ["maxCards",k=>k.includes("sothe")],
  ["maxFinCos",k=>k.includes("cttc")||k.includes("congtytaichinh")],
  ["maxBanks",k=>k.includes("songanhang")||k.startsWith("sonh")],
- ["minLimit",k=>k.includes("hmthecu")||k.includes("hanmucthecu")],
  ["requireCard",k=>k.includes("canthecu")||k.includes("canthetindung")||k.includes("cocothe")],
  ["note",k=>k.includes("ghichu")]
 ];
@@ -307,9 +311,9 @@ function isYes(v){const p=plain(v).trim();return /^(co|c|x|yes|y|true|1|dung|bat
 function isNo(v){const p=plain(v).trim();return /^(khong|k|no|n|false|0|ko)\b/.test(p)}
 function parseJobs(text){
   const p=plain(text);if(!p.trim())return null;
-  if(/tat ca|moi|bat ky|all/.test(p))return{hdld:true,hkd:true,online:true};
-  const j={hdld:/hdld|hop dong|di lam|luong|nhan vien/.test(p),hkd:/hkd|ho kinh doanh|chu ho|giay phep/.test(p),online:/online|kdol|ban hang/.test(p)};
-  return (j.hdld||j.hkd||j.online)?j:null;
+  if(/tat ca|moi|bat ky|all/.test(p))return{hdld:true,hkd:true,online:true,tudo:true};
+  const j={hdld:/hdld|hop dong|di lam|luong|nhan vien/.test(p),hkd:/hkd|ho kinh doanh|chu ho|giay phep/.test(p),online:/online|kdol|ban hang/.test(p),tudo:/tu do|freelance|tudo/.test(p)};
+  return (j.hdld||j.hkd||j.online||j.tudo)?j:null;
 }
 /* Yêu cầu công việc: req = có cần chứng minh công việc, jobs = loại công việc được nhận (null = loại nào cũng được) */
 function jobRule(need,acc){
@@ -323,9 +327,10 @@ function normRule(raw){
   Object.keys(raw).forEach(h=>{const k=hkey(h);const c=COLS.find(([,t])=>t(k));if(c&&r[c[0]]===undefined)r[c[0]]=raw[h]});
   r.job=jobRule(r.needJob,r.jobsAccepted);
   r.maxUtil=num(r.util);
-  r.maxCardsN=num(r.maxCards);r.maxFinCosN=num(r.maxFinCos);r.maxBanksN=num(r.maxBanks);r.minLimitN=num(r.minLimit);
+  r.maxCardsN=num(r.maxCards);r.maxFinCosN=num(r.maxFinCos);r.maxBanksN=num(r.maxBanks);
   r.needCard=isYes(r.requireCard);
   r.isActive=!(r.active!=null&&String(r.active).trim()&&isNo(r.active));
+  r.special=/(^|[^a-z0-9])db([^a-z0-9]|$)/.test(plain(r.note));
   r.name=String(r.name||"").trim();
   return r;
 }
@@ -376,27 +381,29 @@ $("#connSave").addEventListener("click",()=>{
 });
 
 /* ---------- Bảng điều kiện (xem) ---------- */
-function jobText(j){if(!j.req)return"Không cần";if(!j.jobs)return"Cần";return Object.keys(j.jobs).filter(k=>j.jobs[k]).map(k=>({hdld:"HĐLĐ",hkd:"HKD",online:"KD online"}[k])).join(", ")}
+function jobText(j){if(!j.req)return"Không cần";if(!j.jobs)return"Cần";return Object.keys(j.jobs).filter(k=>j.jobs[k]).map(k=>({hdld:"HĐLĐ",hkd:"HKD",online:"KD online",tudo:"Tự do"}[k])).join(", ")}
 function le(v,unit){return v==null?"Không giới hạn":`≤ ${fmt(v)}${unit||""}`}
 function renderRules(){
   $("#rulesSample").hidden=!usingSample;
   $("#rulesCount").textContent=`${rules.length} ngân hàng`;
   $("#rules").innerHTML=rules.map(r=>`
    <div class="rule${r.isActive?"":" off"}">
-     <div class="rhead"><span class="nm">${esc(r.name)}</span>${r.isActive?"":`<span class="chip own">Tạm dừng</span>`}</div>
+     <div class="rhead"><span class="nm">${esc(r.name)}</span><span class="chips">${r.special?`<span class="chip warn">ĐB</span>`:""}${r.isActive?"":`<span class="chip own">Tạm dừng</span>`}</span></div>
      <div class="kv">
        <div><span>Tỷ lệ sử dụng</span><strong>${esc(le(r.maxUtil,"%"))}</strong></div>
        <div><span>Số thẻ</span><strong>${esc(le(r.maxCardsN))}</strong></div>
        <div><span>Công ty tài chính</span><strong>${esc(le(r.maxFinCosN))}</strong></div>
+     </div>
+     <div class="kv two">
        <div><span>Công việc</span><strong>${esc(jobText(r.job))}</strong></div>
        <div><span>Cần thẻ cũ</span><strong>${r.needCard?"Có":"Không"}</strong></div>
-       <div><span>HM thẻ cũ từ</span><strong>${r.minLimitN!=null?esc(fmt(r.minLimitN))+" tr":"—"}</strong></div>
      </div>
      ${condHtml(r)}
    </div>`).join("");
 }
 function condHtml(r){
   const rows=[];
+  if(r.special)return`<div class="db"><b>⚠ Điều kiện đặc biệt (ĐB)</b><span>Tự kiểm tra khách có thoả không: ${esc(r.note)}</span></div>`;
   if(r.note)rows.push(`<b>Ghi chú</b><span>${esc(r.note)}</span>`);
   return rows.length?`<div class="cond">${rows.join("")}</div>`:"";
 }
@@ -478,7 +485,6 @@ function evalRule(r,c,s){
   if(r.maxCardsN!=null&&s.cards>r.maxCardsN)fails.push(`Đang có ${fmt(s.cards)} thẻ, ngân hàng chỉ nhận ≤ ${r.maxCardsN} thẻ`);
   if(r.maxBanksN!=null&&s.bankCount>r.maxBanksN)fails.push(`Đã có thẻ ${s.bankCount} ngân hàng, tối đa ${r.maxBanksN}`);
   if(r.needCard&&s.cards<=0)fails.push("Cần có sẵn thẻ tín dụng ngân hàng khác");
-  if(r.minLimitN!=null&&r.minLimitN>0&&s.cards>0&&s.maxLimit<r.minLimitN)fails.push(`HM thẻ cũ cao nhất ${fmt(s.maxLimit)} tr, cần từ ${fmt(r.minLimitN)} tr`);
   if(s.limit>0&&r.maxUtil!=null&&s.util>r.maxUtil){
     const need=s.used-s.limit*r.maxUtil/100;
     warns.push(`Đang dùng ${Math.round(s.util)}% hạn mức, ngân hàng chỉ nhận ≤ ${r.maxUtil}% → cần trả bớt khoảng ${fmt(Math.ceil(need*10)/10)} tr`);
@@ -499,13 +505,15 @@ function runCheck(scroll){
   const card=x=>{
     const chip={ok:"Có thể mở",warn:"Cần giảm dư nợ",bad:"Không phù hợp",own:"Đã có thẻ"}[x.status];
     const r=x.rule,items=[...x.fails,...x.warns];
-    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chip ${x.status}">${chip}</span></div>
+    return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${r.special&&x.status!=="own"?`<span class="chip warn">ĐB</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
       ${items.length?`<ul class="why">${items.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
       ${x.status==="own"?"":condHtml(r)}</div>`;
   };
   const good=sorted.filter(passes),bad=sorted.filter(x=>x.status==="bad"),own=sorted.filter(x=>x.status==="own");
 
   const tips=[];
+  const sp=good.filter(x=>x.rule.special).map(x=>x.rule.name);
+  if(sp.length)tips.push(["ĐB","w",`<b>${esc(sp.join(", "))}</b> có điều kiện đặc biệt (ĐB). Đọc ghi chú và tự kiểm tra khách có thoả không trước khi nộp hồ sơ.`]);
   if(cust.badDebt)tips.push(["!","w","Khách đang có <b>nợ quá hạn</b>. Cần tất toán và chờ CIC cập nhật trước khi nộp hồ sơ."]);
   if(cust.finCos>0){
     let found=false;
@@ -527,7 +535,7 @@ function runCheck(scroll){
   if(s.cards<=0){
     const need=base.list.filter(x=>x.rule.needCard).map(x=>x.rule.name);
     tips.push(["1","",`Khách chưa có thẻ tín dụng. Nên mở trước ở ngân hàng không yêu cầu thẻ cũ, sau vài tháng dùng tốt có thể mở qua thẻ${need.length?` ở: <b>${esc(need.join(", "))}</b>`:""}.`]);
-  }else tips.push(["HM","",`Hạn mức thẻ cao nhất hiện có <b>${fmt(s.maxLimit)} triệu</b> – căn cứ khi mở thẻ qua thẻ.`]);
+  }
   if(s.bankCount>=4)tips.push(["!","w",`Khách đã có thẻ ở <b>${s.bankCount} ngân hàng</b>. Nên nộp lần lượt 1–2 ngân hàng, tránh nộp dồn dập.`]);
 
   lastResult={s,ok:sorted.filter(x=>x.status==="ok").map(x=>x.rule.name),warn:sorted.filter(x=>x.status==="warn").map(x=>x.rule.name),bad:bad.map(x=>x.rule.name)};

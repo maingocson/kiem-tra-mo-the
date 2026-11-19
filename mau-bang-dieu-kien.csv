@@ -1,9 +1,9 @@
-﻿Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,HM thẻ cũ tối thiểu (tr),Ghi chú
-VPBank,VPB,Có,80,5,2,Không,Có,20,Mẫu
-TPBank,TPB,Có,80,5,2,Không,Có,15,Mẫu
-VIB,,Có,70,4,1,Không,Có,30,Mẫu
-HDBank,HDB,Có,,6,3,Có,Không,,Mẫu
-Techcombank,TCB,Có,60,3,0,HĐLĐ,Không,,Mẫu
-MB Bank,"MB, MBBank",Có,70,4,1,Không,Không,,Mẫu
-Sacombank,STB,Có,85,6,2,Không,Có,10,Mẫu
-Cake by VPBank,Cake,Có,90,,3,Không,Không,,Mẫu: ngân hàng số
+﻿Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,Ghi chú
+VPBank,VPB,Có,80,5,2,Không,Có,Mẫu
+TPBank,TPB,Có,80,5,2,Không,Có,Mẫu
+VIB,,Có,70,4,1,Không,Có,ĐB: thẻ cũ phải mở trên 6 tháng
+HDBank,HDB,Có,,6,3,"HĐLĐ, HKD, Tự do",Không,Mẫu
+Techcombank,TCB,Có,60,3,0,HĐLĐ,Không,Mẫu
+MB Bank,"MB, MBBank",Có,70,4,1,Không,Không,Mẫu
+Sacombank,STB,Có,85,6,2,Không,Có,Mẫu
+Cake by VPBank,Cake,Có,90,,3,Không,Không,Mẫu: ngân hàng số
