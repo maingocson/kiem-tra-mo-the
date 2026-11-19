@@ -147,7 +147,6 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
 .toast.show{opacity:1}
 .policy{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 12px;font-size:13px;color:var(--muted);margin-bottom:14px}
 .policy #pText{flex:1;min-width:0}
-.policy.new{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
 .policy .btn2{padding:8px 10px;font-size:13px;white-space:nowrap}
 .rule.edit{gap:10px}
 .rule.edit .grid3{grid-template-columns:repeat(3,1fr)}
@@ -155,11 +154,13 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
 .ck input{width:17px;height:17px;accent-color:var(--accent);margin:0}
 .checks{display:flex;flex-wrap:wrap;gap:6px}
 .lbl{font-size:12px;color:var(--muted);font-weight:500}
+body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .savebar{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom,0px));z-index:19;display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px))}
 .savebar .in{width:100%;max-width:560px;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);border-radius:14px;padding:8px 8px 8px 14px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
 .savebar span{flex:1;min-width:0}
 .savebar button{font:inherit;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
 .savebar button:disabled{opacity:.5}
+.savebar button.cancel{background:transparent;color:var(--bg);border:1px solid color-mix(in srgb,var(--bg) 40%,transparent)}
 .vlist{display:flex;flex-direction:column;gap:6px}
 .vrow{display:flex;align-items:center;gap:8px;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:8px 8px 8px 10px;font-size:13px}
 .vrow .t{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -177,7 +178,7 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
     <h1><small>Tư vấn thẻ tín dụng</small>Kiểm tra mở thẻ</h1>
     <button class="ghost" id="newCustomer" type="button">Khách mới</button>
   </header>
-  <div class="policy" id="policyBar"><span class="dot" id="pDot"></span><span id="pText">Đang tải chính sách…</span><button class="btn2" id="pUpdate" type="button">Cập nhật chính sách</button></div>
+  <div class="policy" id="policyBar"><span class="dot" id="pDot"></span><span id="pText">…</span><button class="btn2" id="pEdit" type="button">Sửa điều kiện</button></div>
 
   <!-- ===== KIỂM TRA ===== -->
   <div class="view" id="v-check">
@@ -251,24 +252,8 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
       </div>
     </section>
     <section>
-      <details class="grp" id="adminBox">
-        <summary>Quản trị – sửa điều kiện</summary>
-        <div class="panel stack">
-          <div id="adminLogin" class="stack">
-            <label class="f" for="adminUrl">Link Apps Script (kết thúc bằng /exec)<input id="adminUrl" type="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec"></label>
-            <label class="f" for="adminKey">Mã quản trị<input id="adminKey" type="password" autocomplete="off"></label>
-            <div class="row-btns"><button class="btn2 acc" id="adminEnter" type="button">Bật chế độ sửa</button></div>
-            <p class="note" style="margin:0">Chỉ người có mã quản trị mới sửa được điều kiện. Link và mã chỉ lưu trên máy này.</p>
-          </div>
-          <div id="adminOn" class="stack" hidden>
-            <div class="status"><span class="dot on"></span><span>Đang ở chế độ sửa. Sửa xong bấm <b>Lưu lên file</b>.</span></div>
-            <div class="row-btns"><button class="btn2" id="adminExit" type="button">Thoát chế độ sửa</button><a class="ghost" id="fileLink" href="#" target="_blank" rel="noopener">Mở file trên Drive ↗</a></div>
-          </div>
-        </div>
-      </details>
-    </section>
-    <section>
       <div class="sec-head"><h2>Điều kiện đang dùng</h2><span class="note" id="rulesCount"></span></div>
+      <button class="btn2 acc" id="editBtn" type="button">Sửa điều kiện</button>
       <span class="sample" id="rulesSample">Đang dùng điều kiện mẫu – chưa phải điều kiện thật</span>
       <div id="rules" class="stack"></div>
       <button class="add" id="addRule" type="button" hidden><b>+</b> Thêm ngân hàng</button>
@@ -280,21 +265,13 @@ nav.tabs button[aria-selected=true]{color:var(--accent)}
   <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Kiểm tra</button>
   <button role="tab" aria-selected="false" data-tab="rules" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện</button>
 </div></nav>
-<div class="savebar" id="saveBar" hidden><div class="in"><span id="saveText">Chưa có thay đổi</span><button id="saveRules" type="button" disabled>Lưu lên file</button></div></div>
+<div class="savebar" id="saveBar" hidden><div class="in"><span id="saveText">Chưa có thay đổi</span><button id="cancelEdit" type="button" class="cancel">Huỷ</button><button id="saveRules" type="button">Lưu</button></div></div>
 <div class="toast" id="toast"></div>
 <datalist id="bankList"></datalist>
 
 <script>
 (function(){
 "use strict";
-/* ===== CẤU HÌNH =====
-   SCRIPT_URL: link Apps Script (kết thúc bằng /exec). Mọi người đọc chính sách qua link này;
-               người có mã quản trị dùng nó để ghi điều kiện mới lên file trên Drive.
-   CSV_URL:    link file điều kiện trên Drive (chỉ để mở xem file). */
-const CSV_URL="https://drive.google.com/file/d/1T6XZYKhf8akykGFN-aiZM42wz9qtoKtm/view?usp=sharing";
-const SCRIPT_URL="";
-const readUrl=()=>SCRIPT_URL||(load("kmt.admin.v1")||{}).url||"";
-
 const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank","MB Bank","ACB","Sacombank","TPBank","VIB","HDBank","SHB","OCB","MSB","SeABank","Eximbank","LPBank","Nam A Bank","Bac A Bank","PVcomBank","Kienlongbank","ABBANK","BVBank","Shinhan Bank","HSBC","Standard Chartered","UOB","Woori Bank","Cake by VPBank"];
 
 /* ĐIỀU KIỆN MẪU – cùng định dạng với bảng Google Sheet. Chưa phải điều kiện thật của ngân hàng. */
@@ -310,7 +287,7 @@ const SAMPLE_RULES=[
 ];
 const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",badDebt:false,example:true};
 const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",tudo:"Làm tự do",none:"Không chứng minh được công việc"};
-const K_ADMIN="kmt.admin.v1",K_CACHE="kmt.rulesCache.v4",K_VER="kmt.policyVersions.v1",MAX_VER=20,K_CUST="kmt.customer.v2";
+const K_CACHE="kmt.rulesCache.v4",K_VER="kmt.policyVersions.v1",MAX_VER=20,K_CUST="kmt.customer.v2";
 
 const $=s=>document.querySelector(s);
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -396,31 +373,13 @@ function parseCSV(text){
   return clean.slice(1).map(r=>{const o={};head.forEach((h,i)=>{if(h)o[h]=String(r[i]??"").trim()});return o});
 }
 const fmtTime=t=>new Date(t).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"});
-let pending=null; /* chính sách mới đã tải về nhưng chưa áp dụng */
-function setPolicy(state,text,isNew){
-  $("#pDot").className="dot "+state;$("#pText").textContent=text;
-  $("#policyBar").classList.toggle("new",!!isNew);
-}
+function setPolicy(state,text){$("#pDot").className="dot "+state;$("#pText").textContent=text}
 function showPolicy(){
-  if(pending)return setPolicy("wait","Có chính sách mới – bấm để áp dụng",true);
-  if(usingSample)return setPolicy("","Đang dùng điều kiện mẫu");
-  setPolicy("on",`${rules.length} ngân hàng · tải lúc ${fmtTime(cache.at)}`);
-}
-async function fetchPolicy(){
-  const u=readUrl();
-  if(!u)throw new Error("Chưa gắn link Apps Script");
-  let res,d;
-  try{res=await fetch(u+(u.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store"})}
-  catch(e){throw new Error("Không tải được – kiểm tra mạng")}
-  try{d=await res.json()}catch(e){throw new Error("Link Apps Script không đúng hoặc chưa cấp quyền \"Bất kỳ ai\"")}
-  if(!d.ok)throw new Error(d.error||"Lỗi không rõ");
-  const text=String(d.csv||"").replace(/^\uFEFF/,"");
-  const list=parseCSV(text);
-  if(!list.map(normRule).some(r=>r.name))throw new Error("File không có cột \"Ngân hàng\" hoặc chưa có dòng nào");
-  return{text,list};
+  if(usingSample)return setPolicy("wait","Đang dùng điều kiện mẫu – bấm Sửa để nhập điều kiện thật");
+  setPolicy("on",`${rules.length} ngân hàng · lưu trên máy lúc ${fmtTime(cache.at)}`);
 }
 /* ---------- Lưu trên máy: lịch sử, sao lưu, phục hồi ---------- */
-const SRC={drive:"Tải từ Drive",admin:"Quản trị lưu",file:"Phục hồi từ file",old:"Khôi phục bản cũ"};
+const SRC={edit:"Sửa trên app",file:"Phục hồi từ file",old:"Khôi phục bản cũ",drive:"Tải từ Drive",admin:"Sửa trên app"};
 function versions(){const v=load(K_VER);return Array.isArray(v)?v:[]}
 function addVersion(text,count,source){
   const v=versions().filter(x=>x.text!==text);
@@ -483,31 +442,12 @@ $("#restoreYes").addEventListener("click",()=>{
 function applyPolicy(p,source){
   const changed=!cache||cache.text!==p.text;
   cache={rules:p.list,text:p.text,at:new Date().toISOString()};save(K_CACHE,cache);
-  pending=null;setRules(p.list,true);showPolicy();
+  setRules(p.list,true);showPolicy();
   if(changed||!versions().some(x=>x.text===p.text))addVersion(p.text,rules.length,source||"drive");else renderVersions();
 }
-/* Mở app: nếu chưa có chính sách thì tải luôn; nếu đã có thì chỉ báo khi có bản mới */
-async function checkPolicy(){
-  try{
-    const p=await fetchPolicy();
-    if(!cache||!cache.text)applyPolicy(p);
-    else if(p.text!==cache.text){pending=p;showPolicy()}
-    else{cache.at=new Date().toISOString();save(K_CACHE,cache);showPolicy()}
-  }catch(e){if(usingSample)setPolicy(readUrl()?"err":"",readUrl()?e.message+" · đang dùng điều kiện mẫu":"Đang dùng điều kiện mẫu – chưa gắn link Apps Script");else showPolicy()}
-}
-async function updatePolicy(){
-  if(editing&&dirty){toast("Bạn đang sửa điều kiện chưa lưu – lưu hoặc thoát chế độ sửa trước");return}
-  const b=$("#pUpdate");b.disabled=true;setPolicy("wait","Đang tải chính sách mới…");
-  try{const p=await fetchPolicy();const changed=!cache||p.text!==cache.text;applyPolicy(p);if(editing)startEdit();toast(changed?`Đã cập nhật ${rules.length} ngân hàng`:"Chính sách đã là bản mới nhất");if(!$("#results").hidden)runCheck(false)}
-  catch(e){showPolicy();toast(e.message)}
-  b.disabled=false;
-}
-$("#pUpdate").addEventListener("click",updatePolicy);
-
-/* ---------- Quản trị: sửa điều kiện và ghi lên file ---------- */
+/* ---------- Sửa điều kiện trên app ---------- */
 const HEAD=["Ngân hàng","Tên gọi khác","Áp dụng","Tỷ lệ sử dụng tối đa (%)","Số thẻ tối đa","Số CTTC tối đa","Cần công việc","Cần thẻ cũ","Ghi chú"];
 const JOBK=["hdld","hkd","online","tudo"],JOBN={hdld:"HĐLĐ",hkd:"HKD",online:"Online",tudo:"Tự do"};
-let admin=load(K_ADMIN)||{url:SCRIPT_URL,key:""};
 function toModel(r){
   const j=r.job;let mode="none",jobs={};
   if(j.req){mode=(!j.jobs||JOBK.every(k=>j.jobs[k]))?"any":"list";if(mode==="list")jobs=Object.assign({},j.jobs)}
@@ -523,34 +463,18 @@ function toCSV(list){
   const q=v=>{v=String(v??"");return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
   return[HEAD.map(q).join(","),...list.map(o=>HEAD.map(h=>q(o[h])).join(","))].join("\r\n")+"\r\n";
 }
-async function adminCall(action,extra){
-  let res;
-  try{res=await fetch(admin.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({key:admin.key,action},extra||{}))})}
-  catch(e){throw new Error("Không gọi được Apps Script – kiểm tra link và quyền truy cập \"Bất kỳ ai\"")}
-  let d;try{d=await res.json()}catch(e){throw new Error("Link Apps Script không đúng")}
-  if(!d.ok)throw new Error(d.error||"Lỗi không rõ");
-  return d;
-}
-function setDirty(v){dirty=v;$("#saveRules").disabled=!v;$("#saveText").textContent=v?"Có thay đổi chưa lưu":"Chưa có thay đổi"}
+function setDirty(v){dirty=v;$("#saveText").textContent=v?"Có thay đổi chưa lưu":"Chưa có thay đổi"}
 function startEdit(){editing=true;draft=rules.map(toModel);setDirty(false);showAdmin();renderRules()}
+function stopEdit(){editing=false;setDirty(false);delete $("#cancelEdit").dataset.sure;$("#cancelEdit").textContent="Huỷ";showAdmin();renderRules()}
 function showAdmin(){
-  $("#adminLogin").hidden=editing;$("#adminOn").hidden=!editing;
-  $("#saveBar").hidden=!editing||$("#v-rules").hidden;$("#addRule").hidden=!editing;
+  $("#saveBar").hidden=!editing||$("#v-rules").hidden;$("#addRule").hidden=!editing;$("#editBtn").hidden=editing;document.body.classList.toggle("editing",editing&&!$("#v-rules").hidden);
 }
-$("#adminUrl").value=admin.url||"";
-$("#fileLink").href=CSV_URL;
-$("#adminEnter").addEventListener("click",async()=>{
-  admin={url:$("#adminUrl").value.trim(),key:$("#adminKey").value.trim()};
-  if(!admin.url||!admin.key){toast("Nhập link Apps Script và mã quản trị");return}
-  const b=$("#adminEnter");b.disabled=true;b.textContent="Đang kiểm tra…";
-  try{await adminCall("check");save(K_ADMIN,admin);$("#adminKey").value="";startEdit();toast("Đã bật chế độ sửa")}
-  catch(e){toast(e.message)}
-  b.disabled=false;b.textContent="Bật chế độ sửa";
-});
-$("#adminExit").addEventListener("click",()=>{
-  if(dirty&&!$("#adminExit").dataset.sure){$("#adminExit").dataset.sure="1";$("#adminExit").textContent="Bỏ thay đổi chưa lưu và thoát?";return}
-  delete $("#adminExit").dataset.sure;$("#adminExit").textContent="Thoát chế độ sửa";
-  editing=false;setDirty(false);admin.key="";save(K_ADMIN,{url:admin.url,key:""});showAdmin();renderRules();
+$("#editBtn").addEventListener("click",startEdit);
+$("#pEdit").addEventListener("click",()=>{showTab("rules");if(!editing)startEdit()});
+$("#cancelEdit").addEventListener("click",()=>{
+  const b=$("#cancelEdit");
+  if(dirty&&!b.dataset.sure){b.dataset.sure="1";b.textContent="Bỏ thay đổi?";return}
+  stopEdit();
 });
 $("#addRule").addEventListener("click",()=>{
   draft.push({name:"",aliases:"",active:true,util:"",cards:"",fin:"",mode:"none",jobs:{},needCard:false,note:""});
@@ -577,12 +501,9 @@ $("#saveRules").addEventListener("click",async()=>{
   const bad=draft.find(m=>[m.util,m.cards,m.fin].some(v=>String(v).trim()!==""&&num(v)==null));
   if(bad){toast(`${bad.name}: các ô giới hạn chỉ nhập số`);return}
   const list=draft.map(toRaw),csv=toCSV(list);
-  const b=$("#saveRules");b.disabled=true;b.textContent="Đang lưu…";
-  try{
-    await adminCall("save",{csv});
-    applyPolicy({text:csv.replace(/^\uFEFF/,""),list},"admin");startEdit();toast("Đã lưu lên file. Người dùng khác bấm Cập nhật chính sách để nhận.");
-  }catch(e){toast("Chưa lưu được: "+e.message);b.disabled=false}
-  b.textContent="Lưu lên file";
+  applyPolicy({text:csv,list},"edit");stopEdit();
+  toast("Đã lưu trên máy. Nên bấm Sao lưu ra file để dự phòng.");
+  if(!$("#results").hidden)runCheck(false);
 });
 
 /* ---------- Bảng điều kiện (xem) ---------- */
@@ -773,7 +694,7 @@ function runCheck(scroll){
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
-    ${usingSample?`<span class="sample">Đang so với điều kiện mẫu – bấm Cập nhật chính sách</span>`:""}
+    ${usingSample?`<span class="sample">Đang so với điều kiện mẫu – bấm Sửa điều kiện để nhập điều kiện thật</span>`:""}
     <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
     ${tips.length?`<h2 style="margin-top:6px">Gợi ý</h2><div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`:""}
@@ -797,7 +718,7 @@ renderCust();showPolicy();
 if(cust.example)runCheck(false);
 renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-checkPolicy();
+showPolicy();
 })();
 </script>
 </body>

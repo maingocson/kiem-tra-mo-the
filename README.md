@@ -2,21 +2,29 @@
 
 Ứng dụng web cho iPhone: nhập thẻ tín dụng khách đang có, số công ty tài chính đang có dư nợ và công việc của khách. Ứng dụng so với bảng điều kiện mở thẻ online của các ngân hàng và cho biết khách có thể mở thẻ ở ngân hàng nào, kèm gợi ý cải thiện hồ sơ.
 
-- **Ứng dụng:** https://maingocson.github.io/kiem-tra-mo-the/
-- **Bảng điều kiện (chính sách):** một file CSV trên Google Drive của bạn.
-- **Người quản trị** (có mã quản trị) sửa điều kiện ngay trong app, bấm **Lưu lên file** là file trên Drive được cập nhật.
-- **Người dùng khác** bấm **Cập nhật chính sách** để tải bản mới. Khi có bản mới, thanh chính sách đổi màu để nhắc.
-- **Thông tin khách** chỉ nằm trên điện thoại đang dùng, không gửi đi đâu.
+**Ứng dụng:** https://maingocson.github.io/kiem-tra-mo-the/
 
-App đọc và ghi file qua một **Apps Script** chạy bằng tài khoản Google của bạn, vì Google Drive không cho trang web đọc hay ghi file trực tiếp.
+- **Không cần tài khoản, không cần đăng nhập.**
+- **Mọi dữ liệu nằm trên điện thoại:** bảng điều kiện và thông tin khách đều lưu ngay trên máy, không gửi lên mạng. Mất mạng vẫn dùng được.
+- Mỗi máy có bảng điều kiện riêng. Muốn dùng chung cho máy khác thì **Sao lưu ra file** rồi gửi file cho người kia **Phục hồi từ file**.
 
----
+## Cách dùng
 
-## Bước 1 – File điều kiện trên Drive
+1. Mở link app bằng **Safari** → nút **Chia sẻ** → **Thêm vào MH chính**.
+2. Lần đầu app dùng **điều kiện mẫu**. Vào tab **Điều kiện** → **Sửa điều kiện** để nhập điều kiện thật:
+   - sửa từng ngân hàng, **+ Thêm ngân hàng**, hoặc **Xoá ngân hàng này** (bấm 2 lần);
+   - bấm **Lưu** ở thanh dưới cùng. **Huỷ** để bỏ thay đổi.
+3. Tab **Kiểm tra**: nhập thẻ khách đang có, số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**.
 
-File CSV điều kiện đã có trên Drive. Có thể sửa bằng app (khuyên dùng) hoặc tải về, sửa, rồi tải lên **thay thế** file cũ (giữ nguyên file, không tạo file mới).
+## Sao lưu & phục hồi (tab Điều kiện)
 
-### Các cột trong bảng
+- **Sao lưu ra file:** xuất bảng điều kiện đang dùng thành file `.csv`. Trên iPhone chọn *Lưu vào Tệp*, hoặc gửi qua Zalo, email…
+- **Phục hồi từ file:** chọn file `.csv` đã sao lưu, hoặc file nhận từ người khác.
+- **Các bản đã lưu trên máy:** app tự giữ 20 bản gần nhất (mỗi lần Lưu hay phục hồi). Bấm **Khôi phục** để quay lại bản cũ, hoặc **Tải file** để lấy bản đó ra.
+
+**Nên sao lưu ra file sau mỗi lần sửa.** Dữ liệu trên máy sẽ mất nếu xoá app khỏi màn hình chính, hoặc xoá dữ liệu trang web trong Cài đặt Safari.
+
+### Các cột trong file sao lưu (CSV)
 
 App chỉ xét **mở thẻ online**. Ba điều kiện chính là con số, khách đạt khi **nhỏ hơn hoặc bằng** con số đó:
 
@@ -43,51 +51,10 @@ Các cột `Cần công việc`, `Cần thẻ cũ` là tuỳ chọn, xoá đi c�
 - **Đã có thẻ:** khách đã có thẻ tại ngân hàng đó.
 - **Gợi ý:** app thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, và báo ngân hàng nào mở thêm được.
 
-## Bước 2 – Tạo Apps Script
-
-1. Vào https://script.google.com bằng **tài khoản Google đang sở hữu file CSV** → **Dự án mới**.
-2. Xoá nội dung có sẵn, dán toàn bộ file `google-apps-script/Code.gs`.
-3. Kiểm tra dòng `FILE_ID` (đã điền sẵn ID file của bạn) và đổi `MA_QUAN_TRI` thành mã riêng, ít nhất 8 ký tự.
-4. Bấm **Lưu**.
-5. **Triển khai → Tùy chọn triển khai mới** → bánh răng → **Ứng dụng web**:
-   - *Thực thi với tư cách:* **Tôi**
-   - *Người có quyền truy cập:* **Bất kỳ ai**
-6. Bấm **Triển khai** và cấp quyền. Nếu hiện cảnh báo "ứng dụng chưa được xác minh": chọn *Nâng cao → Đi tới … (không an toàn)*. Đây là script của chính bạn.
-7. Sao chép **URL ứng dụng web** (kết thúc bằng `/exec`).
-
-Ai có link `/exec` cũng **đọc** được bảng điều kiện, nhưng chỉ người có **mã quản trị** mới **sửa** được.
-
-Trước mỗi lần lưu, script tự sao lưu bản cũ vào thư mục **"Sao lưu điều kiện mở thẻ"** trên Drive (giữ 30 bản gần nhất).
-
-Khi sửa `Code.gs` sau này: **Triển khai → Quản lý các bản triển khai → bút chì → Phiên bản: Mới → Triển khai**, để giữ nguyên link.
-
-## Bước 3 – Gắn link vào app
-
-Dán link `/exec` vào dòng này trong `index.html` rồi đẩy lên GitHub:
-
-```js
-const SCRIPT_URL="";
-```
-
-Sau bước này, ai mở app cũng đọc được chính sách.
-
-## Cách dùng
-
-- **Người dùng:** mở app → bấm **Cập nhật chính sách** khi thanh trên cùng báo "Có chính sách mới" (hoặc bất cứ lúc nào).
-- **Quản trị:** tab **Điều kiện** → **Quản trị – sửa điều kiện** → nhập link `/exec` và mã quản trị → **Bật chế độ sửa** → sửa / thêm / xoá ngân hàng → **Lưu lên file**.
-- **Sao lưu & phục hồi** (tab **Điều kiện**, ai cũng dùng được):
-  - Chính sách luôn được lưu ngay trên máy, mở app không cần mạng vẫn kiểm tra được.
-  - **Sao lưu ra file:** xuất bảng điều kiện đang dùng thành file `.csv` (trên iPhone chọn *Lưu vào Tệp* hoặc gửi qua Zalo, email…).
-  - **Phục hồi từ file:** chọn lại file `.csv` đã sao lưu.
-  - **Các bản đã lưu trên máy:** app giữ 20 bản gần nhất (mỗi lần tải, lưu hay phục hồi). Bấm **Khôi phục** để quay lại bản cũ, hoặc **Tải file** để lấy bản đó ra.
-  - Phục hồi chỉ đổi chính sách **trên máy đó**. Người quản trị muốn đưa bản phục hồi lên Drive cho mọi người thì bật chế độ sửa, phục hồi, rồi bấm **Lưu lên file**.
-- **Thêm vào màn hình chính iPhone:** mở link app bằng Safari → **Chia sẻ** → **Thêm vào MH chính**.
-
 ## Cấu trúc thư mục
 
 ```
-index.html                    ứng dụng (GitHub Pages)
-icon.png                      biểu tượng trên màn hình chính
-mau-bang-dieu-kien.csv        bảng điều kiện mẫu
-google-apps-script/Code.gs    script đọc/ghi file điều kiện trên Drive
+index.html               ứng dụng (GitHub Pages)
+icon.png                 biểu tượng trên màn hình chính
+mau-bang-dieu-kien.csv   bảng điều kiện mẫu (có thể Phục hồi từ file này)
 ```
