@@ -75,6 +75,12 @@ Sau bước này, ai mở app cũng đọc được chính sách.
 
 - **Người dùng:** mở app → bấm **Cập nhật chính sách** khi thanh trên cùng báo "Có chính sách mới" (hoặc bất cứ lúc nào).
 - **Quản trị:** tab **Điều kiện** → **Quản trị – sửa điều kiện** → nhập link `/exec` và mã quản trị → **Bật chế độ sửa** → sửa / thêm / xoá ngân hàng → **Lưu lên file**.
+- **Sao lưu & phục hồi** (tab **Điều kiện**, ai cũng dùng được):
+  - Chính sách luôn được lưu ngay trên máy, mở app không cần mạng vẫn kiểm tra được.
+  - **Sao lưu ra file:** xuất bảng điều kiện đang dùng thành file `.csv` (trên iPhone chọn *Lưu vào Tệp* hoặc gửi qua Zalo, email…).
+  - **Phục hồi từ file:** chọn lại file `.csv` đã sao lưu.
+  - **Các bản đã lưu trên máy:** app giữ 20 bản gần nhất (mỗi lần tải, lưu hay phục hồi). Bấm **Khôi phục** để quay lại bản cũ, hoặc **Tải file** để lấy bản đó ra.
+  - Phục hồi chỉ đổi chính sách **trên máy đó**. Người quản trị muốn đưa bản phục hồi lên Drive cho mọi người thì bật chế độ sửa, phục hồi, rồi bấm **Lưu lên file**.
 - **Thêm vào màn hình chính iPhone:** mở link app bằng Safari → **Chia sẻ** → **Thêm vào MH chính**.
 
 ## Cấu trúc thư mục
