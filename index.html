@@ -166,6 +166,9 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .vrow .t{flex:1;min-width:0;display:flex;flex-direction:column}
 .vrow .t small{color:var(--muted);font-size:12px}
 .vrow .btn2{padding:7px 9px;font-size:12px}
+.bd-add{display:grid;grid-template-columns:1fr;gap:8px}
+.bd-add .btn2{justify-self:start}
+.vrow .btn2.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
 .vrow.cur{border-color:var(--accent);background:var(--accent-soft)}
 #lockErr{color:var(--bad);font-weight:600}
 .confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px}
@@ -267,6 +270,30 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
       <div id="rules" class="stack"></div>
       <button class="add" id="addRule" type="button" hidden><b>+</b> Thêm ngân hàng</button>
     </section>
+    <section>
+      <div class="sec-head"><h2>Danh sách ngân hàng</h2><span class="note" id="bdCount"></span></div>
+      <div class="panel stack">
+        <p class="note" style="margin:0" id="bdInfo"></p>
+        <form class="bd-add" id="bdForm" autocomplete="off">
+          <label class="f" for="bdName">Tên ngân hàng<input id="bdName" type="text" placeholder="VD: NCB"></label>
+          <label class="f" for="bdAlias">Tên gọi khác (cách nhau dấu phẩy)<input id="bdAlias" type="text" placeholder="VD: Quốc Dân, NCBank"></label>
+          <button class="btn2 acc" type="submit">+ Thêm</button>
+        </form>
+        <div class="row-btns">
+          <button class="btn2" id="bdBackup" type="button">Sao lưu ra file</button>
+          <button class="btn2" id="bdRestore" type="button">Phục hồi từ file</button>
+          <button class="btn2" id="bdReset" type="button">Về mặc định</button>
+          <input type="file" id="bdFile" accept=".csv,text/csv,text/plain" hidden>
+        </div>
+        <div id="bdConfirm" class="confirm" hidden><span id="bdMsg"></span>
+          <button class="btn2 danger" id="bdYes" type="button">Đồng ý</button><button class="btn2" id="bdNo" type="button">Huỷ</button></div>
+        <details class="grp" id="bdGrp">
+          <summary><span>Xem và xoá ngân hàng</span></summary>
+          <input id="bdSearch" type="text" placeholder="Tìm ngân hàng…" aria-label="Tìm ngân hàng" style="margin:8px 0">
+          <div class="vlist" id="bdList"></div>
+        </details>
+      </div>
+    </section>
     </div>
   </div>
 </div>
@@ -304,9 +331,16 @@ const BANK_DIR=[
  "HSBC","Standard Chartered|SCBVL|SC|SCB Standard","Shinhan Bank|Shinhan|SHBVN","Woori Bank|Woori","UOB","CIMB","Public Bank|PBVN",
  "Hong Leong Bank|Hong Leong|HLBVN","Citibank|Citi","ANZ|ANZVL","Indovina Bank|IVB|Indovina","VRB|Việt - Nga"
 ];
-const BANKS=BANK_DIR.map(x=>x.split("|")[0]);
-const BANK_ALIAS={};
-BANK_DIR.forEach(x=>{const [n,...a]=x.split("|");const k=bkey(n);[n,...a].forEach(v=>{const vk=bkey(v);if(vk&&!(vk in BANK_ALIAS))BANK_ALIAS[vk]=k})});
+const K_BANKS="kmt.bankDir.v1";
+const DEFAULT_BANKS=BANK_DIR.map(x=>{const [name,...aliases]=x.split("|");return{name,aliases}});
+let bankDir=null,bankDirAt=null,BANKS=[],BANK_ALIAS={};
+try{const v=JSON.parse(localStorage.getItem(K_BANKS)||"null");if(v&&Array.isArray(v.list)&&v.list.length){bankDir=v.list;bankDirAt=v.at}}catch(e){}
+function banksNow(){return bankDir||DEFAULT_BANKS}
+function buildBankIndex(){
+  BANKS=banksNow().map(b=>b.name);BANK_ALIAS={};
+  banksNow().forEach(b=>{const k=bkey(b.name);[b.name,...b.aliases].forEach(v=>{const vk=bkey(v);if(vk&&!(vk in BANK_ALIAS))BANK_ALIAS[vk]=k})});
+}
+buildBankIndex();
 function canon(name){const k=bkey(name);return BANK_ALIAS[k]||k}
 
 /* BẢNG ĐIỀU KIỆN MẶC ĐỊNH – dùng khi máy chưa lưu bảng nào (giống file mau-bang-dieu-kien.csv). */
@@ -381,11 +415,14 @@ function normRule(raw){
 
 let cache=load(K_CACHE);
 let rules=[],usingSample=true,editing=false,dirty=false,draft=[];
+function fillBankList(){
+  const names=[...new Set([...BANKS,...rules.map(r=>r.name)])];
+  $("#bankList").innerHTML=names.map(b=>`<option value="${esc(b)}">`).join("");
+}
 function setRules(rawList,fromDrive){
   rules=rawList.map(normRule).filter(r=>r.name);
   usingSample=!fromDrive;
-  const names=[...new Set([...rules.map(r=>r.name),...BANKS])];
-  $("#bankList").innerHTML=names.map(b=>`<option value="${esc(b)}">`).join("");
+  fillBankList();
   renderRules();
 }
 if(cache&&Array.isArray(cache.rules)&&cache.rules.length)setRules(cache.rules,true);else setRules(SAMPLE_RULES,false);
@@ -783,6 +820,78 @@ function showTab(t){
   showLock();showAdmin();
 }
 document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+
+/* ---------- Danh sách ngân hàng: thêm, xoá, sao lưu, phục hồi ---------- */
+const csvCell=v=>/[",\n\r]/.test(v)?`"${String(v).replace(/"/g,'""')}"`:String(v);
+const splitAliases=t=>String(t||"").split(/[,;]/).map(x=>x.trim()).filter(Boolean);
+function banksCsv(list){return["Ngân hàng,Tên gọi khác",...list.map(b=>csvCell(b.name)+","+csvCell(b.aliases.join(", ")))].join("\n")}
+function setBankDir(list,toastMsg){
+  bankDir=list;bankDirAt=list?new Date().toISOString():null;
+  try{list?localStorage.setItem(K_BANKS,JSON.stringify({list,at:bankDirAt})):localStorage.removeItem(K_BANKS)}catch(e){}
+  buildBankIndex();fillBankList();renderBankDir();
+  if(toastMsg)toast(toastMsg);
+  if(!$("#results").hidden)runCheck(false);
+}
+function findBank(name){const k=canon(name);return banksNow().findIndex(b=>bkey(b.name)===k||b.aliases.some(a=>bkey(a)===bkey(name)))}
+function renderBankDir(){
+  const list=banksNow(),q=plain($("#bdSearch").value).trim();
+  $("#bdCount").textContent=list.length+" ngân hàng";
+  $("#bdInfo").textContent=bankDir?`Danh sách riêng của máy này, cập nhật ${fmtTime(bankDirAt)}. Dùng để gợi ý tên khi nhập và nhận ra khách đã có thẻ ở đâu.`
+    :"Đang dùng danh sách mặc định. Danh sách dùng để gợi ý tên khi nhập và nhận ra khách đã có thẻ ở đâu.";
+  const rows=list.map((b,i)=>({b,i})).filter(({b})=>!q||plain(b.name+" "+b.aliases.join(" ")).includes(q));
+  $("#bdList").innerHTML=rows.length?rows.map(({b,i})=>`<div class="vrow"><span class="t"><b>${esc(b.name)}</b>${b.aliases.length?`<small>${esc(b.aliases.join(", "))}</small>`:""}</span><button class="btn2 danger" type="button" data-bdel="${i}">Xoá</button></div>`).join("")
+    :`<p class="note" style="margin:0">Không tìm thấy ngân hàng nào.</p>`;
+}
+$("#bdSearch").addEventListener("input",renderBankDir);
+$("#bdForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("#bdName").value.trim(),aliases=splitAliases($("#bdAlias").value);
+  if(!name){$("#bdName").focus();return}
+  const list=clone(banksNow()),i=findBank(name);
+  if(i>=0){
+    const b=list[i],add=aliases.filter(a=>!b.aliases.some(x=>bkey(x)===bkey(a))&&bkey(a)!==bkey(b.name));
+    if(!add.length){toast(`Đã có ${b.name} trong danh sách`);return}
+    b.aliases.push(...add);setBankDir(list,`Đã thêm tên gọi khác cho ${b.name}`);
+  }else{list.push({name,aliases});setBankDir(list,`Đã thêm ${name}`)}
+  $("#bdName").value="";$("#bdAlias").value="";
+});
+$("#bdList").addEventListener("click",e=>{
+  const btn=e.target.closest("[data-bdel]");if(!btn)return;
+  if(!btn.classList.contains("armed")){
+    $("#bdList").querySelectorAll(".armed").forEach(x=>{x.classList.remove("armed");x.textContent="Xoá"});
+    btn.classList.add("armed");btn.textContent="Bấm lần nữa để xoá";return;
+  }
+  const list=clone(banksNow()),[b]=list.splice(+btn.dataset.bdel,1);
+  setBankDir(list,`Đã xoá ${b.name}`);
+});
+$("#bdBackup").addEventListener("click",()=>exportCsv(banksCsv(banksNow()),`danh-muc-ngan-hang_${stamp()}.csv`));
+let bdCand=null;
+function askBank(list,msg){bdCand=list;$("#bdMsg").textContent=msg;$("#bdConfirm").hidden=false}
+$("#bdRestore").addEventListener("click",()=>$("#bdFile").click());
+$("#bdFile").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  try{
+    const rows=parseCSV(await f.text());
+    const nameCol=rows.length&&Object.keys(rows[0]).find(h=>["nganhang","tennganhang","bank"].includes(hkey(h)));
+    if(!nameCol)throw 0;
+    const aliasCol=Object.keys(rows[0]).find(h=>hkey(h).includes("tengoikhac")||hkey(h).includes("vietat"));
+    const list=[],seen=new Set();
+    rows.forEach(r=>{const name=String(r[nameCol]||"").trim();const k=bkey(name);if(!k||seen.has(k))return;seen.add(k);
+      list.push({name,aliases:splitAliases(aliasCol?r[aliasCol]:"").filter(a=>bkey(a)!==k)})});
+    if(!list.length)throw 0;
+    askBank(list,`File ${f.name}: ${list.length} ngân hàng. Thay danh sách đang dùng trên máy này?`);
+  }catch(err){toast("File không đúng định dạng (cần cột \"Ngân hàng\")")}
+});
+$("#bdReset").addEventListener("click",()=>{
+  if(!bankDir){toast("Đang dùng danh sách mặc định");return}
+  askBank(null,`Về danh sách mặc định (${DEFAULT_BANKS.length} ngân hàng)? Danh sách riêng trên máy sẽ mất – nên Sao lưu ra file trước.`);
+});
+$("#bdNo").addEventListener("click",()=>{bdCand=null;$("#bdConfirm").hidden=true});
+$("#bdYes").addEventListener("click",()=>{
+  $("#bdConfirm").hidden=true;
+  setBankDir(bdCand,bdCand?"Đã phục hồi danh sách ngân hàng":"Đã về danh sách mặc định");bdCand=null;
+});
+renderBankDir();
 
 renderCust();showPolicy();showLock();
 if(cust.example)runCheck(false);

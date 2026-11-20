@@ -26,6 +26,17 @@
 
 **Nên sao lưu ra file sau mỗi lần sửa.** Dữ liệu trên máy sẽ mất nếu xoá app khỏi màn hình chính, hoặc xoá dữ liệu trang web trong Cài đặt Safari.
 
+## Danh sách ngân hàng (tab Điều kiện)
+
+Danh sách dùng để gợi ý tên khi nhập và nhận ra khách đã có thẻ ở ngân hàng nào (kể cả khi gõ tên viết tắt).
+
+- **+ Thêm:** nhập tên ngân hàng và tên gọi khác (cách nhau dấu phẩy). Nếu ngân hàng đã có, app chỉ thêm tên gọi khác.
+- **Xoá:** mở *Xem và xoá ngân hàng*, bấm **Xoá** 2 lần. Có ô tìm nhanh.
+- **Sao lưu ra file / Phục hồi từ file:** file `.csv` 2 cột `Ngân hàng,Tên gọi khác` (như `danh-muc-ngan-hang.csv`).
+- **Về mặc định:** bỏ danh sách riêng, dùng lại danh sách có sẵn của app.
+
+Danh sách này lưu riêng, độc lập với bảng điều kiện. Thêm một ngân hàng vào danh sách **không** tự cho app chấm điều kiện ngân hàng đó – muốn chấm thì thêm ở mục Điều kiện.
+
 ### Các cột trong file sao lưu (CSV)
 
 App chỉ xét **mở thẻ online**. Ba điều kiện chính là con số, khách đạt khi **nhỏ hơn hoặc bằng** con số đó:
