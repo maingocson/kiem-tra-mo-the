@@ -1,9 +1,10 @@
-﻿Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,Ghi chú
-VPBank,VPB,Có,80,5,2,Không,Có,Mẫu
-TPBank,TPB,Có,80,5,2,Không,Có,Mẫu
-VIB,,Có,70,4,1,Không,Có,ĐB: thẻ cũ phải mở trên 6 tháng
-HDBank,HDB,Có,,6,3,"HĐLĐ, HKD, Tự do",Không,Mẫu
-Techcombank,TCB,Có,60,3,0,HĐLĐ,Không,Mẫu
-MB Bank,"MB, MBBank",Có,70,4,1,Không,Không,Mẫu
-Sacombank,STB,Có,85,6,2,Không,Có,Mẫu
-Cake by VPBank,Cake,Có,90,,3,Không,Không,Mẫu: ngân hàng số
+Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,Ghi chú
+VPBank,VPB,Có,100,5,,Có,Có,"""ĐB"" : chứng minh được công việc"
+TPBank,TPB,Có,50,3,,Không,Có,"""ĐB"" : có BHXH đóng trên 1 năm"
+VIB,VIB,Có,100,,1,Không,Có,"""ĐB"" :"
+OCB,OCB,Có,70,4,,Không,Không,"""ĐB"" : điểm tín dụng xếp hạng 3 trở lên"
+TCB,TCB,Có,80,3,,Không,Không,Mẫu
+Cake by VPBank,Cake,Có,100,,,Không,Không,"""ĐB"" : không rõ điều kiện. Cứ làm bth"
+ACB,ACB,Có,80,4,1,Không,Không,"""ĐB"" : 3 tháng gần không tháng nào vượt 80%"
+MSB,MSB,Có,70,4,,Không,Không,"""ĐB"" : Điểm tín dụng thấp trình Online Max 50tr"
+SeABank,SEA,Có,65,4,1,Không,Không,"""ĐB"" : có tạm trú HCM, hoặc trình Online max 50tr
