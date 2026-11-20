@@ -263,7 +263,7 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
     <section>
       <div class="sec-head"><h2>Điều kiện đang dùng</h2><span class="note" id="rulesCount"></span></div>
       <button class="btn2 acc" id="editBtn" type="button">Sửa điều kiện</button>
-      <span class="sample" id="rulesSample">Đang dùng điều kiện mẫu – chưa phải điều kiện thật</span>
+      <span class="sample" id="rulesSample">Đang dùng bảng điều kiện mặc định – bấm Sửa điều kiện rồi Lưu để có bảng riêng trên máy</span>
       <div id="rules" class="stack"></div>
       <button class="add" id="addRule" type="button" hidden><b>+</b> Thêm ngân hàng</button>
     </section>
@@ -284,17 +284,18 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 "use strict";
 const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank","MB Bank","ACB","Sacombank","TPBank","VIB","HDBank","SHB","OCB","MSB","SeABank","Eximbank","LPBank","Nam A Bank","Bac A Bank","PVcomBank","Kienlongbank","ABBANK","BVBank","Shinhan Bank","HSBC","Standard Chartered","UOB","Woori Bank","Cake by VPBank"];
 
-/* ĐIỀU KIỆN MẪU – cùng định dạng với bảng Google Sheet. Chưa phải điều kiện thật của ngân hàng. */
-const SAMPLE_RULES=[
- {"Ngân hàng":"VPBank","Tên gọi khác":"VPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"Mẫu"},
- {"Ngân hàng":"TPBank","Tên gọi khác":"TPB","Tỷ lệ sử dụng tối đa (%)":"80","Số thẻ tối đa":"5","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"Mẫu"},
- {"Ngân hàng":"VIB","Tên gọi khác":"","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"ĐB: thẻ cũ phải mở trên 6 tháng"},
- {"Ngân hàng":"HDBank","Tên gọi khác":"HDB","Tỷ lệ sử dụng tối đa (%)":"","Số thẻ tối đa":"6","Số CTTC tối đa":"3","Cần công việc":"HĐLĐ, HKD, Tự do","Cần thẻ cũ":"Không","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Techcombank","Tên gọi khác":"TCB","Tỷ lệ sử dụng tối đa (%)":"60","Số thẻ tối đa":"3","Số CTTC tối đa":"0","Cần công việc":"HĐLĐ","Cần thẻ cũ":"Không","Ghi chú":"Mẫu"},
- {"Ngân hàng":"MB Bank","Tên gọi khác":"MB, MBBank","Tỷ lệ sử dụng tối đa (%)":"70","Số thẻ tối đa":"4","Số CTTC tối đa":"1","Cần công việc":"Không","Cần thẻ cũ":"Không","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Sacombank","Tên gọi khác":"STB","Tỷ lệ sử dụng tối đa (%)":"85","Số thẻ tối đa":"6","Số CTTC tối đa":"2","Cần công việc":"Không","Cần thẻ cũ":"Có","Ghi chú":"Mẫu"},
- {"Ngân hàng":"Cake by VPBank","Tên gọi khác":"Cake","Tỷ lệ sử dụng tối đa (%)":"90","Số thẻ tối đa":"","Số CTTC tối đa":"3","Cần công việc":"Không","Cần thẻ cũ":"Không","Ghi chú":"Mẫu: ngân hàng số"}
-];
+/* BẢNG ĐIỀU KIỆN MẶC ĐỊNH – dùng khi máy chưa lưu bảng nào (giống file mau-bang-dieu-kien.csv). */
+const DEFAULT_CSV=`Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,Ghi chú
+VPBank,VPB,Có,100,5,,Có,Có,"""ĐB"" : chứng minh được công việc"
+TPBank,TPB,Có,50,3,,Không,Có,"""ĐB"" : có BHXH đóng trên 1 năm"
+VIB,VIB,Có,100,,1,Không,Có,"""ĐB"" :"
+OCB,OCB,Có,70,4,,Không,Không,"""ĐB"" : điểm tín dụng xếp hạng 3 trở lên"
+TCB,TCB,Có,80,3,,Không,Không,"Mẫu"
+Cake by VPBank,Cake,Có,100,,,Không,Không,"""ĐB"" : không rõ điều kiện. Cứ làm bth"
+ACB,ACB,Có,80,4,1,Không,Không,"""ĐB"" : 3 tháng gần không tháng nào vượt 80%"
+MSB,MSB,Có,70,4,,Không,Không,"""ĐB"" : Điểm tín dụng thấp trình Online Max 50tr"
+SeABank,SEA,Có,65,4,1,Không,Không,"""ĐB"" : có tạm trú HCM, hoặc trình Online max 50tr"`;
+const SAMPLE_RULES=parseCSV(DEFAULT_CSV);
 const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",badDebt:false,example:true};
 const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",tudo:"Làm tự do",none:"Không chứng minh được công việc"};
 const K_CACHE="kmt.rulesCache.v4",K_VER="kmt.policyVersions.v1",MAX_VER=20,K_CUST="kmt.customer.v2";
@@ -385,7 +386,7 @@ function parseCSV(text){
 const fmtTime=t=>new Date(t).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"});
 function setPolicy(state,text){$("#pDot").className="dot "+state;$("#pText").textContent=text}
 function showPolicy(){
-  if(usingSample)return setPolicy("wait","Đang dùng điều kiện mẫu – bấm Sửa để nhập điều kiện thật");
+  if(usingSample)return setPolicy("wait",`${rules.length} ngân hàng · bảng điều kiện mặc định`);
   setPolicy("on",`${rules.length} ngân hàng · lưu trên máy lúc ${fmtTime(cache.at)}`);
 }
 /* ---------- Lưu trên máy: lịch sử, sao lưu, phục hồi ---------- */
@@ -402,7 +403,7 @@ function renderVersions(){
   $("#versions").innerHTML=v.length?v.map((x,i)=>`<div class="vrow${x.text===cur?" cur":""}"><span class="t"><b>${esc(fmtTime(x.at))} · ${x.count} ngân hàng</b><small>${esc(SRC[x.source]||x.source)}${x.text===cur?" · đang dùng":""}</small></span>
     ${x.text===cur?"":`<button class="btn2" type="button" data-restore="${i}">Khôi phục</button>`}<button class="btn2" type="button" data-export="${i}">Tải file</button></div>`).join("")
     :`<p class="note" style="margin:0">Chưa có bản nào. Bản đầu tiên được lưu khi tải chính sách lần đầu.</p>`;
-  $("#localInfo").textContent=usingSample?"Máy này chưa có chính sách – đang dùng điều kiện mẫu.":`Chính sách đang lưu trên máy này: ${rules.length} ngân hàng, cập nhật ${fmtTime(cache.at)}. Mở app không cần mạng vẫn dùng được.`;
+  $("#localInfo").textContent=usingSample?"Máy này chưa lưu bảng riêng – đang dùng bảng điều kiện mặc định.":`Chính sách đang lưu trên máy này: ${rules.length} ngân hàng, cập nhật ${fmtTime(cache.at)}. Mở app không cần mạng vẫn dùng được.`;
 }
 function stamp(){const d=new Date(),z=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`}
 async function exportCsv(text,name){
@@ -415,8 +416,7 @@ async function exportCsv(text,name){
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast("Đã tải file "+name);
 }
 $("#backupBtn").addEventListener("click",()=>{
-  if(usingSample||!cache||!cache.text){toast("Máy này chưa có chính sách để sao lưu");return}
-  exportCsv(cache.text,`dieu-kien-mo-the_${stamp()}.csv`);
+  exportCsv(usingSample||!cache||!cache.text?DEFAULT_CSV:cache.text,`dieu-kien-mo-the_${stamp()}.csv`);
 });
 let restoreCand=null;
 function askRestore(p,source,label){
@@ -567,9 +567,13 @@ function renderRules(){
      ${condHtml(r)}
    </div>`).join("");
 }
+function dbText(note){
+  const t=String(note||"").replace(/^\s*["“”']?\s*[ĐđDd][Bb]\s*["“”']?\s*[:：\-–]?\s*/,"").trim();
+  return t||"(chưa ghi cụ thể – xem lại với ngân hàng)";
+}
 function condHtml(r){
   const rows=[];
-  if(r.special)return`<div class="db"><b>⚠ Điều kiện đặc biệt (ĐB)</b><span>Tự kiểm tra khách có thoả không: ${esc(r.note)}</span></div>`;
+  if(r.special)return`<div class="db"><b>⚠ Điều kiện đặc biệt (ĐB)</b><span>Tự kiểm tra khách có thoả không: ${esc(dbText(r.note))}</span></div>`;
   if(r.note)rows.push(`<b>Ghi chú</b><span>${esc(r.note)}</span>`);
   return rows.length?`<div class="cond">${rows.join("")}</div>`:"";
 }
@@ -671,7 +675,7 @@ function runCheck(scroll){
     const r=x.rule,items=[...x.fails,...x.warns];
     /* ĐB chỉ xét ở bước cuối: khi mọi điều kiện khác đã thoả */
     const db=r.special&&x.status==="ok";
-    const extra=db?`<div class="db"><b>⚠ Bước cuối: kiểm tra điều kiện đặc biệt</b><span>Các điều kiện khác đã thoả. Khách mở được nếu thoả thêm: ${esc(r.note)}</span></div>`
+    const extra=db?`<div class="db"><b>⚠ Bước cuối: kiểm tra điều kiện đặc biệt</b><span>Các điều kiện khác đã thoả. Khách mở được nếu thoả thêm: ${esc(dbText(r.note))}</span></div>`
       :(x.status==="own"||r.special)?"":condHtml(r);
     return `<div class="rcard ${x.status}"><div class="rhead"><b>${esc(r.name)}</b><span class="chips">${db?`<span class="chip warn">Kiểm tra ĐB</span>`:""}<span class="chip ${x.status}">${chip}</span></span></div>
       ${items.length?`<ul class="why">${items.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
@@ -709,7 +713,6 @@ function runCheck(scroll){
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
-    ${usingSample?`<span class="sample">Đang so với điều kiện mẫu – bấm Sửa điều kiện để nhập điều kiện thật</span>`:""}
     <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
     ${tips.length?`<h2 style="margin-top:6px">Gợi ý</h2><div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`:""}
