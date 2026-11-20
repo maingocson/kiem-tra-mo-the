@@ -8,6 +8,8 @@
 - **Mọi dữ liệu nằm trên điện thoại:** bảng điều kiện và thông tin khách đều lưu ngay trên máy, không gửi lên mạng. Mất mạng vẫn dùng được.
 - Mỗi máy có bảng điều kiện riêng. Muốn dùng chung cho máy khác thì **Sao lưu ra file** rồi gửi file cho người kia **Phục hồi từ file**.
 
+Ô tên ngân hàng có gợi ý sẵn **danh mục đầy đủ ngân hàng tại Việt Nam** (nhà nước, cổ phần, ngân hàng số, ngân hàng nước ngoài).
+
 ## Cách dùng
 
 1. Mở link app bằng **Safari** → nút **Chia sẻ** → **Thêm vào MH chính**.
@@ -31,7 +33,7 @@ App chỉ xét **mở thẻ online**. Ba điều kiện chính là con số, kh�
 | Cột | Cách ghi | Ví dụ |
 |---|---|---|
 | Ngân hàng | Tên ngân hàng | VPBank |
-| Tên gọi khác | Tên viết tắt, cách nhau dấu phẩy (để nhận ra khi khách đã có thẻ) | VPB, VP |
+| Tên gọi khác | Tên viết tắt, cách nhau dấu phẩy (để nhận ra khi khách đã có thẻ). App đã tự hiểu tên phổ biến của các ngân hàng Việt Nam, ví dụ TCB = Techcombank, NCB = Quốc Dân | VPB, VP |
 | Áp dụng | `Có` / `Không` (Không = tạm bỏ qua ngân hàng này) | Có |
 | Tỷ lệ sử dụng tối đa (%) | Khách đạt khi tỷ lệ dùng hạn mức **≤** số này. Để trống = không giới hạn | 80 |
 | Số thẻ tối đa | Khách đạt khi số thẻ **đang có ≤** số này. Để trống = không giới hạn | 5 |

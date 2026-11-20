@@ -282,7 +282,31 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 <script>
 (function(){
 "use strict";
-const BANKS=["Vietcombank","VietinBank","BIDV","Agribank","Techcombank","VPBank","MB Bank","ACB","Sacombank","TPBank","VIB","HDBank","SHB","OCB","MSB","SeABank","Eximbank","LPBank","Nam A Bank","Bac A Bank","PVcomBank","Kienlongbank","ABBANK","BVBank","Shinhan Bank","HSBC","Standard Chartered","UOB","Woori Bank","Cake by VPBank"];
+/* Danh mục ngân hàng tại Việt Nam: "Tên chính|tên gọi khác|..." (tên gọi khác để nhận ra khi khách gõ tắt) */
+const BANK_DIR=[
+ // Ngân hàng thương mại nhà nước
+ "Vietcombank|VCB|Ngoại thương","VietinBank|CTG|Vietin|Công thương","BIDV|Đầu tư và Phát triển","Agribank|AGR|Nông nghiệp",
+ // Ngân hàng chuyển giao bắt buộc (tên mới)
+ "VCBNeo|CBBank|Xây dựng","MBV|OceanBank|Đại Dương","Vikki Bank|Vikki|DongA Bank|Đông Á","GPBank|Dầu khí toàn cầu",
+ // Ngân hàng thương mại cổ phần
+ "Techcombank|TCB|Kỹ thương","VPBank|VPB|VP|Việt Nam Thịnh Vượng","MB Bank|MB|MBBank|Quân đội","ACB|Á Châu",
+ "Sacombank|STB|Sài Gòn Thương Tín","TPBank|TPB|Tiên Phong","VIB|Quốc tế","HDBank|HDB|Phát triển TP.HCM",
+ "SHB|Sài Gòn - Hà Nội","OCB|Phương Đông","MSB|Maritime Bank|Hàng Hải","SeABank|SEA|SSB|Đông Nam Á",
+ "Eximbank|EIB|Exim|Xuất nhập khẩu","LPBank|LPB|LienVietPostBank|Lộc Phát","NCB|Quốc Dân|National Citizen Bank",
+ "Nam A Bank|NAB|Nam Á","Bac A Bank|BAB|Bắc Á","PVcomBank|PVB|PVcom|Đại chúng","Kienlongbank|KLB|Kiên Long",
+ "ABBANK|ABB|An Bình","BVBank|BVB|Viet Capital|Bản Việt","BaoViet Bank|BAOVIET|Bảo Việt","VietABank|VAB|Việt Á",
+ "Vietbank|VBB|Việt Nam Thương Tín","PGBank|PGB|Thịnh vượng và Phát triển","Saigonbank|SGB|Sài Gòn Công Thương",
+ "SCB|Sài Gòn Commercial",
+ // Ngân hàng số / thương hiệu số
+ "Cake by VPBank|Cake","Ubank by VPBank|Ubank","Timo|Timo Plus","TNEX|TNEX by MSB","Liobank|Liobank by OCB","Digimi|Digimi by BVBank",
+ // Ngân hàng 100% vốn nước ngoài và liên doanh
+ "HSBC","Standard Chartered|SC|SCB Standard","Shinhan Bank|Shinhan|SHBVN","Woori Bank|Woori","UOB","CIMB","Public Bank|PBVN",
+ "Hong Leong Bank|Hong Leong|HLBVN","Citibank|Citi","Indovina Bank|IVB|Indovina","VRB|Việt - Nga"
+];
+const BANKS=BANK_DIR.map(x=>x.split("|")[0]);
+const BANK_ALIAS={};
+BANK_DIR.forEach(x=>{const [n,...a]=x.split("|");const k=bkey(n);[n,...a].forEach(v=>{const vk=bkey(v);if(vk&&!(vk in BANK_ALIAS))BANK_ALIAS[vk]=k})});
+function canon(name){const k=bkey(name);return BANK_ALIAS[k]||k}
 
 /* BẢNG ĐIỀU KIỆN MẶC ĐỊNH – dùng khi máy chưa lưu bảng nào (giống file mau-bang-dieu-kien.csv). */
 const DEFAULT_CSV=`Ngân hàng,Tên gọi khác,Áp dụng,Tỷ lệ sử dụng tối đa (%),Số thẻ tối đa,Số CTTC tối đa,Cần công việc,Cần thẻ cũ,Ghi chú
@@ -600,7 +624,7 @@ function renderRows(){
 }
 function stats(c){
   const rows=c.rows.filter(r=>String(r.bank||"").trim());
-  const banks=new Set(rows.map(r=>bkey(r.bank)));
+  const banks=new Set(rows.map(r=>canon(r.bank)));
   let cards=0,limit=0,used=0,maxLimit=0;
   rows.forEach(r=>{const l=num(r.limit)||0;cards+=num(r.cards)||0;limit+=l;used+=num(r.used)||0;maxLimit=Math.max(maxLimit,l)});
   return{banks,bankCount:banks.size,cards,limit,used,maxLimit,util:limit>0?used/limit*100:0};
@@ -638,7 +662,7 @@ $("#newYes").addEventListener("click",()=>{
 });
 
 /* ---------- Đối chiếu ---------- */
-function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].map(bkey).filter(Boolean).some(k=>s.banks.has(k))}
+function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].filter(x=>bkey(x)).map(canon).some(k=>s.banks.has(k))}
 function jobFail(j,job){
   if(j.req&&job==="none")return"cần chứng minh công việc";
   if(j.jobs&&job!=="none"&&!j.jobs[job])return`không nhận ${JOBS[job].toLowerCase()} (nhận: ${jobText(j)})`;
