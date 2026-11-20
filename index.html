@@ -286,6 +286,7 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 const BANK_DIR=[
  // Ngân hàng thương mại nhà nước
  "Vietcombank|VCB|Ngoại thương","VietinBank|CTG|Vietin|Công thương","BIDV|Đầu tư và Phát triển","Agribank|AGR|Nông nghiệp",
+ "VBSP|Chính sách xã hội|NHCSXH","VDB|Phát triển Việt Nam","Co-opBank|Coopbank|Hợp tác xã",
  // Ngân hàng chuyển giao bắt buộc (tên mới)
  "VCBNeo|CBBank|Xây dựng","MBV|OceanBank|Đại Dương","Vikki Bank|Vikki|DongA Bank|Đông Á","GPBank|Dầu khí toàn cầu",
  // Ngân hàng thương mại cổ phần
@@ -293,15 +294,15 @@ const BANK_DIR=[
  "Sacombank|STB|Sài Gòn Thương Tín","TPBank|TPB|Tiên Phong","VIB|Quốc tế","HDBank|HDB|Phát triển TP.HCM",
  "SHB|Sài Gòn - Hà Nội","OCB|Phương Đông","MSB|Maritime Bank|Hàng Hải","SeABank|SEA|SSB|Đông Nam Á",
  "Eximbank|EIB|Exim|Xuất nhập khẩu","LPBank|LPB|LienVietPostBank|Lộc Phát","NCB|Quốc Dân|National Citizen Bank",
- "Nam A Bank|NAB|Nam Á","Bac A Bank|BAB|Bắc Á","PVcomBank|PVB|PVcom|Đại chúng","Kienlongbank|KLB|Kiên Long",
+ "Nam A Bank|NamABank|NAB|Nam Á","Bac A Bank|BAB|Bắc Á","PVcomBank|PVB|PVcom|Đại chúng","Kienlongbank|KLB|Kiên Long",
  "ABBANK|ABB|An Bình","BVBank|BVB|Viet Capital|Bản Việt","BaoViet Bank|BAOVIET|Bảo Việt","VietABank|VAB|Việt Á",
  "Vietbank|VBB|Việt Nam Thương Tín","PGBank|PGB|Thịnh vượng và Phát triển","Saigonbank|SGB|Sài Gòn Công Thương",
  "SCB|Sài Gòn Commercial",
  // Ngân hàng số / thương hiệu số
  "Cake by VPBank|Cake","Ubank by VPBank|Ubank","Timo|Timo Plus","TNEX|TNEX by MSB","Liobank|Liobank by OCB","Digimi|Digimi by BVBank",
  // Ngân hàng 100% vốn nước ngoài và liên doanh
- "HSBC","Standard Chartered|SC|SCB Standard","Shinhan Bank|Shinhan|SHBVN","Woori Bank|Woori","UOB","CIMB","Public Bank|PBVN",
- "Hong Leong Bank|Hong Leong|HLBVN","Citibank|Citi","Indovina Bank|IVB|Indovina","VRB|Việt - Nga"
+ "HSBC","Standard Chartered|SCBVL|SC|SCB Standard","Shinhan Bank|Shinhan|SHBVN","Woori Bank|Woori","UOB","CIMB","Public Bank|PBVN",
+ "Hong Leong Bank|Hong Leong|HLBVN","Citibank|Citi","ANZ|ANZVL","Indovina Bank|IVB|Indovina","VRB|Việt - Nga"
 ];
 const BANKS=BANK_DIR.map(x=>x.split("|")[0]);
 const BANK_ALIAS={};
