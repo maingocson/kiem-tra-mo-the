@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 140" width="448" height="140">
+  <title>Smart-B – Bank · Bridge · Benefit</title>
+  <g transform="translate(10 10) scale(1.25)">
+    <rect width="96" height="96" rx="22" fill="#16325c"/>
+    <rect x="26" y="20" width="9" height="56" rx="2" fill="#fff"/>
+    <path d="M31 24.5H52a11.5 11.5 0 0 1 0 23H31" fill="none" stroke="#fff" stroke-width="9" stroke-linejoin="round"/>
+    <path d="M31 47.5H56a12 12 0 0 1 0 24H31" fill="none" stroke="#fff" stroke-width="9" stroke-linejoin="round"/>
+    <path d="M18 84Q48 64 78 84" fill="none" stroke="#f0b429" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <text x="150" y="80" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" letter-spacing="-1" fill="#16325c">Smart<tspan fill="#f0b429">-B</tspan></text>
+  <text x="153" y="116" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="500" letter-spacing="1.5" fill="#5b6472">BANK · BRIDGE · BENEFIT</text>
+</svg>

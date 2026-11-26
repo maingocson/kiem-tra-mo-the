@@ -32,7 +32,9 @@ Bấm **Xuất PDF** ở phần Kết quả. File PDF có logo, thông tin khác
 
 ## Logo công ty
 
-Tab **Điều kiện** → **Logo công ty** → **Chọn ảnh logo**. Logo hiện ở đầu app và trên PDF. Logo lưu trên từng máy; muốn mọi máy có sẵn logo thì đặt file `logo.png` vào thư mục app.
+App dùng sẵn logo **Smart-B** (Bank · Bridge · Benefit): `logo.svg` là bản gốc, `logo.png` hiện ở đầu app và trên PDF, `icon.png` là biểu tượng trên màn hình chính iPhone.
+
+Muốn dùng logo khác trên một máy: tab **Điều kiện** → **Logo công ty** → **Chọn ảnh logo** (bấm **Xoá logo** để quay về Smart-B).
 
 ## Sao lưu & phục hồi (tab Điều kiện)
 
@@ -85,5 +87,6 @@ Các cột `Cần công việc`, `Cần thẻ cũ` là tuỳ chọn, xoá đi c�
 ```
 index.html               ứng dụng (GitHub Pages)
 icon.png                 biểu tượng trên màn hình chính
+logo.svg, logo.png       logo Smart-B
 mau-bang-dieu-kien.csv   bảng điều kiện mẫu (có thể Phục hồi từ file này)
 ```
