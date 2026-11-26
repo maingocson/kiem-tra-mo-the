@@ -106,7 +106,7 @@ input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(-
 .saved-tag{font-size:12px;color:var(--ok);font-weight:600}
 .logo-prev{display:flex;align-items:center;justify-content:center;min-height:70px;background:var(--sunk);border:1px dashed var(--line);border-radius:10px;padding:8px}
 .logo-prev img{max-height:70px;max-width:220px;object-fit:contain}
-#pdfStage{position:fixed;left:-10000px;top:0;width:760px;background:#fff;color:#1d1d1f}
+
 button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 #results{scroll-margin-top:16px}
@@ -359,7 +359,6 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 </div></nav>
 <div class="savebar" id="saveBar" hidden><div class="in"><span id="saveText">Chưa có thay đổi</span><button id="cancelEdit" type="button" class="cancel">Huỷ</button><button id="saveRules" type="button">Lưu</button></div></div>
 <div class="toast" id="toast"></div>
-<div id="pdfStage" aria-hidden="true"></div>
 <datalist id="bankList"></datalist>
 
 <script>
@@ -845,6 +844,7 @@ function runCheck(scroll){
     ${bad.length?`<details class="grp"><summary>Không phù hợp (${bad.length})</summary><div class="res">${bad.map(card).join("")}</div></details>`:""}
     ${own.length?`<details class="grp"><summary>Đã có thẻ (${own.length})</summary><div class="res">${own.map(card).join("")}</div></details>`:""}`;
   R.hidden=false;
+  loadPdfLib().catch(()=>{});
   if(scroll!==false)R.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
 }
 $("#runCheck").addEventListener("click",()=>runCheck(true));
@@ -1060,57 +1060,82 @@ $("#logoFile").addEventListener("change",e=>{
 });
 $("#logoDel").addEventListener("click",()=>{try{localStorage.removeItem(K_LOGO)}catch(e){}showLogo();toast("Đã xoá logo")});
 
-/* ---------- Xuất PDF kết quả ---------- */
-const PDF_LIB="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+/* ---------- Xuất PDF kết quả (pdfmake: chữ thật, tự sang trang, chạy tốt trên iPhone) ---------- */
+const PDF_LIBS=["https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js","https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"];
 let pdfLib=null;
+function loadScript(src){return new Promise((ok,fail)=>{const sc=document.createElement("script");sc.src=src;sc.onload=ok;sc.onerror=fail;document.head.appendChild(sc)})}
 function loadPdfLib(){
-  if(window.html2pdf)return Promise.resolve();
-  return pdfLib||(pdfLib=new Promise((ok,fail)=>{const sc=document.createElement("script");sc.src=PDF_LIB;sc.onload=ok;sc.onerror=()=>{pdfLib=null;fail()};document.head.appendChild(sc)}));
+  if(window.pdfMake&&window.pdfMake.vfs)return Promise.resolve();
+  return pdfLib||(pdfLib=(async()=>{for(const u of PDF_LIBS)await loadScript(u)})().catch(e=>{pdfLib=null;throw e}));
 }
-function reportHtml(){
+async function logoDataUrl(){
+  const own=logoNow();if(own)return own;
+  const img=$("#brandLogo");if(img.hidden||!img.complete||!img.naturalWidth)return null;
+  try{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);return c.toDataURL("image/png")}catch(e){return null}
+}
+/* đổi đoạn HTML gợi ý (<b>…</b>) sang chữ có in đậm cho PDF */
+function richText(html){
+  const dec=t=>t.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&");
+  const out=[];String(html).split(/(<b>[\s\S]*?<\/b>)/).forEach(part=>{
+    if(!part)return;const m=part.match(/^<b>([\s\S]*)<\/b>$/);
+    const t=dec((m?m[1]:part).replace(/<[^>]+>/g,""));if(t)out.push(m?{text:t,bold:true}:{text:t});
+  });
+  return out;
+}
+async function buildPdfDoc(){
   const a=analyze(),s=a.s,c=cust,now=new Date();
-  const logo=logoNow()||(!$("#brandLogo").hidden&&$("#brandLogo").src)||"";
-  const C={ok:"#1f7a4d",warn:"#b26a00",bad:"#b3261e",own:"#6b6b70"};
+  const logo=await logoDataUrl();
+  const C={ok:"#1f7a4d",warn:"#b26a00",bad:"#b3261e",own:"#6b6b70",ink:"#1d1d1f",mute:"#5b6472",line:"#d9d9de",brand:"#16325c"};
   const label={ok:"Có thể mở",warn:"Cần giảm dư nợ",bad:"Không phù hợp",own:"Đã có thẻ"};
   const rows=c.rows.filter(r=>String(r.bank||"").trim());
-  const th='style="text-align:left;padding:6px 8px;border-bottom:1px solid #ddd;font-size:12px;color:#555"';
-  const td='style="padding:6px 8px;border-bottom:1px solid #eee;font-size:13px"';
-  const item=x=>{
-    const r=x.rule,db=r.special&&x.status==="ok",why=[...x.fails,...x.warns];
-    return`<div style="border:1px solid #e3e3e3;border-left:4px solid ${C[x.status]};border-radius:6px;padding:8px 10px;margin-bottom:6px;page-break-inside:avoid">
-      <div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:14px">${esc(r.name)}</b><span style="font-size:12px;font-weight:700;color:${C[x.status]}">${label[x.status]}${db?" · cần kiểm tra ĐB":""}</span></div>
-      ${why.length?`<ul style="margin:4px 0 0;padding-left:18px;font-size:12.5px">${why.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
-      ${db?`<div style="margin-top:4px;font-size:12.5px;color:#7a4a00">Điều kiện đặc biệt cần kiểm tra thêm: ${esc(dbText(r.note))}</div>`:""}</div>`;
+  const H=t=>({text:t,style:"h",margin:[0,14,0,6]});
+  /* font Roboto không có dấu mũi tên → : đổi sang » để không hiện ô vuông */
+  const fx=t=>String(t).replace(/→/g,"»");
+  /* tiêu đề luôn đi liền với mục đầu tiên, không bị bỏ lại cuối trang */
+  const keep=(title,items)=>items.length?[{stack:[H(title),items[0]],unbreakable:true},...items.slice(1)]:[];
+  const info=[["Khách hàng",{text:c.name||"—",bold:true}]];
+  if(c.phone)info.push(["Số điện thoại",c.phone]);
+  info.push(["Công việc",JOBS[c.job]]);
+  info.push(["Công ty tài chính",`${c.finCos} công ty đang có dư nợ`]);
+  info.push(["Nợ quá hạn / nợ xấu",c.badDebt?{text:"Có",bold:true,color:C.bad}:"Không"]);
+  if(c.note)info.push(["Ghi chú",c.note]);
+  const card=x=>{
+    const r=x.rule,db=r.special&&x.status==="ok",why=[...x.fails,...x.warns].map(fx);
+    const body=[{columns:[{text:r.name,bold:true,fontSize:11.5},{text:label[x.status]+(db?" · cần kiểm tra ĐB":""),color:C[x.status],bold:true,alignment:"right",fontSize:9.5}]}];
+    if(why.length)body.push({ul:why,margin:[0,3,0,0]});
+    if(db)body.push({text:[{text:"Điều kiện đặc biệt cần kiểm tra thêm: ",bold:true},dbText(r.note)],color:"#7a4a00",margin:[0,3,0,0]});
+    return{table:{widths:["*"],body:[[{stack:body,margin:[6,4,4,4]}]]},unbreakable:true,margin:[0,0,0,5],
+      layout:{hLineWidth:()=>.5,vLineWidth:i=>i===0?3:.5,hLineColor:()=>C.line,vLineColor:i=>i===0?C[x.status]:C.line}};
   };
-  const group=(title,list)=>list.length?`<h3 style="font-size:15px;margin:14px 0 6px">${title} (${list.length})</h3>${list.map(item).join("")}`:"";
-  return`<div style="font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;padding:28px 30px;color:#1d1d1f;line-height:1.45">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:2px solid #1f6f5c;padding-bottom:12px">
-      <div style="display:flex;align-items:center;gap:14px">${logo?`<img src="${logo}" style="height:60px;max-width:240px;object-fit:contain">`:""}
-        <div><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#666;font-weight:600">Tư vấn thẻ tín dụng</div><div style="font-size:21px;font-weight:800">KẾT QUẢ KIỂM TRA MỞ THẺ</div></div></div>
-      <div style="text-align:right;font-size:12px;color:#555">Ngày kiểm tra<br><b style="color:#1d1d1f">${esc(now.toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}))}</b></div>
-    </div>
-    <table style="width:100%;margin-top:12px;font-size:13.5px;border-collapse:collapse">
-      <tr><td style="padding:3px 0;color:#555;width:150px">Khách hàng</td><td><b>${esc(c.name||"—")}</b></td></tr>
-      ${c.phone?`<tr><td style="padding:3px 0;color:#555">Số điện thoại</td><td>${esc(c.phone)}</td></tr>`:""}
-      <tr><td style="padding:3px 0;color:#555">Công việc</td><td>${esc(JOBS[c.job])}</td></tr>
-      <tr><td style="padding:3px 0;color:#555">Công ty tài chính</td><td>${c.finCos} công ty đang có dư nợ</td></tr>
-      <tr><td style="padding:3px 0;color:#555">Nợ quá hạn / nợ xấu</td><td>${c.badDebt?"<b style='color:#b3261e'>Có</b>":"Không"}</td></tr>
-      ${c.note?`<tr><td style="padding:3px 0;color:#555">Ghi chú</td><td>${esc(c.note)}</td></tr>`:""}
-    </table>
-    <h3 style="font-size:15px;margin:16px 0 6px">Thẻ tín dụng đang có</h3>
-    ${rows.length?`<table style="width:100%;border-collapse:collapse"><tr><th ${th}>Ngân hàng</th><th ${th}>Số thẻ</th><th ${th}>HM cấp (tr)</th><th ${th}>Đã dùng (tr)</th><th ${th}>Tỷ lệ</th></tr>
-      ${rows.map(r=>{const l=num(r.limit)||0,u=num(r.used)||0;return`<tr><td ${td}>${esc(r.bank)}</td><td ${td}>${esc(r.cards)}</td><td ${td}>${fmt(l)}</td><td ${td}>${fmt(u)}</td><td ${td}>${l>0?Math.round(u/l*100)+"%":"—"}</td></tr>`}).join("")}
-      <tr><td ${td}><b>Tổng</b></td><td ${td}><b>${fmt(s.cards)}</b></td><td ${td}><b>${fmt(s.limit)}</b></td><td ${td}><b>${fmt(s.used)}</b></td><td ${td}><b>${Math.round(s.util)}%</b></td></tr></table>`
-      :`<p style="font-size:13px;color:#555;margin:0">Chưa có thẻ tín dụng.</p>`}
-    <div style="display:flex;gap:8px;margin:16px 0 4px">
-      ${[["ok","Có thể mở"],["warn","Cần giảm dư nợ"],["bad","Không phù hợp"]].map(([k,t])=>`<div style="flex:1;border:1px solid #e3e3e3;border-radius:8px;padding:8px 10px"><div style="font-size:22px;font-weight:800;color:${C[k]}">${a.n(k)}</div><div style="font-size:12px;color:#555">${t}</div></div>`).join("")}
-    </div>
-    ${group("Ngân hàng có thể mở",a.good)}
-    ${a.tips.length?`<h3 style="font-size:15px;margin:14px 0 6px">Gợi ý</h3><ul style="margin:0;padding-left:18px;font-size:13px">${a.tips.map(t=>`<li style="margin-bottom:3px;page-break-inside:avoid">${t[2]}</li>`).join("")}</ul>`:""}
-    ${group("Không phù hợp",a.bad)}
-    ${a.own.length?`<h3 style="font-size:15px;margin:14px 0 6px">Đã có thẻ</h3><p style="font-size:13px;margin:0">${esc(a.own.map(x=>x.rule.name).join(", "))}</p>`:""}
-    <p style="margin-top:18px;font-size:11px;color:#777;border-top:1px solid #e3e3e3;padding-top:8px">Kết quả mang tính tham khảo, đối chiếu theo bảng điều kiện mở thẻ online tại thời điểm kiểm tra. Ngân hàng là bên thẩm định và quyết định cuối cùng.</p>
-  </div>`;
+  const group=(title,list)=>keep(`${title} (${list.length})`,list.map(card));
+  const content=[
+    {columns:[
+      logo?{image:logo,fit:[150,48],width:160}:{text:"",width:0},
+      {stack:[{text:"TƯ VẤN THẺ TÍN DỤNG",fontSize:8,bold:true,color:C.mute,characterSpacing:1},{text:"KẾT QUẢ KIỂM TRA MỞ THẺ",fontSize:16,bold:true,color:C.brand}],margin:[logo?6:0,8,0,0]},
+      {stack:[{text:"Ngày kiểm tra",fontSize:8.5,color:C.mute},{text:now.toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}),bold:true}],alignment:"right",width:90,margin:[0,10,0,0]}
+    ]},
+    {canvas:[{type:"line",x1:0,y1:0,x2:515,y2:0,lineWidth:1.5,lineColor:C.brand}],margin:[0,8,0,6]},
+    {table:{widths:[120,"*"],body:info.map(([k,v])=>[{text:k,color:C.mute},v])},layout:"noBorders"},
+    H("Thẻ tín dụng đang có"),
+    rows.length?{table:{headerRows:1,widths:["*",45,70,70,45],body:[
+      ["Ngân hàng","Số thẻ","HM cấp (tr)","Đã dùng (tr)","Tỷ lệ"].map(t=>({text:t,bold:true,color:C.mute,fontSize:9})),
+      ...rows.map(r=>{const l=num(r.limit)||0,u=num(r.used)||0;return[r.bank,String(r.cards??""),fmt(l),fmt(u),l>0?Math.round(u/l*100)+"%":"—"]}),
+      [{text:"Tổng",bold:true},{text:fmt(s.cards),bold:true},{text:fmt(s.limit),bold:true},{text:fmt(s.used),bold:true},{text:Math.round(s.util)+"%",bold:true}]
+    ]},layout:{hLineWidth:(i,n)=>i===0||i===n.table.body.length?0:.5,vLineWidth:()=>0,hLineColor:()=>C.line,paddingTop:()=>4,paddingBottom:()=>4}}
+    :{text:"Khách chưa có thẻ tín dụng.",color:C.mute},
+    {table:{widths:["*","*","*"],body:[[["ok","Có thể mở"],["warn","Cần giảm dư nợ"],["bad","Không phù hợp"]].map(([k,t])=>({stack:[{text:String(a.n(k)),fontSize:18,bold:true,color:C[k]},{text:t,fontSize:9,color:C.mute}],margin:[4,2,4,2]}))]},
+      layout:{hLineWidth:()=>.5,vLineWidth:()=>.5,hLineColor:()=>C.line,vLineColor:()=>C.line},margin:[0,14,0,0]},
+    ...(a.good.length?group("Ngân hàng có thể mở",a.good):[H("Ngân hàng có thể mở"),{text:"Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.",color:C.mute}]),
+    ...keep("Gợi ý",a.tips.map(t=>({ul:[{text:richText(fx(t[2]))}],margin:[0,0,0,3]}))),
+    ...group("Không phù hợp",a.bad),
+    ...keep(`Đã có thẻ (${a.own.length})`,a.own.length?[{text:a.own.map(x=>x.rule.name).join(", ")}]:[]),
+    {text:"Kết quả mang tính tham khảo, đối chiếu theo bảng điều kiện mở thẻ online tại thời điểm kiểm tra. Ngân hàng là bên thẩm định và quyết định cuối cùng.",fontSize:8.5,color:"#777",margin:[0,18,0,0]}
+  ];
+  return{pageSize:"A4",pageMargins:[40,36,40,44],content,
+    footer:(cur,total)=>({columns:[{text:"Smart-B · Bank · Bridge · Benefit",color:"#999"},{text:`Trang ${cur}/${total}`,alignment:"right",color:"#999"}],fontSize:8,margin:[40,14,40,0]}),
+    defaultStyle:{font:"Roboto",fontSize:10.5,color:C.ink,lineHeight:1.2},
+    styles:{h:{fontSize:12.5,bold:true,color:C.brand}},
+    info:{title:`Kết quả kiểm tra mở thẻ – ${c.name||"khách hàng"}`}};
 }
 let pdfReady=null;
 async function sharePdf(file){
@@ -1126,18 +1151,17 @@ async function exportPdf(btn){
   const old=btn.textContent;btn.disabled=true;btn.textContent="Đang tạo PDF…";
   try{
     await loadPdfLib();
-    const stage=$("#pdfStage");stage.innerHTML=reportHtml();
+    const doc=await buildPdfDoc();
     const safe=plain(cust.name||"khach").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"khach";
     const name=`ket-qua_${safe}_${stamp()}.pdf`;
-    const blob=await html2pdf().set({margin:[8,6,10,6],image:{type:"jpeg",quality:.95},html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from(stage.firstElementChild).outputPdf("blob");
-    stage.innerHTML="";
+    const blob=await new Promise((ok,fail)=>{try{pdfMake.createPdf(doc).getBlob(ok)}catch(e){fail(e)}});
     pdfReady=new File([blob],name,{type:"application/pdf"});
     try{await sharePdf(pdfReady);btn.textContent=old}
     catch(e){
       if(e&&e.name==="AbortError"){btn.textContent=old}
       else{btn.dataset.ready="1";btn.textContent="Mở / gửi PDF";toast("PDF đã sẵn sàng – bấm Mở / gửi PDF")}
     }
-  }catch(e){btn.textContent=old;toast("Chưa tạo được PDF – kiểm tra kết nối mạng rồi thử lại")}
+  }catch(e){console.error(e);btn.textContent=old;toast("Chưa tạo được PDF – kiểm tra kết nối mạng rồi thử lại")}
   finally{btn.disabled=false}
 }
 

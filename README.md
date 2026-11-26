@@ -28,7 +28,7 @@
 
 ## Xuất PDF kết quả
 
-Bấm **Xuất PDF** ở phần Kết quả. File PDF có logo, thông tin khách, các thẻ đang có, ngân hàng có thể mở (kèm điều kiện ĐB cần kiểm tra), gợi ý và ngân hàng không phù hợp. Trên iPhone, chọn gửi qua Zalo, email hoặc *Lưu vào Tệp*. Lần đầu xuất PDF cần có mạng để tải công cụ tạo PDF.
+Bấm **Xuất PDF** ở phần Kết quả. File PDF có logo, thông tin khách, các thẻ đang có, ngân hàng có thể mở (kèm điều kiện ĐB cần kiểm tra), gợi ý và ngân hàng không phù hợp. PDF dùng chữ thật (không chụp ảnh màn hình), khổ A4, tự sang trang khi dài, có số trang. Trên iPhone, chọn gửi qua Zalo, email hoặc *Lưu vào Tệp*; nếu bảng chia sẻ không tự hiện, bấm nút **Mở / gửi PDF**. Lần đầu xuất PDF cần có mạng để tải công cụ tạo PDF.
 
 ## Logo công ty
 
