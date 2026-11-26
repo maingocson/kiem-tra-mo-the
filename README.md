@@ -18,6 +18,22 @@
    - bấm **Lưu** ở thanh dưới cùng. **Huỷ** để bỏ thay đổi.
 3. Tab **Kiểm tra**: nhập thẻ khách đang có, số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**.
 
+## Khách hàng
+
+- Tab **Kiểm tra** có ô **Tên khách hàng**, số điện thoại và ghi chú.
+- Sau khi kiểm tra, bấm **Lưu khách hàng** để lưu hồ sơ. Lưu lại lần nữa sẽ cập nhật đúng hồ sơ đó, không tạo bản trùng. Bấm **Khách mới** để nhập khách khác.
+- Tab **Khách hàng**: tìm theo tên, số điện thoại hoặc ngân hàng; **Mở** để xem lại và kiểm tra lại; **Xoá** (bấm 2 lần).
+- **Sao lưu ra file / Phục hồi từ file** (file `.json`). Phục hồi sẽ gộp vào danh sách đang có.
+- Dữ liệu khách **chỉ lưu trên điện thoại**, không gửi lên mạng.
+
+## Xuất PDF kết quả
+
+Bấm **Xuất PDF** ở phần Kết quả. File PDF có logo, thông tin khách, các thẻ đang có, ngân hàng có thể mở (kèm điều kiện ĐB cần kiểm tra), gợi ý và ngân hàng không phù hợp. Trên iPhone, chọn gửi qua Zalo, email hoặc *Lưu vào Tệp*. Lần đầu xuất PDF cần có mạng để tải công cụ tạo PDF.
+
+## Logo công ty
+
+Tab **Điều kiện** → **Logo công ty** → **Chọn ảnh logo**. Logo hiện ở đầu app và trên PDF. Logo lưu trên từng máy; muốn mọi máy có sẵn logo thì đặt file `logo.png` vào thư mục app.
+
 ## Sao lưu & phục hồi (tab Điều kiện)
 
 - **Sao lưu ra file:** xuất bảng điều kiện đang dùng thành file `.csv`. Trên iPhone chọn *Lưu vào Tệp*, hoặc gửi qua Zalo, email…

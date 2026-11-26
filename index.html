@@ -98,6 +98,15 @@ input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(-
 .btn2.danger{color:var(--bad)}
 .btn2.acc{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .row-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand img{height:42px;width:auto;max-width:110px;object-fit:contain;border-radius:8px;flex:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res-acts .btn2{padding:12px}
+.saved-tag{font-size:12px;color:var(--ok);font-weight:600}
+.logo-prev{display:flex;align-items:center;justify-content:center;min-height:70px;background:var(--sunk);border:1px dashed var(--line);border-radius:10px;padding:8px}
+.logo-prev img{max-height:70px;max-width:220px;object-fit:contain}
+#pdfStage{position:fixed;left:-10000px;top:0;width:760px;background:#fff;color:#1d1d1f}
 button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 #results{scroll-margin-top:16px}
@@ -139,7 +148,7 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
-nav.tabs .in{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%;max-width:560px}
+nav.tabs .in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:560px}
 nav.tabs button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-radius:10px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-selected=true]{color:var(--accent)}
@@ -179,7 +188,7 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 <body>
 <div class="wrap">
   <header>
-    <h1><small>Tư vấn thẻ tín dụng</small>Kiểm tra mở thẻ</h1>
+    <div class="brand"><img id="brandLogo" alt="Logo" hidden><h1><small>Tư vấn thẻ tín dụng</small>Kiểm tra mở thẻ</h1></div>
     <button class="ghost" id="newCustomer" type="button">Khách mới</button>
   </header>
   <div class="policy" id="policyBar"><span class="dot" id="pDot"></span><span id="pText">…</span><button class="btn2" id="pEdit" type="button">Sửa điều kiện</button></div>
@@ -188,6 +197,17 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
   <div class="view" id="v-check">
     <div id="newConfirm" class="confirm" hidden>Xoá toàn bộ thông tin khách đang nhập?
       <button class="btn2 danger" id="newYes" type="button">Xoá</button><button class="btn2" id="newNo" type="button">Huỷ</button></div>
+
+    <section>
+      <div class="sec-head"><h2>Khách hàng</h2><span class="saved-tag" id="savedTag" hidden></span></div>
+      <div class="panel stack">
+        <label class="f" for="cName">Tên khách hàng<input id="cName" type="text" placeholder="Họ và tên" autocomplete="off"></label>
+        <div class="grid2">
+          <label class="f" for="cPhone">Số điện thoại<input id="cPhone" type="tel" inputmode="tel" placeholder="Không bắt buộc" autocomplete="off"></label>
+          <label class="f" for="cNote">Ghi chú<input id="cNote" type="text" placeholder="Không bắt buộc" autocomplete="off"></label>
+        </div>
+      </div>
+    </section>
 
     <section>
       <div class="sec-head"><h2>Thẻ tín dụng đang có</h2><span class="sample" id="exampleTag" hidden>Ví dụ</span></div>
@@ -236,6 +256,28 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
     <section id="results" hidden></section>
   </div>
 
+  <!-- ===== KHÁCH HÀNG ĐÃ LƯU ===== -->
+  <div class="view" id="v-custs" hidden>
+    <section>
+      <div class="sec-head"><h2>Khách hàng đã lưu</h2><span class="note" id="csCount"></span></div>
+      <input id="csSearch" type="text" placeholder="Tìm theo tên, số điện thoại, ngân hàng…" aria-label="Tìm khách hàng">
+      <div class="vlist" id="csList"></div>
+    </section>
+    <section>
+      <h2>Sao lưu &amp; phục hồi khách hàng</h2>
+      <div class="panel stack">
+        <p class="note" style="margin:0">Danh sách khách chỉ lưu trên máy này. Nên sao lưu ra file định kỳ để không mất khi xoá app.</p>
+        <div class="row-btns">
+          <button class="btn2 acc" id="csBackup" type="button">Sao lưu ra file</button>
+          <button class="btn2" id="csRestore" type="button">Phục hồi từ file</button>
+          <input type="file" id="csFile" accept=".json,application/json,text/plain" hidden>
+        </div>
+        <div id="csConfirm" class="confirm" hidden><span id="csMsg"></span>
+          <button class="btn2 danger" id="csYes" type="button">Đồng ý</button><button class="btn2" id="csNo" type="button">Huỷ</button></div>
+      </div>
+    </section>
+  </div>
+
   <!-- ===== ĐIỀU KIỆN ===== -->
   <div class="view" id="v-rules" hidden>
     <form class="panel stack" id="lockBox" autocomplete="off">
@@ -271,6 +313,18 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
       <button class="add" id="addRule" type="button" hidden><b>+</b> Thêm ngân hàng</button>
     </section>
     <section>
+      <h2>Logo công ty</h2>
+      <div class="panel stack">
+        <p class="note" style="margin:0">Logo hiện ở đầu app và trên file PDF kết quả. Nên dùng ảnh PNG nền trong suốt.</p>
+        <div class="logo-prev" id="logoPrev"><span class="note">Chưa có logo</span></div>
+        <div class="row-btns">
+          <button class="btn2 acc" id="logoPick" type="button">Chọn ảnh logo</button>
+          <button class="btn2 danger" id="logoDel" type="button" hidden>Xoá logo</button>
+          <input type="file" id="logoFile" accept="image/*" hidden>
+        </div>
+      </div>
+    </section>
+    <section>
       <div class="sec-head"><h2>Danh sách ngân hàng</h2><span class="note" id="bdCount"></span></div>
       <div class="panel stack">
         <p class="note" style="margin:0" id="bdInfo"></p>
@@ -300,10 +354,12 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 
 <nav class="tabs"><div class="in" role="tablist">
   <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Kiểm tra</button>
+  <button role="tab" aria-selected="false" data-tab="custs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 6"/></svg>Khách hàng</button>
   <button role="tab" aria-selected="false" data-tab="rules" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện</button>
 </div></nav>
 <div class="savebar" id="saveBar" hidden><div class="in"><span id="saveText">Chưa có thay đổi</span><button id="cancelEdit" type="button" class="cancel">Huỷ</button><button id="saveRules" type="button">Lưu</button></div></div>
 <div class="toast" id="toast"></div>
+<div id="pdfStage" aria-hidden="true"></div>
 <datalist id="bankList"></datalist>
 
 <script>
@@ -468,10 +524,11 @@ function renderVersions(){
   $("#localInfo").textContent=usingSample?"Máy này chưa lưu bảng riêng – đang dùng bảng điều kiện mặc định.":`Chính sách đang lưu trên máy này: ${rules.length} ngân hàng, cập nhật ${fmtTime(cache.at)}. Mở app không cần mạng vẫn dùng được.`;
 }
 function stamp(){const d=new Date(),z=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`}
-async function exportCsv(text,name){
-  const blob=new Blob(["\uFEFF"+text],{type:"text/csv;charset=utf-8"});
+function exportCsv(text,name){return exportFile("\uFEFF"+text,name,"text/csv")}
+async function exportFile(text,name,type){
+  const blob=new Blob([text],{type:type+";charset=utf-8"});
   try{
-    const file=new File([blob],name,{type:"text/csv"});
+    const file=new File([blob],name,{type});
     if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
   }catch(e){if(e&&e.name==="AbortError")return}
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
@@ -680,6 +737,8 @@ function updateTotals(){
 function setPressed(sel,attr,val){document.querySelectorAll(sel+" button").forEach(b=>b.setAttribute("aria-pressed",b.dataset[attr]===val))}
 function renderCust(){
   $("#exampleTag").hidden=!cust.example;
+  $("#cName").value=cust.name||"";$("#cPhone").value=cust.phone||"";$("#cNote").value=cust.note||"";
+  showSavedTag();
   renderRows();
   $("#finCos").value=cust.finCos;
   setPressed("#job","job",cust.job);
@@ -692,10 +751,11 @@ document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",(
 $("#finCos").addEventListener("input",e=>{cust.finCos=Math.max(0,parseInt(e.target.value)||0);edited()});
 $("#job").addEventListener("click",e=>{const b=e.target.closest("[data-job]");if(!b)return;cust.job=b.dataset.job;setPressed("#job","job",cust.job);edited()});
 $("#badDebt").addEventListener("change",e=>{cust.badDebt=e.target.checked;edited()});
+[["#cName","name"],["#cPhone","phone"],["#cNote","note"]].forEach(([sel,f])=>$(sel).addEventListener("input",e=>{cust[f]=e.target.value;edited()}));
 $("#newCustomer").addEventListener("click",()=>{showTab("check");$("#newConfirm").hidden=false});
 $("#newNo").addEventListener("click",()=>$("#newConfirm").hidden=true);
 $("#newYes").addEventListener("click",()=>{
-  cust={name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",badDebt:false,example:false};
+  cust={id:null,name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",badDebt:false,example:false};
   $("#newConfirm").hidden=true;$("#results").hidden=true;renderCust();saveCust();toast("Đã tạo hồ sơ khách mới");
 });
 
@@ -726,7 +786,7 @@ const passes=x=>x.status==="ok"||x.status==="warn";
 function scenario(mod){const c2=clone(cust);mod(c2);return evaluate(c2)}
 function gained(base,alt,strict){return alt.list.filter((x,i)=>{const b=base.list[i];return strict?(x.status==="ok"&&b.status!=="ok"):(passes(x)&&!passes(b))}).map(x=>x.rule.name)}
 
-function runCheck(scroll){
+function analyze(){
   const base=evaluate(cust),s=base.s;
   const ord={ok:0,warn:1,bad:2,own:3};
   const dbLast=x=>x.status==="ok"&&x.rule.special?1:0;
@@ -771,10 +831,14 @@ function runCheck(scroll){
     tips.push(["1","",`Khách chưa có thẻ tín dụng. Nên mở trước ở ngân hàng không yêu cầu thẻ cũ, sau vài tháng dùng tốt có thể mở qua thẻ${need.length?` ở: <b>${esc(need.join(", "))}</b>`:""}.`]);
   }
   if(s.bankCount>=4)tips.push(["!","w",`Khách đã có thẻ ở <b>${s.bankCount} ngân hàng</b>. Nên nộp lần lượt 1–2 ngân hàng, tránh nộp dồn dập.`]);
-
+  return{base,s,sorted,good,bad,own,tips,n,card};
+}
+function runCheck(scroll){
+  const{good,bad,own,tips,n,card}=analyze();
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
+    <div class="res-acts"><button class="btn2 acc" type="button" data-act="save">Lưu khách hàng</button><button class="btn2" type="button" data-act="pdf">Xuất PDF</button></div>
     <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
     ${tips.length?`<h2 style="margin-top:6px">Gợi ý</h2><div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`:""}
@@ -784,6 +848,7 @@ function runCheck(scroll){
   if(scroll!==false)R.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
 }
 $("#runCheck").addEventListener("click",()=>runCheck(true));
+$("#results").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;if(b.dataset.act==="save")saveCustomer();else exportPdf(b)});
 
 /* ---------- Tabs ---------- */
 /* ---------- Mật khẩu tab Điều kiện ---------- */
@@ -813,7 +878,8 @@ $("#lockAgain").addEventListener("click",()=>{
   showLock();showAdmin();
 });
 function showTab(t){
-  ["check","rules"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  ["check","custs","rules"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  if(t==="custs")renderCustList();
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   window.scrollTo(0,0);
   if(t!=="rules")wantEdit=false;
@@ -893,7 +959,189 @@ $("#bdYes").addEventListener("click",()=>{
 });
 renderBankDir();
 
-renderCust();showPolicy();showLock();
+/* ---------- Khách hàng đã lưu (chỉ trên máy) ---------- */
+const K_CUSTS="kmt.customers.v1";
+function custList(){const v=load(K_CUSTS);return Array.isArray(v)?v:[]}
+function setCustList(v){try{localStorage.setItem(K_CUSTS,JSON.stringify(v));return true}catch(e){toast("Bộ nhớ trên máy đã đầy – hãy sao lưu và xoá bớt khách");return false}}
+function summaryOf(c){
+  const{list}=evaluate(c);
+  return{ok:list.filter(x=>x.status==="ok").map(x=>x.rule.name),warn:list.filter(x=>x.status==="warn").map(x=>x.rule.name)};
+}
+function showSavedTag(){
+  const rec=cust.id&&custList().find(x=>x.id===cust.id);
+  $("#savedTag").hidden=!rec;if(rec)$("#savedTag").textContent="Đã lưu "+fmtTime(rec.at);
+}
+function saveCustomer(){
+  if(!String(cust.name||"").trim()){showTab("check");$("#cName").focus();toast("Nhập tên khách hàng trước khi lưu");return}
+  const list=custList();
+  if(!cust.id)cust.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  cust.example=false;
+  const rec={id:cust.id,at:new Date().toISOString(),cust:clone(cust),summary:summaryOf(cust)};
+  const i=list.findIndex(x=>x.id===cust.id);
+  if(i>=0)list.splice(i,1);
+  list.unshift(rec);
+  if(!setCustList(list))return;
+  saveCust();showSavedTag();$("#exampleTag").hidden=true;
+  toast(i>=0?`Đã cập nhật khách ${cust.name}`:`Đã lưu khách ${cust.name}`);
+}
+function renderCustList(){
+  const q=plain($("#csSearch").value).trim(),all=custList();
+  $("#csCount").textContent=all.length+" khách";
+  const rows=all.filter(x=>!q||plain([x.cust.name,x.cust.phone,x.cust.note,...(x.cust.rows||[]).map(r=>r.bank)].join(" ")).includes(q));
+  $("#csList").innerHTML=rows.length?rows.map(x=>{
+    const c=x.cust,sm=x.summary||{ok:[],warn:[]};
+    const res=sm.ok.length?`Mở được: ${sm.ok.join(", ")}`:sm.warn.length?`Cần giảm dư nợ: ${sm.warn.join(", ")}`:"Chưa có ngân hàng phù hợp";
+    return`<div class="vrow${x.id===cust.id?" cur":""}"><span class="t"><b>${esc(c.name||"(chưa có tên)")}${c.phone?` · ${esc(c.phone)}`:""}</b><small>${esc(fmtTime(x.at))} · ${esc(res)}</small></span>
+      <button class="btn2" type="button" data-open="${esc(x.id)}">Mở</button><button class="btn2 danger" type="button" data-cdel="${esc(x.id)}">Xoá</button></div>`}).join("")
+    :`<p class="note" style="margin:0">${all.length?"Không tìm thấy khách nào.":"Chưa lưu khách nào. Nhập thông tin khách ở tab Kiểm tra rồi bấm Lưu khách hàng."}</p>`;
+}
+$("#csSearch").addEventListener("input",renderCustList);
+$("#csList").addEventListener("click",e=>{
+  const o=e.target.closest("[data-open]"),d=e.target.closest("[data-cdel]");
+  if(o){
+    const rec=custList().find(x=>x.id===o.dataset.open);if(!rec)return;
+    cust=clone(rec.cust);cust.id=rec.id;cust.example=false;saveCust();
+    renderCust();showTab("check");runCheck(false);toast(`Đã mở hồ sơ ${cust.name||"khách"}`);
+  }
+  if(d){
+    if(!d.classList.contains("armed")){$("#csList").querySelectorAll(".armed").forEach(x=>{x.classList.remove("armed");x.textContent="Xoá"});d.classList.add("armed");d.textContent="Bấm lần nữa để xoá";return}
+    const list=custList(),i=list.findIndex(x=>x.id===d.dataset.cdel);if(i<0)return;
+    const[r]=list.splice(i,1);setCustList(list);
+    if(cust.id===r.id){cust.id=null;saveCust();showSavedTag()}
+    renderCustList();toast(`Đã xoá khách ${r.cust.name||""}`);
+  }
+});
+$("#csBackup").addEventListener("click",()=>{
+  const list=custList();if(!list.length){toast("Chưa có khách nào để sao lưu");return}
+  exportFile(JSON.stringify({app:"kiem-tra-mo-the",type:"customers",at:new Date().toISOString(),list},null,1),`khach-hang_${stamp()}.json`,"application/json");
+});
+let csCand=null;
+$("#csRestore").addEventListener("click",()=>$("#csFile").click());
+$("#csFile").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  try{
+    const j=JSON.parse((await f.text()).replace(/^\uFEFF/,""));
+    const list=(Array.isArray(j)?j:j.list||[]).filter(x=>x&&x.id&&x.cust&&Array.isArray(x.cust.rows));
+    if(!list.length)throw 0;
+    const have=new Set(custList().map(x=>x.id)),upd=list.filter(x=>have.has(x.id)).length;
+    csCand=list;$("#csMsg").textContent=`File ${f.name}: ${list.length} khách (${list.length-upd} mới${upd?`, ${upd} đã có sẽ được thay bằng bản trong file`:""}). Gộp vào danh sách trên máy?`;
+    $("#csConfirm").hidden=false;
+  }catch(err){toast("File không đúng định dạng sao lưu khách hàng (.json)")}
+});
+$("#csNo").addEventListener("click",()=>{csCand=null;$("#csConfirm").hidden=true});
+$("#csYes").addEventListener("click",()=>{
+  if(!csCand)return;const add=csCand;csCand=null;$("#csConfirm").hidden=true;
+  const ids=new Set(add.map(x=>x.id)),list=[...add,...custList().filter(x=>!ids.has(x.id))].sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  if(setCustList(list)){renderCustList();showSavedTag();toast(`Đã phục hồi ${add.length} khách`)}
+});
+
+/* ---------- Logo công ty (lưu trên máy) ---------- */
+const K_LOGO="kmt.logo.v1";
+function logoNow(){try{return localStorage.getItem(K_LOGO)}catch(e){return null}}
+function showLogo(){
+  const src=logoNow(),img=$("#brandLogo");
+  if(src){img.src=src;img.hidden=false}
+  else{img.onerror=()=>{img.hidden=true};img.onload=()=>{img.hidden=false};img.src="logo.png"}
+  $("#logoPrev").innerHTML=src?`<img src="${src}" alt="Logo công ty">`:`<span class="note">Chưa chọn logo${img.hidden?"":" – đang dùng logo mặc định"}</span>`;
+  $("#logoDel").hidden=!src;
+}
+$("#logoPick").addEventListener("click",()=>$("#logoFile").click());
+$("#logoFile").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  const url=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{
+    const k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement("canvas");
+    c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+    c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);
+    try{localStorage.setItem(K_LOGO,c.toDataURL("image/png"));showLogo();toast("Đã lưu logo")}catch(err){toast("Ảnh quá lớn, hãy chọn ảnh khác")}
+  };
+  im.onerror=()=>{URL.revokeObjectURL(url);toast("Không đọc được ảnh này")};
+  im.src=url;
+});
+$("#logoDel").addEventListener("click",()=>{try{localStorage.removeItem(K_LOGO)}catch(e){}showLogo();toast("Đã xoá logo")});
+
+/* ---------- Xuất PDF kết quả ---------- */
+const PDF_LIB="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+let pdfLib=null;
+function loadPdfLib(){
+  if(window.html2pdf)return Promise.resolve();
+  return pdfLib||(pdfLib=new Promise((ok,fail)=>{const sc=document.createElement("script");sc.src=PDF_LIB;sc.onload=ok;sc.onerror=()=>{pdfLib=null;fail()};document.head.appendChild(sc)}));
+}
+function reportHtml(){
+  const a=analyze(),s=a.s,c=cust,now=new Date();
+  const logo=logoNow()||(!$("#brandLogo").hidden&&$("#brandLogo").src)||"";
+  const C={ok:"#1f7a4d",warn:"#b26a00",bad:"#b3261e",own:"#6b6b70"};
+  const label={ok:"Có thể mở",warn:"Cần giảm dư nợ",bad:"Không phù hợp",own:"Đã có thẻ"};
+  const rows=c.rows.filter(r=>String(r.bank||"").trim());
+  const th='style="text-align:left;padding:6px 8px;border-bottom:1px solid #ddd;font-size:12px;color:#555"';
+  const td='style="padding:6px 8px;border-bottom:1px solid #eee;font-size:13px"';
+  const item=x=>{
+    const r=x.rule,db=r.special&&x.status==="ok",why=[...x.fails,...x.warns];
+    return`<div style="border:1px solid #e3e3e3;border-left:4px solid ${C[x.status]};border-radius:6px;padding:8px 10px;margin-bottom:6px;page-break-inside:avoid">
+      <div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:14px">${esc(r.name)}</b><span style="font-size:12px;font-weight:700;color:${C[x.status]}">${label[x.status]}${db?" · cần kiểm tra ĐB":""}</span></div>
+      ${why.length?`<ul style="margin:4px 0 0;padding-left:18px;font-size:12.5px">${why.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
+      ${db?`<div style="margin-top:4px;font-size:12.5px;color:#7a4a00">Điều kiện đặc biệt cần kiểm tra thêm: ${esc(dbText(r.note))}</div>`:""}</div>`;
+  };
+  const group=(title,list)=>list.length?`<h3 style="font-size:15px;margin:14px 0 6px">${title} (${list.length})</h3>${list.map(item).join("")}`:"";
+  return`<div style="font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;padding:28px 30px;color:#1d1d1f;line-height:1.45">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:2px solid #1f6f5c;padding-bottom:12px">
+      <div style="display:flex;align-items:center;gap:14px">${logo?`<img src="${logo}" style="height:56px;max-width:180px;object-fit:contain">`:""}
+        <div><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#666;font-weight:600">Tư vấn thẻ tín dụng</div><div style="font-size:21px;font-weight:800">KẾT QUẢ KIỂM TRA MỞ THẺ</div></div></div>
+      <div style="text-align:right;font-size:12px;color:#555">Ngày kiểm tra<br><b style="color:#1d1d1f">${esc(now.toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}))}</b></div>
+    </div>
+    <table style="width:100%;margin-top:12px;font-size:13.5px;border-collapse:collapse">
+      <tr><td style="padding:3px 0;color:#555;width:150px">Khách hàng</td><td><b>${esc(c.name||"—")}</b></td></tr>
+      ${c.phone?`<tr><td style="padding:3px 0;color:#555">Số điện thoại</td><td>${esc(c.phone)}</td></tr>`:""}
+      <tr><td style="padding:3px 0;color:#555">Công việc</td><td>${esc(JOBS[c.job])}</td></tr>
+      <tr><td style="padding:3px 0;color:#555">Công ty tài chính</td><td>${c.finCos} công ty đang có dư nợ</td></tr>
+      <tr><td style="padding:3px 0;color:#555">Nợ quá hạn / nợ xấu</td><td>${c.badDebt?"<b style='color:#b3261e'>Có</b>":"Không"}</td></tr>
+      ${c.note?`<tr><td style="padding:3px 0;color:#555">Ghi chú</td><td>${esc(c.note)}</td></tr>`:""}
+    </table>
+    <h3 style="font-size:15px;margin:16px 0 6px">Thẻ tín dụng đang có</h3>
+    ${rows.length?`<table style="width:100%;border-collapse:collapse"><tr><th ${th}>Ngân hàng</th><th ${th}>Số thẻ</th><th ${th}>HM cấp (tr)</th><th ${th}>Đã dùng (tr)</th><th ${th}>Tỷ lệ</th></tr>
+      ${rows.map(r=>{const l=num(r.limit)||0,u=num(r.used)||0;return`<tr><td ${td}>${esc(r.bank)}</td><td ${td}>${esc(r.cards)}</td><td ${td}>${fmt(l)}</td><td ${td}>${fmt(u)}</td><td ${td}>${l>0?Math.round(u/l*100)+"%":"—"}</td></tr>`}).join("")}
+      <tr><td ${td}><b>Tổng</b></td><td ${td}><b>${fmt(s.cards)}</b></td><td ${td}><b>${fmt(s.limit)}</b></td><td ${td}><b>${fmt(s.used)}</b></td><td ${td}><b>${Math.round(s.util)}%</b></td></tr></table>`
+      :`<p style="font-size:13px;color:#555;margin:0">Chưa có thẻ tín dụng.</p>`}
+    <div style="display:flex;gap:8px;margin:16px 0 4px">
+      ${[["ok","Có thể mở"],["warn","Cần giảm dư nợ"],["bad","Không phù hợp"]].map(([k,t])=>`<div style="flex:1;border:1px solid #e3e3e3;border-radius:8px;padding:8px 10px"><div style="font-size:22px;font-weight:800;color:${C[k]}">${a.n(k)}</div><div style="font-size:12px;color:#555">${t}</div></div>`).join("")}
+    </div>
+    ${group("Ngân hàng có thể mở",a.good)}
+    ${a.tips.length?`<h3 style="font-size:15px;margin:14px 0 6px">Gợi ý</h3><ul style="margin:0;padding-left:18px;font-size:13px">${a.tips.map(t=>`<li style="margin-bottom:3px;page-break-inside:avoid">${t[2]}</li>`).join("")}</ul>`:""}
+    ${group("Không phù hợp",a.bad)}
+    ${a.own.length?`<h3 style="font-size:15px;margin:14px 0 6px">Đã có thẻ</h3><p style="font-size:13px;margin:0">${esc(a.own.map(x=>x.rule.name).join(", "))}</p>`:""}
+    <p style="margin-top:18px;font-size:11px;color:#777;border-top:1px solid #e3e3e3;padding-top:8px">Kết quả mang tính tham khảo, đối chiếu theo bảng điều kiện mở thẻ online tại thời điểm kiểm tra. Ngân hàng là bên thẩm định và quyết định cuối cùng.</p>
+  </div>`;
+}
+let pdfReady=null;
+async function sharePdf(file){
+  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:file.name});return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);toast("Đã tải file "+file.name);
+}
+async function exportPdf(btn){
+  if(btn.dataset.ready&&pdfReady){
+    try{await sharePdf(pdfReady)}catch(e){if(e&&e.name!=="AbortError")toast("Không chia sẻ được file")}
+    return;
+  }
+  const old=btn.textContent;btn.disabled=true;btn.textContent="Đang tạo PDF…";
+  try{
+    await loadPdfLib();
+    const stage=$("#pdfStage");stage.innerHTML=reportHtml();
+    const safe=plain(cust.name||"khach").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"khach";
+    const name=`ket-qua_${safe}_${stamp()}.pdf`;
+    const blob=await html2pdf().set({margin:[8,6,10,6],image:{type:"jpeg",quality:.95},html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"]}}).from(stage.firstElementChild).outputPdf("blob");
+    stage.innerHTML="";
+    pdfReady=new File([blob],name,{type:"application/pdf"});
+    try{await sharePdf(pdfReady);btn.textContent=old}
+    catch(e){
+      if(e&&e.name==="AbortError"){btn.textContent=old}
+      else{btn.dataset.ready="1";btn.textContent="Mở / gửi PDF";toast("PDF đã sẵn sàng – bấm Mở / gửi PDF")}
+    }
+  }catch(e){btn.textContent=old;toast("Chưa tạo được PDF – kiểm tra kết nối mạng rồi thử lại")}
+  finally{btn.disabled=false}
+}
+
+renderCust();showPolicy();showLock();showLogo();
 if(cust.example)runCheck(false);
 renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
