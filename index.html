@@ -257,6 +257,16 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
 .av.s36{width:36px;height:36px;font-size:15px} .av.s28{width:28px;height:28px;font-size:12px} .av.s64{width:64px;height:64px;font-size:24px} .av.s96{width:96px;height:96px;font-size:34px}
 button.av{cursor:pointer}
+/* Trang Tôi: vùng Kiểm tra & Kế hoạch */
+.me-act{background:var(--accent-soft);border-radius:var(--r);padding:14px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.me-act h2{margin:0 4px 4px;color:var(--accent)}
+.ma-item{display:flex;align-items:center;gap:12px;width:100%;font:inherit;color:var(--ink);background:var(--surface);border:0;border-radius:12px;padding:12px;text-align:left;cursor:pointer}
+.ma-item:active{opacity:.75}
+.ma-ic{flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.ma-ic svg{width:22px;height:22px}
+.ma-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ma-t b{font-size:16px;line-height:1.3} .ma-t small{font-size:13px;color:var(--muted)}
+.ma-item .chev{flex:none;width:20px;height:20px;color:var(--muted)}
 /* Khung trượt kiểu X */
 .dr-bg{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:40;opacity:0;transition:opacity .25s;pointer-events:none}
 .dr-bg.on{opacity:1;pointer-events:auto}
@@ -570,11 +580,14 @@ button.av{cursor:pointer}
         <div class="stack" id="meCards"></div>
         <button class="add" id="meAddCard" type="button"><b>+</b> Thêm ngân hàng</button>
         <div class="note" id="meCb"></div>
-        <div class="row-btns"><button class="btn2" id="meToCb" type="button">Thẻ hoàn tiền &amp; kế hoạch chi tiêu</button></div>
       </div>
     </section>
     <button class="primary" id="meSave" type="button">Lưu trên máy</button>
-    <button class="btn2" id="meCheck" type="button" style="width:100%">Kiểm tra mở thẻ cho tôi</button>
+    <section class="me-act">
+      <h2>Kiểm tra &amp; Kế hoạch</h2>
+      <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Thẻ hoàn tiền &amp; kế hoạch chi tiêu</b><small>Thẻ đang có, lịch sử chi tiêu, gợi ý quẹt thẻ</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+      <button class="ma-item" id="meCheck" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg></span><span class="ma-t"><b>Kiểm tra mở thẻ cho tôi</b><small>Ngân hàng nào còn có thể mở thẻ</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+    </section>
     <p class="note" style="margin:0;text-align:center">Thông tin chỉ lưu trên điện thoại này, không gửi đi đâu.</p>
   </div>
 </div>
