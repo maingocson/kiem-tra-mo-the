@@ -231,6 +231,7 @@ details.cbc>summary::-webkit-details-marker{display:none}
 /* Kế hoạch hoàn tiền cho khách */
 .cbseg{grid-template-columns:1fr 1fr}
 .cp select,.cp input{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0;width:100%}
+.me-cb{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
 .cp-add{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cp-add .wide{grid-column:1/-1}
 .cp-card{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--sunk)}
@@ -579,7 +580,16 @@ button.av{cursor:pointer}
         <div class="mhead"><span>Ngân hàng</span><span>Số thẻ</span><span>HM (tr)</span><span>Đã dùng (tr)</span><span></span></div>
         <div class="stack" id="meCards"></div>
         <button class="add" id="meAddCard" type="button"><b>+</b> Thêm ngân hàng</button>
-        <div class="note" id="meCb"></div>
+        <div class="me-cb">
+          <div class="cbk">Chi tiết thẻ hoàn tiền</div>
+          <p class="note" style="margin:0 0 8px">Chọn đúng dòng thẻ trong danh mục hoàn tiền để theo dõi và lên kế hoạch chi tiêu.</p>
+          <div class="stack" id="meCbCards"></div>
+          <div class="cp-add" style="margin-top:8px">
+            <select id="meCbBank" aria-label="Ngân hàng"></select>
+            <select id="meCbCard" aria-label="Dòng thẻ"></select>
+            <button class="btn2 acc wide" id="meCbAdd" type="button">Thêm thẻ hoàn tiền</button>
+          </div>
+        </div>
       </div>
     </section>
     <button class="primary" id="meSave" type="button">Lưu trên máy</button>
@@ -1677,8 +1687,34 @@ function cpOptimize(owned,needs,fine){
   const out=cards.map(x=>({...x,res:cpCalc(x.c,x.e,x.sp)}));
   return{cards:out,cash:out.reduce((a,x)=>a+x.res.cash,0)};
 }
-function cpData(){if(!cust.cb)cust.cb={cards:[],hist:[],needs:{}};const d=cust.cb;d.cards=d.cards||[];d.hist=d.hist||[];d.needs=d.needs||{};return d}
-function cpOwned(){const all=cbAll(),d=cpData();return d.cards.map(e=>({c:all.find(c=>c.id===e.id),e})).filter(x=>x.c)}
+function cbOf(p){if(!p.cb)p.cb={cards:[],hist:[],needs:{}};const d=p.cb;d.cards=d.cards||[];d.hist=d.hist||[];d.needs=d.needs||{};return d}
+function cpData(){return cbOf(cust)}
+function cpOwnedOf(p){const all=cbAll(),d=cbOf(p);return d.cards.map(e=>({c:all.find(c=>c.id===e.id),e})).filter(x=>x.c)}
+function cpOwned(){return cpOwnedOf(cust)}
+/* danh sách thẻ hoàn tiền đang có (dùng chung cho tab Hoàn tiền và trang Tôi) */
+function cpCardsHtml(p,empty){const owned=cpOwnedOf(p),hist=cbOf(p).hist;
+  return owned.length?owned.map(({c,e},i)=>{
+    const tierSel=!cpSpendTier(c)&&c.tiers.length>1?`<label class="note" style="display:flex;flex-direction:column;gap:3px">${esc(c.by||"Mức")}<select data-cp-tier="${i}">${c.tiers.map((t,k)=>`<option value="${k}"${(e.tier||0)===k?" selected":""}>${esc(t.n||"Mức "+(k+1))}</option>`).join("")}</select></label>`:"";
+    const pg=c.groups.map((g,k)=>[g,k]).filter(([g])=>g.pick);
+    const picks=pg.length?`<div class="note">Nhóm đã đăng ký (${esc(c.pick||"")}) – bỏ trống để app tự chọn nhóm có lợi nhất:</div><div class="cp-picks">${pg.map(([g,k])=>`<label><input type="checkbox" data-cp-pick="${i}" value="${k}"${(e.pick||[]).includes(k)?" checked":""}>${esc(g.g)}</label>`).join("")}</div>`:"";
+    const warn=[c.exp?`Chương trình hết hạn ${esc(c.to)}`:"",c.lv==="C"?"Mức tin cậy C – chưa đủ dữ liệu để tính":"",c.minTxn?`Cần ≥ ${c.minTxn} giao dịch/${cbPer(c)}`:""].filter(Boolean).join(" · ");
+    const hs=hist.filter(h=>h.card===c.id),per=hs.map(h=>h.p).sort().pop();
+    const spent=per?`<div class="note">Tháng ${esc(cpPerTxt(per))} đã chi ${fmt(Math.round(hs.filter(h=>h.p===per).reduce((a,h)=>a+h.amt,0)*100)/100)} tr</div>`:"";
+    return`<div class="cp-card"><div class="t"><div><b>${esc(c.name)}</b><div class="cbsub">${esc(c.bank)} · mức ${esc(c.lv)}</div></div><button class="x" type="button" data-cp-del="${i}">Xoá</button></div>${tierSel}${picks}${spent}${warn?`<div class="note" style="color:var(--warn)">${warn}</div>`:""}</div>`}).join("")
+    :`<p class="note" style="margin:0">${empty}</p>`}
+function cpFillSel(bankSel,cardSel,p){const all=cbAll(),bSel=$(bankSel).value;
+  const banks=[...new Set(all.map(c=>c.bank))];
+  $(bankSel).innerHTML=`<option value="">Ngân hàng…</option>`+banks.map(b=>`<option${b===bSel?" selected":""}>${esc(b)}</option>`).join("");
+  cpFillCardSel(bankSel,cardSel,p)}
+function cpFillCardSel(bankSel,cardSel,p){const b=$(bankSel).value,own=new Set(cbOf(p).cards.map(e=>e.id));
+  const list=cbAll().filter(c=>c.bank===b&&!own.has(c.id));
+  $(cardSel).innerHTML=b?(list.length?list.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.stop?" (ngừng phát hành)":""}</option>`).join(""):`<option value="">Đã thêm hết thẻ của ngân hàng này</option>`):`<option value="">Dòng thẻ…</option>`}
+/* sửa danh sách thẻ: xoá, mức, nhóm đăng ký */
+function cpCardsBind(box,getP,saveFn,after){
+  $(box).addEventListener("click",e=>{const del=e.target.closest("[data-cp-del]");if(!del)return;cbOf(getP()).cards.splice(+del.dataset.cpDel,1);saveFn();after(true)});
+  $(box).addEventListener("change",e=>{const t=e.target,d=cbOf(getP());
+    if(t.dataset.cpTier!=null){d.cards[+t.dataset.cpTier].tier=+t.value;saveFn();after(false)}
+    else if(t.dataset.cpPick!=null){const c=d.cards[+t.dataset.cpPick];const v=+t.value;c.pick=(c.pick||[]).filter(x=>x!==v);if(t.checked)c.pick.push(v);saveFn();after(false)}})}
 const cpTr=v=>{const n=cbN(v);return n==null?0:n*TRV};
 const cpPerTxt=p=>{const m=String(p||"").match(/^(\d{4})-(\d{2})$/);return m?`${m[2]}/${m[1]}`:p};
 function cpSave(){edited()}
@@ -1686,12 +1722,7 @@ function renderPlan(){
   const all=cbAll(),d=cpData(),owned=cpOwned();
   $("#cpWho").innerHTML=`Khách: <b>${esc(cust.name||"chưa đặt tên")}</b> · đổi khách ở tab Kiểm tra hoặc Khách hàng. Dữ liệu lưu cùng hồ sơ khách.`;
   /* thẻ đang có */
-  $("#cpCards").innerHTML=owned.length?owned.map(({c,e},i)=>{
-    const tierSel=!cpSpendTier(c)&&c.tiers.length>1?`<label class="note" style="display:flex;flex-direction:column;gap:3px">${esc(c.by||"Mức")}<select data-cp-tier="${i}">${c.tiers.map((t,k)=>`<option value="${k}"${(e.tier||0)===k?" selected":""}>${esc(t.n||"Mức "+(k+1))}</option>`).join("")}</select></label>`:"";
-    const pg=c.groups.map((g,k)=>[g,k]).filter(([g])=>g.pick);
-    const picks=pg.length?`<div class="note">Nhóm khách đã đăng ký (${esc(c.pick||"")}) – bỏ trống để app tự chọn nhóm có lợi nhất:</div><div class="cp-picks">${pg.map(([g,k])=>`<label><input type="checkbox" data-cp-pick="${i}" value="${k}"${(e.pick||[]).includes(k)?" checked":""}>${esc(g.g)}</label>`).join("")}</div>`:"";
-    const warn=[c.exp?`Chương trình hết hạn ${esc(c.to)}`:"",c.lv==="C"?"Mức tin cậy C – chưa đủ dữ liệu để tính":"",c.minTxn?`Cần ≥ ${c.minTxn} giao dịch/${cbPer(c)}`:""].filter(Boolean).join(" · ");
-    return`<div class="cp-card"><div class="t"><div><b>${esc(c.name)}</b><div class="cbsub">${esc(c.bank)} · mức ${esc(c.lv)}</div></div><button class="x" type="button" data-cp-del="${i}">Xoá</button></div>${tierSel}${picks}${warn?`<div class="note" style="color:var(--warn)">${warn}</div>`:""}</div>`}).join(""):`<p class="note" style="margin:0">Chưa có thẻ nào. Chọn ngân hàng và dòng thẻ bên dưới.</p>`;
+  $("#cpCards").innerHTML=cpCardsHtml(cust,"Chưa có thẻ nào. Chọn ngân hàng và dòng thẻ bên dưới.");
   const banks=[...new Set(all.map(c=>c.bank))];const bSel=$("#cpBank").value;
   $("#cpBank").innerHTML=`<option value="">Ngân hàng…</option>`+banks.map(b=>`<option${b===bSel?" selected":""}>${esc(b)}</option>`).join("");
   cpFillCards();
@@ -1759,11 +1790,8 @@ $("#cpBank").addEventListener("change",cpFillCards);
 $("#cpAdd").addEventListener("click",()=>{const id=$("#cpCard").value;if(!id){toast("Chọn ngân hàng và dòng thẻ");return}
   cpData().cards.push({id,tier:0,pick:[]});cpSave();renderPlan();toast("Đã thêm thẻ")});
 $("#cpView").addEventListener("click",e=>{
-  const del=e.target.closest("[data-cp-del]");if(del){cpData().cards.splice(+del.dataset.cpDel,1);cpSave();renderPlan();return}
   const hd=e.target.closest("[data-cp-hdel]");if(hd){cpData().hist.splice(+hd.dataset.cpHdel,1);cpSave();renderPlan();return}});
-$("#cpView").addEventListener("change",e=>{const t=e.target;
-  if(t.dataset.cpTier!=null){cpData().cards[+t.dataset.cpTier].tier=+t.value;cpSave();renderPlanOut()}
-  else if(t.dataset.cpPick!=null){const c=cpData().cards[+t.dataset.cpPick];const v=+t.value;c.pick=(c.pick||[]).filter(x=>x!==v);if(t.checked)c.pick.push(v);cpSave();renderPlanOut()}});
+cpCardsBind("#cpCards",()=>cust,cpSave,full=>full?renderPlan():renderPlanOut());
 $("#cpView").addEventListener("input",e=>{const k=e.target.dataset.cpNeed;if(!k)return;const v=e.target.value.trim();const d=cpData();if(v==="")delete d.needs[k];else d.needs[k]=v;cpSave();clearTimeout(renderPlanOut.t);renderPlanOut.t=setTimeout(renderPlanOut,350)});
 $("#cpHAdd").addEventListener("click",()=>{const p=$("#cpPer").value,card=$("#cpHCard").value,cat=$("#cpHCat").value,amt=cbN($("#cpHAmt").value);
   if(!card){toast("Thêm thẻ khách đang có ở bước 1 trước");return}if(!p){toast("Chọn tháng");return}if(!amt||amt<=0){toast("Nhập số tiền (triệu đồng)");return}
@@ -1818,9 +1846,14 @@ function renderMe(){
   if(!$("#meJob").options.length)$("#meJob").innerHTML=Object.entries(JOBS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
   $("#meJob").value=me.job||"hdld";$("#meBhxh").checked=!!me.bhxh;$("#meDebt").value=String(me.debtGroup||(me.badDebt?2:1));$("#meFin").value=me.finCos||0;
   meRows();
-  const cb=(me.cb&&me.cb.cards||[]).map(e=>cbAll().find(c=>c.id===e.id)).filter(Boolean);
-  $("#meCb").textContent=cb.length?`Thẻ hoàn tiền: ${cb.map(c=>c.bank+" "+c.name).join(", ")}`:"Chưa chọn dòng thẻ hoàn tiền nào.";
+  meCbRender();
 }
+function meCbRender(){$("#meCbCards").innerHTML=cpCardsHtml(me,"Chưa có thẻ hoàn tiền nào.");cpFillSel("#meCbBank","#meCbCard",me)}
+function meCbSave(){save(K_ME,me);if(cust.isMe)cust=me}
+cpCardsBind("#meCbCards",()=>me,meCbSave,full=>{if(full)meCbRender()});
+$("#meCbBank").addEventListener("change",()=>cpFillCardSel("#meCbBank","#meCbCard",me));
+$("#meCbAdd").addEventListener("click",()=>{const id=$("#meCbCard").value;if(!id){toast("Chọn ngân hàng và dòng thẻ");return}
+  cbOf(me).cards.push({id,tier:0,pick:[]});meCbSave();meCbRender();toast("Đã thêm thẻ hoàn tiền")});
 function meChanged(full){save(K_ME,me);if(cust.isMe)cust=me;renderWho();if(full)renderMe();else{$("#meAv").innerHTML=avHtml(me);$("#meTitle").textContent=me.name||"Hồ sơ của tôi"}}
 [["#meName","name"],["#mePhone","phone"]].forEach(([sel,f])=>$(sel).addEventListener("input",e=>{me[f]=e.target.value;meChanged(false)}));
 $("#meJob").addEventListener("change",e=>{me.job=e.target.value;meChanged(false)});
