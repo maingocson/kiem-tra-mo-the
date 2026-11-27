@@ -119,6 +119,16 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - Thẻ có "Hiệu lực đến" đã qua ngày hôm nay được làm mờ, ghi "hết hạn" và xếp cuối danh sách.
 - Mức tin cậy: **A** có thể lệ đầy đủ · **B** theo trang thẻ · **C** chỉ có câu quảng cáo.
 
+### Kế hoạch cho khách (nút "Kế hoạch cho khách" đầu tab)
+
+Gắn với khách đang chọn (lưu cùng hồ sơ khách):
+
+1. **Thẻ khách đang có** – chọn ngân hàng → dòng thẻ. Thẻ xếp mức theo hạng/gói/lương thì chọn mức của khách; thẻ phải đăng ký nhóm thì tick nhóm đã đăng ký (bỏ trống để app tự chọn nhóm có lợi nhất).
+2. **Lịch sử chi tiêu** – mỗi dòng: tháng, thẻ, nhóm chi tiêu, số tiền (triệu).
+3. **Nhu cầu tháng tới** – số tiền theo 15 nhóm chi tiêu; "Lấy theo tháng gần nhất" để chép từ lịch sử.
+
+App tính: mỗi nhóm nên quẹt thẻ nào (tối đa tiền hoàn, có tính ngưỡng mức và trần), tiền hoàn theo kế hoạch so với tháng gần nhất, thẻ nào chi thêm bao nhiêu để lên mức, và gợi ý mở thẻ mới (kèm kết quả đủ điều kiện từ tab Kiểm tra). Đây là ước tính: nhóm chi tiêu ghép theo tên nhóm của ngân hàng, phần vượt trần không được hoàn, không tính ưu đãi đối tác riêng.
+
 Dữ liệu theo form mẫu `du-lieu-hoan-tien/mau-hoan-tien.xlsx` (trang Hướng dẫn giải thích từng cột):
 
 | Trang | File CSV |
