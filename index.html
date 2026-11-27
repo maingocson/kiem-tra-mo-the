@@ -213,6 +213,10 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .lv.A{background:var(--ok-soft);color:var(--ok)} .lv.B{background:var(--warn-soft);color:var(--warn)} .lv.C{background:var(--bad-soft);color:var(--bad)}
 .cbsub{font-size:12px;color:var(--muted)}
 .cbh-l{display:flex;gap:12px;align-items:center;min-width:0}
+.bk{display:table;font-size:12px;font-weight:800;letter-spacing:.02em;color:#fff;background:var(--c1);border-radius:6px;padding:2px 7px;margin-bottom:4px;line-height:1.35}
+.cb-bank{display:flex;align-items:center;gap:8px;margin:14px 2px 0;font-size:18px;font-weight:800;color:var(--ink)}
+.cb-bank i{width:12px;height:12px;border-radius:3px;background:var(--c1);flex:none}
+.cb-bank small{font-size:12px;font-weight:600;color:var(--muted)}
 .cimg{position:relative;flex:none;width:84px;aspect-ratio:1.586;border-radius:7px;overflow:hidden;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 1px 3px rgba(0,0,0,.18)}
 .cimg.sm{width:64px;border-radius:6px}
 .cimg .cf{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:6px 7px;color:#fff}
@@ -1535,7 +1539,9 @@ const cbPer=c=>/tháng/i.test(c.cyc)?"tháng":"kỳ";
 /* hình thẻ: ảnh chính thức lấy từ web ngân hàng (du-lieu-hoan-tien/hinh-the/<mã thẻ>.webp); 2 = thẻ dọc/nhiều thẻ, hiển thị đủ cả ảnh */
 const CB_IMG={"ctg-mccb":1,"ctg-sig":1,"ctg-visacb":1,"msb-elite":1,"msb-family":1,"msb-green":1,"msb-mwave":1,"msb-online":1,"msb-sig":1,"msb-travel":1,"sh-365":2,"sh-baemin":2,"sh-cb-bk":1,"sh-cb-chuan":1,"sh-cb-vang":1,"sh-ecard":1,"sh-mylife":2,"sh-pwm":1,"sh-tiki":2,"shb-cb":1,"tcb-everyday":1,"tcb-private":1,"tcb-sig":1,"tcb-spark":1,"vib-cb":1,"vib-family":1,"vib-laz":2,"vib-one":1,"vib-online":1,"vib-super":1,"vpb-diamond-lady":1,"vpb-lady":1,"vpb-stepup":1,"vpb-z":2};
 const CB_COL=[[/shinhan/i,"#1d4ed8","#0b2a7a"],[/msb/i,"#ef4123","#a3180a"],[/vib/i,"#0a3d91","#f7931e"],[/shb/i,"#f26f21","#b9470c"],[/ocb/i,"#00a651","#00602e"],[/vietin/i,"#005b9f","#00335c"],[/techcom/i,"#2b2b2b","#e2231a"],[/vpbank/i,"#00873e","#00512a"]];
-function cbImg(c,sm){const k=CB_IMG[c.id],col=(CB_COL.find(x=>x[0].test(c.bank))||[0,"#5a6b67","#2c3533"]);
+const cbCol=bank=>CB_COL.find(x=>x[0].test(bank))||[0,"#5a6b67","#2c3533"];
+const cbBk=c=>`<span class="bk" style="--c1:${cbCol(c.bank)[1]}">${esc(c.bank)}</span>`;
+function cbImg(c,sm){const k=CB_IMG[c.id],col=cbCol(c.bank);
   const bk=c.bank.replace(/ Bank$/i,"");
   return`<span class="cimg${sm?" sm":""}${k===2?" v":""}" style="--c1:${col[1]};--c2:${col[2]}"><span class="cf"><b>${esc(bk)}</b><i>${esc(c.net||"")}</i></span>${k?`<img src="du-lieu-hoan-tien/hinh-the/${esc(c.id)}.webp" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:""}</span>`}
 function cbMcc(list){if(!list.length)return"";const sh=list.slice(0,8).join(", ");return"MCC "+esc(sh)+(list.length>8?` <span title="${esc(list.join(", "))}">+${list.length-8} mã</span>`:"")}
@@ -1543,7 +1549,7 @@ function cbCard(c,hit){
   const per=cbPer(c),nt=c.nt,capMax=Math.max(0,...c.capT.filter(v=>v!=null));
   const chips=[c.top!=null?`<span class="chip ok">đến ${cbPct(c.top)}</span>`:"",capMax?`<span class="chip ch">trần ${cbMoney(capMax)}/${per}</span>`:"",
     c.pick?`<span class="chip ch">khách chọn nhóm</span>`:"",c.stop?`<span class="chip bad">ngừng phát hành</span>`:"",c.exp?`<span class="chip bad">hết hạn ${esc(c.to)}</span>`:""].join("");
-  const head=`<div class="cbh"><div class="cbh-l">${cbImg(c)}<div><b>${esc(c.name)}</b><div class="cbsub">${esc([c.bank,c.net].filter(Boolean).join(" · "))}</div></div></div><span class="lv ${esc(c.lv)}" title="Mức tin cậy">${esc(c.lv)}</span></div><div class="chips">${chips}</div>`;
+  const head=`<div class="cbh"><div class="cbh-l">${cbImg(c)}<div>${cbBk(c)}<b>${esc(c.name)}</b><div class="cbsub">${esc(c.net||"")}</div></div></div><span class="lv ${esc(c.lv)}" title="Mức tin cậy">${esc(c.lv)}</span></div><div class="chips">${chips}</div>`;
   const kv=[["Chu kỳ",c.cyc],["Xếp mức theo",c.by],["Hoàn cơ bản",c.base!=null?cbPct(c.base)+" chi tiêu khác":""],["Trần năm",c.capY!=null?cbMoney(c.capY):""],
     ["Phí thường niên",c.fee!=null?(c.fee?cbMoney(c.fee):"Miễn phí"):""],["Phí ngoại tệ",c.fx!=null?cbPct(c.fx):""],["Số GD tối thiểu",c.minTxn?c.minTxn+" giao dịch/"+per:""],
     ["Chọn nhóm",c.pick],["Ngưỡng đổi điểm",c.redeem?cbMoney(c.redeem)+" điểm":""],["Hiệu lực",[c.from,c.to].filter(Boolean).join(" – ")]].filter(x=>x[1]);
@@ -1585,7 +1591,9 @@ function renderCb(){
   const list=CB.filter(c=>(!cbBank||c.bank===cbBank)&&(!cbLv||c.lv===cbLv)&&(!hide||!c.stop)).map(c=>[c,cbHit(c,q)]).filter(([,h])=>h.ok).sort((a,b)=>a[0].exp-b[0].exp);
   if(q)list.sort((a,b)=>{const ra=Math.max(-1,...[...a[1].g].map(i=>Math.max(...a[0].groups[i].r.filter(v=>v!=null)))),rb=Math.max(-1,...[...b[1].g].map(i=>Math.max(...b[0].groups[i].r.filter(v=>v!=null))));return (a[0].exp-b[0].exp)||rb-ra});
   $("#cbCount").textContent=q?`${list.length} thẻ khớp “${q}”${/^\d{4}$/.test(q)?" (theo mã MCC, xếp theo tỷ lệ hoàn cao nhất)":""}`:`${list.length} thẻ`;
-  $("#cbList").innerHTML=list.map(([c,h])=>cbCard(c,q?h.g:new Set())).join("")||`<div class="panel note">Không có thẻ nào khớp.</div>`;
+  if(!q){const bi=b=>banks.indexOf(b);list.sort((a,b)=>bi(a[0].bank)-bi(b[0].bank)||a[0].exp-b[0].exp)}
+  let prev=null;const cnt={};list.forEach(([c])=>cnt[c.bank]=(cnt[c.bank]||0)+1);
+  $("#cbList").innerHTML=list.map(([c,h])=>{const hd=!q&&c.bank!==prev?`<div class="cb-bank" style="--c1:${cbCol(c.bank)[1]}"><i></i>${esc(c.bank)} <small>${cnt[c.bank]} thẻ</small></div>`:"";prev=c.bank;return hd+cbCard(c,q?h.g:new Set())}).join("")||`<div class="panel note">Không có thẻ nào khớp.</div>`;
   $("#cbReset").hidden=!(cbStore&&cbStore.the);
 }
 $("#cbSearch").addEventListener("input",e=>{cbQ=e.target.value;clearTimeout(renderCb.t);renderCb.t=setTimeout(renderCb,150)});
@@ -1724,7 +1732,7 @@ function cpCardsHtml(p,empty){const owned=cpOwnedOf(p),hist=cbOf(p).hist;
     const warn=[c.exp?`Chương trình hết hạn ${esc(c.to)}`:"",c.lv==="C"?"Mức tin cậy C – chưa đủ dữ liệu để tính":"",c.minTxn?`Cần ≥ ${c.minTxn} giao dịch/${cbPer(c)}`:""].filter(Boolean).join(" · ");
     const hs=hist.filter(h=>h.card===c.id),per=hs.map(h=>h.p).sort().pop();
     const spent=per?`<div class="note">Tháng ${esc(cpPerTxt(per))} đã chi ${fmt(Math.round(hs.filter(h=>h.p===per).reduce((a,h)=>a+h.amt,0)*100)/100)} tr</div>`:"";
-    return`<div class="cp-card"><div class="t"><div class="cbh-l">${cbImg(c,1)}<div><b>${esc(c.name)}</b><div class="cbsub">${esc(c.bank)} · mức ${esc(c.lv)}</div></div></div><button class="x" type="button" data-cp-del="${i}">Xoá</button></div>${tierSel}${picks}${spent}${warn?`<div class="note" style="color:var(--warn)">${warn}</div>`:""}</div>`}).join("")
+    return`<div class="cp-card"><div class="t"><div class="cbh-l">${cbImg(c,1)}<div>${cbBk(c)}<b>${esc(c.name)}</b><div class="cbsub">mức tin cậy ${esc(c.lv)}</div></div></div><button class="x" type="button" data-cp-del="${i}">Xoá</button></div>${tierSel}${picks}${spent}${warn?`<div class="note" style="color:var(--warn)">${warn}</div>`:""}</div>`}).join("")
     :`<p class="note" style="margin:0">${empty}</p>`}
 function cpFillSel(bankSel,cardSel,p){const all=cbAll(),bSel=$(bankSel).value;
   const banks=[...new Set(all.map(c=>c.bank))];
