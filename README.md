@@ -69,9 +69,10 @@ App chỉ xét **mở thẻ online**. Ba điều kiện chính là con số, kh�
 | Số CTTC tối đa | Khách đạt khi số công ty tài chính đang có dư nợ **≤** số này. `0` = không nhận khách có CTTC | 2 |
 | Cần công việc | `Không` = không cần. `Có` = cần chứng minh công việc (loại nào cũng được). Hoặc ghi rõ loại nhận: `HĐLĐ`, `HKD`, `Online`, `Tự do` (ghi nhiều thì cách dấu phẩy) | Không |
 | Cần thẻ cũ | `Có` nếu chỉ mở qua thẻ (khách phải có sẵn thẻ tín dụng) | Có |
+| Bắt buộc BHXH | `Có` nếu ngân hàng bắt buộc khách có đóng bảo hiểm xã hội. Khách không có BHXH thì báo Không phù hợp | Không |
 | Ghi chú | Hiện trong kết quả. Nếu có chữ **ĐB** (điều kiện đặc biệt): app chỉ nhắc kiểm tra ĐB ở **bước cuối**, khi khách đã thoả mọi điều kiện khác. Không thoả điều kiện khác thì báo Không phù hợp, không nhắc ĐB | ĐB: thẻ cũ phải mở trên 6 tháng |
 
-Các cột `Cần công việc`, `Cần thẻ cũ` là tuỳ chọn, xoá đi cũng được. Có thể thêm cột `Số ngân hàng tối đa` nếu ngân hàng giới hạn số ngân hàng khách đã có thẻ.
+Các cột `Cần công việc`, `Cần thẻ cũ`, `Bắt buộc BHXH` là tuỳ chọn, xoá đi cũng được. Có thể thêm cột `Số ngân hàng tối đa` nếu ngân hàng giới hạn số ngân hàng khách đã có thẻ.
 
 ### Cách ứng dụng chấm
 
@@ -80,7 +81,9 @@ Các cột `Cần công việc`, `Cần thẻ cũ` là tuỳ chọn, xoá đi c�
 - **Không phù hợp:** có nợ xấu, vượt số thẻ hoặc số CTTC, công việc không được nhận, hoặc cần thẻ cũ mà khách chưa có.
 - **ĐB:** ngân hàng có chữ ĐB trong ghi chú vẫn được chấm như thường, nhưng gắn nhãn ĐB và hiện ghi chú nổi bật để bạn tự kiểm tra.
 - **Đã có thẻ:** khách đã có thẻ tại ngân hàng đó.
-- **Gợi ý:** app thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, và báo ngân hàng nào mở thêm được.
+- **BHXH:** ở tab Kiểm tra bật/tắt *Có đóng bảo hiểm xã hội (BHXH)*. Ngân hàng đánh dấu *Bắt buộc có BHXH* mà khách không có thì báo Không phù hợp.
+- **Gợi ý:** app thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, có BHXH, và báo ngân hàng nào mở thêm được.
+- **Chuyên gia sửa gợi ý:** ở phần Gợi ý bấm **✎ Chuyên gia sửa**, nhập mật khẩu chuyên gia (khác mật khẩu tab Điều kiện), sửa nội dung (mỗi dòng một gợi ý) rồi **Lưu gợi ý**. Gợi ý đã sửa có ghi chú *“Đã được chuyên gia chỉnh sửa”* kèm thời gian, trên app và trên file PDF; gợi ý tự động vẫn xem được ở mục *Gợi ý tự động (tham khảo)*. Bấm **Dùng lại gợi ý tự động** để bỏ bản đã sửa. Gợi ý đã sửa lưu theo từng khách – bấm **Lưu khách hàng** để lưu vào hồ sơ.
 
 ## Cấu trúc thư mục
 

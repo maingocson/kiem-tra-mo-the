@@ -136,6 +136,9 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 .tip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;display:flex;gap:10px}
 .tip .k{flex:none;min-width:26px;height:26px;padding:0 4px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--accent-soft);color:var(--accent)}
 .tip.w .k{background:var(--warn-soft);color:var(--warn)}
+.tip.x{border-color:var(--ok)} .tip.x .k{background:var(--ok-soft);color:var(--ok)}
+.xnote{font-size:12px;font-weight:600;color:var(--ok);background:var(--ok-soft);border-radius:8px;padding:6px 10px}
+#xErr{color:var(--bad);font-weight:600}
 
 
 .rule{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
@@ -246,7 +249,8 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
     </section>
 
     <section>
-      <div class="panel">
+      <div class="panel stack">
+        <label class="switch" for="bhxh"><span><span style="font-weight:600">Có đóng bảo hiểm xã hội (BHXH)</span><br><span class="note">Đang tham gia BHXH tại nơi làm việc</span></span><input type="checkbox" id="bhxh"></label>
         <label class="switch" for="badDebt"><span><span style="font-weight:600">Đang có nợ quá hạn / nợ xấu</span><br><span class="note">Nợ nhóm 2 trở lên trên CIC</span></span><input type="checkbox" id="badDebt"></label>
       </div>
     </section>
@@ -410,7 +414,7 @@ ACB,ACB,Có,80,4,1,Không,Không,"""ĐB"" : 3 tháng gần không tháng nào v�
 MSB,MSB,Có,70,4,,Không,Không,"""ĐB"" : Điểm tín dụng thấp trình Online Max 50tr"
 SeABank,SEA,Có,65,4,1,Không,Không,"""ĐB"" : có tạm trú HCM, hoặc trình Online max 50tr"`;
 const SAMPLE_RULES=parseCSV(DEFAULT_CSV);
-const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",badDebt:false,example:true};
+const EXAMPLE_CUSTOMER={name:"",phone:"",note:"",rows:[{bank:"VPBank",cards:1,limit:50,used:20},{bank:"TPBank",cards:1,limit:30,used:25}],finCos:1,job:"hdld",bhxh:true,badDebt:false,example:true};
 const JOBS={hdld:"Đi làm có HĐLĐ",hkd:"Chủ hộ kinh doanh",online:"Kinh doanh online",tudo:"Làm tự do",none:"Không chứng minh được công việc"};
 const K_CACHE="kmt.rulesCache.v4",K_VER="kmt.policyVersions.v1",MAX_VER=20,K_CUST="kmt.customer.v2";
 
@@ -437,6 +441,7 @@ const COLS=[
  ["maxCards",k=>k.includes("sothe")],
  ["maxFinCos",k=>k.includes("cttc")||k.includes("congtytaichinh")],
  ["maxBanks",k=>k.includes("songanhang")||k.startsWith("sonh")],
+ ["needBhxh",k=>k.includes("bhxh")||k.includes("baohiemxahoi")],
  ["requireCard",k=>k.includes("canthecu")||k.includes("canthetindung")||k.includes("cocothe")],
  ["note",k=>k.includes("ghichu")]
 ];
@@ -462,6 +467,7 @@ function normRule(raw){
   r.maxUtil=num(r.util);
   r.maxCardsN=num(r.maxCards);r.maxFinCosN=num(r.maxFinCos);r.maxBanksN=num(r.maxBanks);
   r.needCard=isYes(r.requireCard);
+  r.needBhxhB=isYes(r.needBhxh);
   r.isActive=!(r.active!=null&&String(r.active).trim()&&isNo(r.active));
   r.special=/(^|[^a-z0-9])db([^a-z0-9]|$)/.test(plain(r.note));
   r.name=String(r.name||"").trim();
@@ -574,18 +580,18 @@ function applyPolicy(p,source){
   if(changed||!versions().some(x=>x.text===p.text))addVersion(p.text,rules.length,source||"drive");else renderVersions();
 }
 /* ---------- Sửa điều kiện trên app ---------- */
-const HEAD=["Ngân hàng","Tên gọi khác","Áp dụng","Tỷ lệ sử dụng tối đa (%)","Số thẻ tối đa","Số CTTC tối đa","Cần công việc","Cần thẻ cũ","Ghi chú"];
+const HEAD=["Ngân hàng","Tên gọi khác","Áp dụng","Tỷ lệ sử dụng tối đa (%)","Số thẻ tối đa","Số CTTC tối đa","Cần công việc","Cần thẻ cũ","Bắt buộc BHXH","Ghi chú"];
 const JOBK=["hdld","hkd","online","tudo"],JOBN={hdld:"HĐLĐ",hkd:"HKD",online:"Online",tudo:"Tự do"};
 function toModel(r){
   const j=r.job;let mode="none",jobs={};
   if(j.req){mode=(!j.jobs||JOBK.every(k=>j.jobs[k]))?"any":"list";if(mode==="list")jobs=Object.assign({},j.jobs)}
   const v=x=>x==null?"":String(x);
-  return{name:r.name,aliases:v(r.aliases).trim(),active:r.isActive,util:v(r.maxUtil),cards:v(r.maxCardsN),fin:v(r.maxFinCosN),mode,jobs,needCard:r.needCard,note:v(r.note).trim()};
+  return{name:r.name,aliases:v(r.aliases).trim(),active:r.isActive,util:v(r.maxUtil),cards:v(r.maxCardsN),fin:v(r.maxFinCosN),mode,jobs,needCard:r.needCard,bhxh:!!r.needBhxhB,note:v(r.note).trim()};
 }
 function toRaw(m){
   const picked=JOBK.filter(k=>m.jobs[k]);
   const job=m.mode==="none"?"Không":(m.mode==="any"||!picked.length||picked.length===JOBK.length)?"Có":picked.map(k=>JOBN[k]).join(", ");
-  return{"Ngân hàng":m.name.trim(),"Tên gọi khác":m.aliases,"Áp dụng":m.active?"Có":"Không","Tỷ lệ sử dụng tối đa (%)":m.util,"Số thẻ tối đa":m.cards,"Số CTTC tối đa":m.fin,"Cần công việc":job,"Cần thẻ cũ":m.needCard?"Có":"Không","Ghi chú":m.note};
+  return{"Ngân hàng":m.name.trim(),"Tên gọi khác":m.aliases,"Áp dụng":m.active?"Có":"Không","Tỷ lệ sử dụng tối đa (%)":m.util,"Số thẻ tối đa":m.cards,"Số CTTC tối đa":m.fin,"Cần công việc":job,"Cần thẻ cũ":m.needCard?"Có":"Không","Bắt buộc BHXH":m.bhxh?"Có":"Không","Ghi chú":m.note};
 }
 function toCSV(list){
   const q=v=>{v=String(v??"");return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
@@ -605,7 +611,7 @@ $("#cancelEdit").addEventListener("click",()=>{
   stopEdit();
 });
 $("#addRule").addEventListener("click",()=>{
-  draft.push({name:"",aliases:"",active:true,util:"",cards:"",fin:"",mode:"none",jobs:{},needCard:false,note:""});
+  draft.push({name:"",aliases:"",active:true,util:"",cards:"",fin:"",mode:"none",jobs:{},needCard:false,bhxh:false,note:""});
   setDirty(true);renderRules();const el=document.getElementById(`e${draft.length-1}-name`);el&&el.focus();
 });
 function onEdit(e){
@@ -659,6 +665,7 @@ function renderEdit(){
      </div>
      <div class="checks">
        <label class="ck"><input type="checkbox" data-f="needCard" ${m.needCard?"checked":""}>Cần thẻ cũ</label>
+       <label class="ck"><input type="checkbox" data-f="bhxh" ${m.bhxh?"checked":""}>Bắt buộc có BHXH</label>
        <label class="ck"><input type="checkbox" data-f="active" ${m.active?"checked":""}>Đang áp dụng</label>
      </div>
      <label class="f" for="e${i}-note">Ghi chú (ghi "ĐB" nếu có điều kiện đặc biệt)<input id="e${i}-note" data-f="note" type="text" value="${esc(m.note)}"></label>
@@ -678,9 +685,10 @@ function renderRules(){
        <div><span>Số thẻ</span><strong>${esc(le(r.maxCardsN))}</strong></div>
        <div><span>Công ty tài chính</span><strong>${esc(le(r.maxFinCosN))}</strong></div>
      </div>
-     <div class="kv two">
+     <div class="kv">
        <div><span>Công việc</span><strong>${esc(jobText(r.job))}</strong></div>
        <div><span>Cần thẻ cũ</span><strong>${r.needCard?"Có":"Không"}</strong></div>
+       <div><span>Bắt buộc BHXH</span><strong>${r.needBhxhB?"Có":"Không"}</strong></div>
      </div>
      ${condHtml(r)}
    </div>`).join("");
@@ -742,6 +750,7 @@ function renderCust(){
   $("#finCos").value=cust.finCos;
   setPressed("#job","job",cust.job);
   $("#badDebt").checked=!!cust.badDebt;
+  $("#bhxh").checked=!!cust.bhxh;
 }
 $("#cards").addEventListener("input",e=>{const f=e.target.dataset.f;if(!f)return;cust.rows[+e.target.closest(".crow").dataset.i][f]=e.target.value;updateTotals();edited()});
 $("#cards").addEventListener("click",e=>{const d=e.target.closest("[data-del]");if(!d)return;cust.rows.splice(+d.dataset.del,1);renderRows();edited()});
@@ -750,12 +759,13 @@ document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",(
 $("#finCos").addEventListener("input",e=>{cust.finCos=Math.max(0,parseInt(e.target.value)||0);edited()});
 $("#job").addEventListener("click",e=>{const b=e.target.closest("[data-job]");if(!b)return;cust.job=b.dataset.job;setPressed("#job","job",cust.job);edited()});
 $("#badDebt").addEventListener("change",e=>{cust.badDebt=e.target.checked;edited()});
+$("#bhxh").addEventListener("change",e=>{cust.bhxh=e.target.checked;edited()});
 [["#cName","name"],["#cPhone","phone"],["#cNote","note"]].forEach(([sel,f])=>$(sel).addEventListener("input",e=>{cust[f]=e.target.value;edited()}));
 $("#newCustomer").addEventListener("click",()=>{showTab("check");$("#newConfirm").hidden=false});
 $("#newNo").addEventListener("click",()=>$("#newConfirm").hidden=true);
 $("#newYes").addEventListener("click",()=>{
-  cust={id:null,name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",badDebt:false,example:false};
-  $("#newConfirm").hidden=true;$("#results").hidden=true;renderCust();saveCust();toast("Đã tạo hồ sơ khách mới");
+  cust={id:null,name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",bhxh:false,badDebt:false,example:false};
+  xState=null;$("#newConfirm").hidden=true;$("#results").hidden=true;renderCust();saveCust();toast("Đã tạo hồ sơ khách mới");
 });
 
 /* ---------- Đối chiếu ---------- */
@@ -770,6 +780,7 @@ function evalRule(r,c,s){
   if(ownsAt(r,s))return{status:"own",fails:["Khách đã có thẻ tại ngân hàng này"],warns};
   if(c.badDebt)fails.push("Đang có nợ quá hạn / nợ xấu");
   const jf=jobFail(r.job,c.job);if(jf)fails.push(jf.charAt(0).toUpperCase()+jf.slice(1));
+  if(r.needBhxhB&&!c.bhxh)fails.push("Ngân hàng bắt buộc có BHXH, khách chưa có BHXH");
   if(r.maxFinCosN!=null&&c.finCos>r.maxFinCosN)fails.push(`Đang có dư nợ ${c.finCos} công ty tài chính, ngân hàng chỉ nhận ≤ ${r.maxFinCosN}`);
   if(r.maxCardsN!=null&&s.cards>r.maxCardsN)fails.push(`Đang có ${fmt(s.cards)} thẻ, ngân hàng chỉ nhận ≤ ${r.maxCardsN} thẻ`);
   if(r.maxBanksN!=null&&s.bankCount>r.maxBanksN)fails.push(`Đã có thẻ ${s.bankCount} ngân hàng, tối đa ${r.maxBanksN}`);
@@ -825,6 +836,10 @@ function analyze(){
     const g=gained(base,scenario(c=>c.job="hdld"));
     if(g.length)tips.push(["HĐ","",`Nếu chứng minh được thu nhập theo diện <b>đi làm có HĐLĐ</b> → mở thêm được: <b>${esc(g.join(", "))}</b>.`]);
   }
+  if(!cust.bhxh){
+    const g=gained(base,scenario(c=>c.bhxh=true));
+    if(g.length)tips.push(["BH","",`Nếu khách <b>tham gia BHXH</b> → mở thêm được: <b>${esc(g.join(", "))}</b>.`]);
+  }
   if(s.cards<=0){
     const need=base.list.filter(x=>x.rule.needCard).map(x=>x.rule.name);
     tips.push(["1","",`Khách chưa có thẻ tín dụng. Nên mở trước ở ngân hàng không yêu cầu thẻ cũ, sau vài tháng dùng tốt có thể mở qua thẻ${need.length?` ở: <b>${esc(need.join(", "))}</b>`:""}.`]);
@@ -832,23 +847,77 @@ function analyze(){
   if(s.bankCount>=4)tips.push(["!","w",`Khách đã có thẻ ở <b>${s.bankCount} ngân hàng</b>. Nên nộp lần lượt 1–2 ngân hàng, tránh nộp dồn dập.`]);
   return{base,s,sorted,good,bad,own,tips,n,card};
 }
+/* ---------- Gợi ý: chuyên gia có thể sửa (mật khẩu riêng) ---------- */
+const EXPERT_HASH="83fc816333d1695e4b939a90104567505be3e103560f66378171f0f81d5e0918";
+let xUnlocked=false,xState=null; /* xState: null | "pass" | "edit" */
+try{xUnlocked=sessionStorage.getItem("kmt.unlockX")==="1"}catch(e){}
+const tipPlain=h=>richText(h).map(x=>x.text).join("");
+const autoTips=tips=>`<div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`;
+function tipsHtml(tips){
+  const x=cust.expertTips;
+  let h=`<div class="sec-head" id="tipsSec" style="margin-top:6px"><h2>Gợi ý</h2>${xState?"":`<button class="btn2" type="button" data-act="xedit">✎ ${x?"Sửa gợi ý":"Chuyên gia sửa"}</button>`}</div>`;
+  if(xState==="pass")return h+`<form class="panel stack" id="xForm" autocomplete="off">
+      <p class="note" style="margin:0">Chỉ chuyên gia được sửa gợi ý. Nhập mật khẩu chuyên gia.</p>
+      <label class="f" for="xPass">Mật khẩu chuyên gia<input id="xPass" type="password" inputmode="numeric" autocomplete="off"></label>
+      <div class="row-btns"><button class="btn2 acc" type="submit">Mở khoá</button><button class="btn2" type="button" data-act="xcancel">Huỷ</button><span class="note" id="xErr" hidden>Sai mật khẩu</span></div>
+    </form>`;
+  if(xState==="edit"){
+    const text=x?x.items.join("\n"):tips.map(t=>tipPlain(t[2])).join("\n");
+    return h+`<div class="panel stack">
+      <label class="f" for="xText">Mỗi dòng là một gợi ý<textarea id="xText" rows="8">${esc(text)}</textarea></label>
+      <p class="note" style="margin:0">Sau khi lưu, gợi ý được ghi chú <b>“Đã được chuyên gia chỉnh sửa”</b> trên app và file PDF.</p>
+      <div class="row-btns"><button class="btn2 acc" type="button" data-act="xsave">Lưu gợi ý</button><button class="btn2" type="button" data-act="xcancel">Huỷ</button>${x?`<button class="btn2 danger" type="button" data-act="xreset">Dùng lại gợi ý tự động</button>`:""}</div>
+    </div>`;
+  }
+  if(x)return h+`<div class="xnote">✎ Đã được chuyên gia chỉnh sửa · ${esc(fmtTime(x.at))}</div>
+    <div class="tips">${x.items.map(t=>`<div class="tip x"><span class="k">✎</span><div>${esc(t)}</div></div>`).join("")}</div>
+    ${tips.length?`<details class="grp"><summary>Gợi ý tự động (tham khảo)</summary>${autoTips(tips)}</details>`:""}`;
+  return h+(tips.length?autoTips(tips):`<div class="panel note">Không có gợi ý tự động cho hồ sơ này.</div>`);
+}
+function xShow(st,focus){
+  xState=st;runCheck(false);
+  const el=$("#tipsSec");el&&el.scrollIntoView({block:"start"});
+  if(focus){const f=$(focus);f&&f.focus()}
+}
+function xAct(act,btn){
+  if(act==="xedit")return xShow(xUnlocked?"edit":"pass",xUnlocked?"#xText":"#xPass");
+  if(act==="xcancel")return xShow(null);
+  if(act==="xsave"){
+    const items=$("#xText").value.split(/\n/).map(t=>t.replace(/^\s*[-•*]\s*/,"").trim()).filter(Boolean);
+    cust.expertTips=items.length?{items,at:new Date().toISOString()}:null;edited();
+    xShow(null);
+    toast(items.length?(cust.id?"Đã lưu gợi ý – bấm Lưu khách hàng để cập nhật hồ sơ":"Đã lưu gợi ý của chuyên gia"):"Đã bỏ gợi ý chuyên gia, dùng lại gợi ý tự động");
+    return;
+  }
+  if(act==="xreset"){
+    if(!btn.classList.contains("armed")){btn.classList.add("armed");btn.textContent="Bấm lần nữa để bỏ gợi ý đã sửa";return}
+    cust.expertTips=null;edited();xShow(null);toast("Đã dùng lại gợi ý tự động");
+  }
+}
 function runCheck(scroll){
   const{good,bad,own,tips,n,card}=analyze();
   const R=$("#results");
   R.innerHTML=`
-    <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.finCos} CTTC</span></div>
+    <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.bhxh?"Có":"Không"} BHXH · ${cust.finCos} CTTC</span></div>
     <div class="res-acts"><button class="btn2 acc" type="button" data-act="save">Lưu khách hàng</button><button class="btn2" type="button" data-act="pdf">Xuất PDF</button></div>
     <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
-    ${tips.length?`<h2 style="margin-top:6px">Gợi ý</h2><div class="tips">${tips.map(t=>`<div class="tip ${t[1]}"><span class="k">${t[0]}</span><div>${t[2]}</div></div>`).join("")}</div>`:""}
+    ${tipsHtml(tips)}
     ${bad.length?`<details class="grp"><summary>Không phù hợp (${bad.length})</summary><div class="res">${bad.map(card).join("")}</div></details>`:""}
     ${own.length?`<details class="grp"><summary>Đã có thẻ (${own.length})</summary><div class="res">${own.map(card).join("")}</div></details>`:""}`;
   R.hidden=false;
   loadPdfLib().catch(()=>{});
   if(scroll!==false)R.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
 }
-$("#runCheck").addEventListener("click",()=>runCheck(true));
-$("#results").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;if(b.dataset.act==="save")saveCustomer();else exportPdf(b)});
+$("#runCheck").addEventListener("click",()=>{xState=null;runCheck(true)});
+$("#results").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;if(a==="save")saveCustomer();else if(a==="pdf")exportPdf(b);else xAct(a,b)});
+$("#results").addEventListener("submit",async e=>{
+  if(e.target.id!=="xForm")return;e.preventDefault();
+  const ok=(await hashPass($("#xPass").value.trim()))===EXPERT_HASH;
+  if(!ok){$("#xPass").value="";$("#xErr").hidden=false;$("#xPass").focus();return}
+  xUnlocked=true;try{sessionStorage.setItem("kmt.unlockX","1")}catch(err){}
+  xShow("edit","#xText");
+});
 
 /* ---------- Tabs ---------- */
 /* ---------- Mật khẩu tab Điều kiện ---------- */
@@ -1000,7 +1069,7 @@ $("#csList").addEventListener("click",e=>{
   const o=e.target.closest("[data-open]"),d=e.target.closest("[data-cdel]");
   if(o){
     const rec=custList().find(x=>x.id===o.dataset.open);if(!rec)return;
-    cust=clone(rec.cust);cust.id=rec.id;cust.example=false;saveCust();
+    cust=clone(rec.cust);cust.id=rec.id;cust.example=false;xState=null;saveCust();
     renderCust();showTab("check");runCheck(false);toast(`Đã mở hồ sơ ${cust.name||"khách"}`);
   }
   if(d){
@@ -1096,6 +1165,7 @@ async function buildPdfDoc(){
   const info=[["Khách hàng",{text:c.name||"—",bold:true}]];
   if(c.phone)info.push(["Số điện thoại",c.phone]);
   info.push(["Công việc",JOBS[c.job]]);
+  info.push(["BHXH",c.bhxh?"Có đóng BHXH":"Không đóng BHXH"]);
   info.push(["Công ty tài chính",`${c.finCos} công ty đang có dư nợ`]);
   info.push(["Nợ quá hạn / nợ xấu",c.badDebt?{text:"Có",bold:true,color:C.bad}:"Không"]);
   if(c.note)info.push(["Ghi chú",c.note]);
@@ -1126,7 +1196,8 @@ async function buildPdfDoc(){
     {table:{widths:["*","*","*"],body:[[["ok","Có thể mở"],["warn","Cần giảm dư nợ"],["bad","Không phù hợp"]].map(([k,t])=>({stack:[{text:String(a.n(k)),fontSize:18,bold:true,color:C[k]},{text:t,fontSize:9,color:C.mute}],margin:[4,2,4,2]}))]},
       layout:{hLineWidth:()=>.5,vLineWidth:()=>.5,hLineColor:()=>C.line,vLineColor:()=>C.line},margin:[0,14,0,0]},
     ...(a.good.length?group("Ngân hàng có thể mở",a.good):[H("Ngân hàng có thể mở"),{text:"Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.",color:C.mute}]),
-    ...keep("Gợi ý",a.tips.map(t=>({ul:[{text:richText(fx(t[2]))}],margin:[0,0,0,3]}))),
+    ...(c.expertTips?keep("Gợi ý",c.expertTips.items.map((t,i)=>{const ul={ul:[fx(t)],margin:[0,0,0,3]};return i?ul:{stack:[{text:`Đã được chuyên gia chỉnh sửa · ${fmtTime(c.expertTips.at)}`,fontSize:9,bold:true,color:C.ok,margin:[0,0,0,4]},ul]}}))
+      :keep("Gợi ý",a.tips.map(t=>({ul:[{text:richText(fx(t[2]))}],margin:[0,0,0,3]})))),
     ...group("Không phù hợp",a.bad),
     ...keep(`Đã có thẻ (${a.own.length})`,a.own.length?[{text:a.own.map(x=>x.rule.name).join(", ")}]:[]),
     {text:"Kết quả mang tính tham khảo, đối chiếu theo bảng điều kiện mở thẻ online tại thời điểm kiểm tra. Ngân hàng là bên thẩm định và quyết định cuối cùng.",fontSize:8.5,color:"#777",margin:[0,18,0,0]}
