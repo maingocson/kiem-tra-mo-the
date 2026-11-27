@@ -544,7 +544,7 @@ button.av{cursor:pointer}
       <button class="av s96" id="meAv" type="button" aria-label="Đổi ảnh đại diện"></button>
       <div class="row-btns" style="justify-content:center"><button class="btn2" id="meAvPick" type="button">Đổi ảnh</button><button class="btn2 danger" id="meAvDel" type="button" hidden>Xoá ảnh</button></div>
       <input type="file" id="meAvFile" accept="image/*" hidden>
-      <b id="meTitle"></b><span class="note" id="meSub"></span>
+      <b id="meTitle"></b>
     </section>
     <section>
       <h2>Thông tin</h2>
@@ -581,7 +581,7 @@ button.av{cursor:pointer}
 
 <div class="dr-bg" id="drBg"></div>
 <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Menu tài khoản">
-  <div class="dr-head"><span class="av s64" id="drAv"></span><b id="drName"></b><span class="note" id="drSub"></span><div class="dr-now" id="drNow"></div></div>
+  <div class="dr-head"><span class="av s64" id="drAv"></span><b id="drName"></b><div class="dr-now" id="drNow"></div></div>
   <button class="dr-item" type="button" data-go="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Hồ sơ của tôi</button>
   <button class="dr-item" type="button" data-go="back" id="drBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>Kiểm tra cho tôi</button>
   <button class="dr-item" type="button" data-go="custs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 6"/></svg>Khách hàng</button>
@@ -1778,7 +1778,6 @@ $("#whoBack").addEventListener("click",()=>{useMe();showTab("check")});
 /* khung trượt */
 function drOpen(){
   $("#drAv").innerHTML=avHtml(me);$("#drName").textContent=me.name||"Chưa đặt tên";
-  $("#drSub").textContent=[jobTxt(me.job),me.bhxh?"có BHXH":"chưa BHXH",debtTxt(me)].filter(Boolean).join(" · ");
   $("#drNow").innerHTML=cust.isMe?"Đang dùng: <b>hồ sơ của tôi</b>":`Đang tư vấn: <b>${esc(cust.name||"khách chưa đặt tên")}</b>`;
   $("#drBack").hidden=!!cust.isMe;
   $("#drFoot").textContent=`Kiểm Tra Mở Thẻ · ${rules.length} ngân hàng có điều kiện`;
@@ -1802,7 +1801,6 @@ function meRows(){
 function renderMe(){
   $("#meAv").innerHTML=avHtml(me);$("#meAvDel").hidden=!me.avatar;
   $("#meTitle").textContent=me.name||"Hồ sơ của tôi";
-  $("#meSub").textContent=[jobTxt(me.job),me.bhxh?"có BHXH":"chưa BHXH",debtTxt(me)].join(" · ");
   $("#meName").value=me.name||"";$("#mePhone").value=me.phone||"";
   if(!$("#meJob").options.length)$("#meJob").innerHTML=Object.entries(JOBS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
   $("#meJob").value=me.job||"hdld";$("#meBhxh").checked=!!me.bhxh;$("#meDebt").value=String(me.debtGroup||(me.badDebt?2:1));$("#meFin").value=me.finCos||0;
@@ -1810,7 +1808,7 @@ function renderMe(){
   const cb=(me.cb&&me.cb.cards||[]).map(e=>cbAll().find(c=>c.id===e.id)).filter(Boolean);
   $("#meCb").textContent=cb.length?`Thẻ hoàn tiền: ${cb.map(c=>c.bank+" "+c.name).join(", ")}`:"Chưa chọn dòng thẻ hoàn tiền nào.";
 }
-function meChanged(full){save(K_ME,me);if(cust.isMe)cust=me;renderWho();if(full)renderMe();else{$("#meAv").innerHTML=avHtml(me);$("#meTitle").textContent=me.name||"Hồ sơ của tôi";$("#meSub").textContent=[jobTxt(me.job),me.bhxh?"có BHXH":"chưa BHXH",debtTxt(me)].join(" · ")}}
+function meChanged(full){save(K_ME,me);if(cust.isMe)cust=me;renderWho();if(full)renderMe();else{$("#meAv").innerHTML=avHtml(me);$("#meTitle").textContent=me.name||"Hồ sơ của tôi"}}
 [["#meName","name"],["#mePhone","phone"]].forEach(([sel,f])=>$(sel).addEventListener("input",e=>{me[f]=e.target.value;meChanged(false)}));
 $("#meJob").addEventListener("change",e=>{me.job=e.target.value;meChanged(false)});
 $("#meBhxh").addEventListener("change",e=>{me.bhxh=e.target.checked;meChanged(false)});
@@ -2032,7 +2030,7 @@ function showTab(t){
   if(t!=="rules")wantEdit=false;
   showLock();showAdmin();
 }
-document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.addEventListener("click",()=>b.dataset.tab==="me"?drOpen():showTab(b.dataset.tab)));
 
 /* ---------- Danh sách ngân hàng: thêm, xoá, sao lưu, phục hồi ---------- */
 const csvCell=v=>/[",\n\r]/.test(v)?`"${String(v).replace(/"/g,'""')}"`:String(v);

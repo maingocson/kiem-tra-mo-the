@@ -20,7 +20,7 @@
 
 ## Giao diện
 
-- Thanh dưới: **Mở thẻ** · **Hoàn tiền** (mật khẩu riêng) · **Tôi**.
+- Thanh dưới: **Mở thẻ** · **Hoàn tiền** (mật khẩu riêng) · **Tôi** (mở khung trượt, giống bấm avatar).
 - Thanh trên: avatar của bạn (góc trái), logo Smart-B (góc phải).
 - Bấm avatar → khung trượt: Hồ sơ của tôi, Kiểm tra cho tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
 - **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có → **Lưu trên máy**. Đây là hồ sơ mặc định: Mở thẻ và Hoàn tiền tính theo hồ sơ này; khi tư vấn khách (Khách mới, mở khách đã lưu, đọc CIC của khách) thì tính theo khách, bấm **Về tôi** để quay lại.
