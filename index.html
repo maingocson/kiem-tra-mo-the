@@ -420,6 +420,7 @@ details.cbc>summary::-webkit-details-marker{display:none}
       <div class="cb-tools">
         <input id="cbSearch" type="text" enterkeyhint="search"placeholder="Tìm thẻ, nhóm chi tiêu hoặc mã MCC (vd 5411)" aria-label="Tìm thẻ hoàn tiền" autocomplete="off">
         <div class="cb-filter" id="cbBanks" role="group" aria-label="Lọc theo ngân hàng"></div>
+        <div class="cb-filter" id="cbLvs" role="group" aria-label="Lọc theo mức tin cậy"></div>
         <label class="cb-opt"><input type="checkbox" id="cbHide" checked> Ẩn thẻ đã ngừng phát hành</label>
       </div>
       <p class="note" style="margin:0" id="cbCount"></p>
@@ -1282,7 +1283,7 @@ MSB,,"Trả góp; rút tiền mặt; giao dịch hoàn, hủy; giao dịch khố
 VIB,4900;4814,"Thuế; trả góp; giao dịch không có MCC (QR, hóa đơn qua MyVIB); bất động sản; điện nước, viễn thông; bảo hiểm không đứng tên chủ thẻ; quảng cáo trực tuyến (trừ thẻ có quy định riêng); giao dịch đặc biệt (thẻ game, thẻ nạp, thẻ quà tặng, nơi làm việc) có trần riêng rất thấp",https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
 VietinBank,6010;6011;4111;4112;5541;5542;7311;6211;4829;6051,"Rút tiền mặt; phí và lãi; vận chuyển; xăng dầu; quảng cáo; chứng khoán, ngoại hối; chuyển tiền; giao dịch DCC; giao dịch qua VietinBank iPay; giao dịch gian lận",Thể lệ Visa Signature`};
 const K_CB="kmt.cashback.v1";
-let cbStore=load(K_CB),CB=null,cbBank="",cbQ="";
+let cbStore=load(K_CB),CB=null,cbBank="",cbQ="",cbLv="";
 const cbSrc=()=>cbStore&&cbStore.the?cbStore:CB_DEF;
 /* số từ Excel: chấp nhận 300000, 300.000, 300,000 (phân cách nghìn) và 0,1 / 0.1 (thập phân) */
 const cbN=v=>{let s=String(v??"").replace(/[\s%đ₫]/g,"");if(!s)return null;
@@ -1375,8 +1376,10 @@ function renderCb(){
   const src=cbSrc(),banks=[...new Set(CB.map(c=>c.bank))];
   $("#cbInfo").textContent=`${CB.length} thẻ · dữ liệu ngày ${fmtDay(src.at)}${cbStore&&cbStore.the?" (đã cập nhật trên máy này)":""}. Tỷ lệ và trần theo web, thể lệ ngân hàng – luôn đối chiếu nguồn trước khi tư vấn.`;
   $("#cbBanks").innerHTML=["",...banks].map(b=>`<button type="button" data-b="${esc(b)}" aria-pressed="${b===cbBank}">${esc(b||"Tất cả")}</button>`).join("");
+  const lvN=l=>CB.filter(c=>c.lv===l&&(!cbBank||c.bank===cbBank)&&(!$("#cbHide").checked||!c.stop)).length;
+  $("#cbLvs").innerHTML=[["","Mọi mức tin cậy"],["A","A · có thể lệ"],["B","B · trang thẻ"],["C","C · quảng cáo"]].map(([v,t])=>`<button type="button" data-lv="${v}" aria-pressed="${v===cbLv}">${t}${v?` (${lvN(v)})`:""}</button>`).join("");
   const hide=$("#cbHide").checked,q=cbQ.trim();
-  const list=CB.filter(c=>(!cbBank||c.bank===cbBank)&&(!hide||!c.stop)).map(c=>[c,cbHit(c,q)]).filter(([,h])=>h.ok).sort((a,b)=>a[0].exp-b[0].exp);
+  const list=CB.filter(c=>(!cbBank||c.bank===cbBank)&&(!cbLv||c.lv===cbLv)&&(!hide||!c.stop)).map(c=>[c,cbHit(c,q)]).filter(([,h])=>h.ok).sort((a,b)=>a[0].exp-b[0].exp);
   if(q)list.sort((a,b)=>{const ra=Math.max(-1,...[...a[1].g].map(i=>Math.max(...a[0].groups[i].r.filter(v=>v!=null)))),rb=Math.max(-1,...[...b[1].g].map(i=>Math.max(...b[0].groups[i].r.filter(v=>v!=null))));return (a[0].exp-b[0].exp)||rb-ra});
   $("#cbCount").textContent=q?`${list.length} thẻ khớp “${q}”${/^\d{4}$/.test(q)?" (theo mã MCC, xếp theo tỷ lệ hoàn cao nhất)":""}`:`${list.length} thẻ`;
   $("#cbList").innerHTML=list.map(([c,h])=>cbCard(c,q?h.g:new Set())).join("")||`<div class="panel note">Không có thẻ nào khớp.</div>`;
@@ -1384,6 +1387,7 @@ function renderCb(){
 }
 $("#cbSearch").addEventListener("input",e=>{cbQ=e.target.value;clearTimeout(renderCb.t);renderCb.t=setTimeout(renderCb,150)});
 $("#cbHide").addEventListener("change",renderCb);
+$("#cbLvs").addEventListener("click",e=>{const b=e.target.closest("[data-lv]");if(!b)return;cbLv=b.dataset.lv;renderCb()});
 $("#cbBanks").addEventListener("click",e=>{const b=e.target.closest("[data-b]");if(!b)return;cbBank=b.dataset.b;renderCb()});
 $("#cbList").addEventListener("toggle",e=>{const d=e.target;if(d.dataset&&d.dataset.id){d.open?cbOpenIds.add(d.dataset.id):cbOpenIds.delete(d.dataset.id)}},true);
 /* cập nhật: nhận diện file theo tiêu đề cột */
