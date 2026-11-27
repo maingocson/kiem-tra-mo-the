@@ -527,6 +527,7 @@ button.av{cursor:pointer}
         </div>
         <p class="note" style="margin:0" id="cpHint"></p>
       </div>
+      <button class="primary" id="cpMake" type="button">Lập kế hoạch chi tiêu</button>
       <div class="panel stack">
         <div class="cbk">2. Lịch sử chi tiêu</div>
         <p class="note" style="margin:0">Mỗi dòng: tháng, thẻ đã quẹt, nhóm chi tiêu và số tiền (triệu đồng).</p>
@@ -545,6 +546,7 @@ button.av{cursor:pointer}
         <p class="cp-tip" id="cpNeedsSrc" hidden></p>
         <div class="cp-needs" id="cpNeeds"></div>
         <div class="row-btns"><button class="btn2 acc" id="cpAuto" type="button">Tự tính theo thẻ</button><button class="btn2" id="cpFromHist" type="button">Lấy theo tháng gần nhất</button><button class="btn2" id="cpClearNeeds" type="button">Xoá hết</button></div>
+        <button class="primary" id="cpMake2" type="button">Lập kế hoạch theo nhu cầu này</button>
       </div>
       <div class="panel stack cp-now">
         <div class="cbk" id="cpNowTitle">4. Chi tiêu tháng này</div>
@@ -629,6 +631,7 @@ button.av{cursor:pointer}
           <button class="btn2 acc wide" id="meCbAdd" type="button">Thêm thẻ hoàn tiền</button>
         </div>
       </div>
+      <button class="primary" id="meMakePlan" type="button">Lập kế hoạch chi tiêu</button>
       <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Lịch sử &amp; kế hoạch chi tiêu</b><small>Ghi chi tiêu theo tháng, gợi ý quẹt thẻ nào để đạt mức hoàn</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
     </section>
     <button class="primary" id="meSave" type="button">Lưu trên máy</button>
@@ -1926,6 +1929,12 @@ $("#cpFromHist").addEventListener("click",()=>{const d=cpData();const pers=[...n
   const last=pers[pers.length-1],n={};d.hist.filter(h=>h.p===last).forEach(h=>n[h.cat]=(n[h.cat]||0)+h.amt);
   d.needs=Object.fromEntries(Object.entries(n).map(([k,v])=>[k,String(Math.round(v*100)/100)]));d.needsSrc="hist";cpSave();renderPlan();toast(`Đã lấy nhu cầu theo tháng ${cpPerTxt(last)}`)});
 $("#cpClearNeeds").addEventListener("click",()=>{const d=cpData();d.needs={};d.needsSrc="tay";cpSave();renderPlan()});
+/* nút Lập kế hoạch: tự tính nhu cầu theo thẻ (trừ khi đã nhập tay) rồi đưa tới kết quả */
+function cpMake(keep){const d=cpData();if(!cpOwned().length){toast("Thêm thẻ đang có ở bước 1 trước");$("#cpBank").focus();return}
+  if(!keep&&d.needsSrc!=="tay"&&d.needsSrc!=="hist")d.needsSrc="auto";cpSave();renderPlan();
+  setTimeout(()=>{const o=$("#cpOut");window.scrollTo({top:o.getBoundingClientRect().top+scrollY-70,behavior:"smooth"})},60);toast("Đã lập kế hoạch chi tiêu")}
+$("#cpMake").addEventListener("click",()=>cpMake(false));
+$("#cpMake2").addEventListener("click",()=>cpMake(true));
 $("#cpAuto").addEventListener("click",()=>{const d=cpData();if(!cpOwned().length){toast("Thêm thẻ đang có ở bước 1 trước");return}d.needsSrc="auto";cpSave();renderPlan();toast("Đã tự tính nhu cầu theo thẻ đang có")});
 $("#cpBudget").addEventListener("input",e=>{const d=cpData();const v=e.target.value.trim();if(v)d.budget=v;else delete d.budget;if(d.needsSrc!=="auto"&&cpOwned().length)d.needsSrc="auto";cpSave();clearTimeout(renderPlan.t);renderPlan.t=setTimeout(renderPlan,400)});
 
@@ -2020,7 +2029,10 @@ $("#meCards").addEventListener("click",e=>{const d=e.target.closest("[data-mdel]
 $("#meAddCard").addEventListener("click",()=>{me.rows.push({bank:"",cards:1,limit:"",used:""});meRows();save(K_ME,me);const el=$("#meCards .mrow:last-child input");el&&el.focus()});
 $("#meSave").addEventListener("click",()=>{save(K_ME,me);if(cust.isMe)cust=me;renderWho();toast("Đã lưu hồ sơ của bạn trên máy")});
 $("#meCheck").addEventListener("click",()=>{save(K_ME,me);if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("check");renderCust();runCheck(true)});
-$("#meToCb").addEventListener("click",()=>{if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("cb");if(cbOk){$('#cbSeg [data-seg="plan"]').click()}});
+let cbGoPlan=false;
+function meGoPlan(make){if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("cb");if(cbOk){$('#cbSeg [data-seg="plan"]').click();if(make)cpMake(false)}else{cbGoPlan=make?"make":"plan";toast("Nhập mật khẩu Hoàn tiền để xem kế hoạch")}}
+$("#meToCb").addEventListener("click",()=>meGoPlan(false));
+$("#meMakePlan").addEventListener("click",()=>{if(!cbOf(me).cards.length){toast("Thêm thẻ hoàn tiền trước");return}meGoPlan(true)});
 $("#meAvPick").addEventListener("click",()=>$("#meAvFile").click());
 $("#meAv").addEventListener("click",()=>$("#meAvFile").click());
 $("#meAvDel").addEventListener("click",()=>{me.avatar="";meChanged(true);toast("Đã xoá ảnh đại diện")});
@@ -2038,7 +2050,8 @@ function cbShowLock(){$("#cbLock").hidden=cbOk;$("#cbSeg").hidden=!cbOk;
   else{const plan=$('#cbSeg [data-seg="plan"]').getAttribute("aria-pressed")==="true";$("#cpView").hidden=!plan;$("#cbCatA").hidden=plan;$("#cbCatB").hidden=plan}}
 $("#cbLock").addEventListener("submit",async e=>{e.preventDefault();
   const ok=(await hashPass($("#cbPass").value.trim()))===CB_HASH;$("#cbPass").value="";$("#cbPassErr").hidden=ok;if(!ok)return;
-  cbOk=true;try{sessionStorage.setItem("kmt.cbUnlock","1")}catch(err){}cbShowLock();renderCb();if(!$("#cpView").hidden)renderPlan()});
+  cbOk=true;try{sessionStorage.setItem("kmt.cbUnlock","1")}catch(err){}cbShowLock();renderCb();if(!$("#cpView").hidden)renderPlan();
+  if(cbGoPlan){const m=cbGoPlan==="make";cbGoPlan=false;$('#cbSeg [data-seg="plan"]').click();if(m)cpMake(false)}});
 
 /* ---------- Đối chiếu ---------- */
 function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].filter(x=>bkey(x)).map(canon).some(k=>s.banks.has(k))}
