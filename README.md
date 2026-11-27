@@ -40,6 +40,7 @@ Muốn dùng logo khác trên một máy: tab **Điều kiện** → **Logo côn
 
 Bảng điều kiện dùng chung nằm ở kho riêng [kiem-tra-mo-the-dieu-kien](https://github.com/maingocson/kiem-tra-mo-the-dieu-kien) (file `dieu-kien.json`), tách khỏi kho chứa app.
 
+- **Thanh đầu trang:** hiện *Điều kiện mới nhất ngày …*; nếu máy đang khác bản chung thì hiện *Có điều kiện mới ngày … · nhấn để cập nhật*. Nhấn **Cập nhật** để tải bản chung mới nhất ngay.
 - **Người dùng:** mỗi lần mở app (hoặc quay lại app sau ít nhất 5 phút), app tự tải bản chung. Nếu có bản mới hơn thì tự dùng và báo *Đã cập nhật điều kiện mới*. Bản cũ vẫn nằm trong *Các bản đã lưu trên máy*. Bấm **Tải bản chung về máy** để lấy ngay.
 - **Người quản lý:** sửa điều kiện, bấm **Lưu**, rồi bấm **Đăng cho mọi người**. Máy khác nhận bản mới khi mở app (GitHub có thể chậm tối đa khoảng 5 phút).
 
