@@ -152,7 +152,7 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
 nav.tabs button{white-space:nowrap}
-nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:560px}
+nav.tabs .in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:560px}
 nav.tabs button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-radius:10px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-selected=true]{color:var(--accent)}
@@ -249,14 +249,48 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .cp-big .up strong{color:var(--ok)}
 .cp-tip{font-size:13px;background:var(--accent-soft);border-radius:10px;padding:8px 10px}
 .cp-hist td .x{font:inherit;font-size:11px;color:var(--bad);background:none;border:0;cursor:pointer;padding:0 2px}
+/* Thanh trên: avatar trái, logo phải */
+.topbar{position:sticky;top:0;z-index:15;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;padding:10px 0;margin-bottom:6px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.topbar .tb-title{font-size:18px;font-weight:800;letter-spacing:-.01em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar #brandLogo{height:34px;width:auto;max-width:110px;object-fit:contain;background:#fff;border-radius:8px;padding:2px 6px}
+.av{display:inline-grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;overflow:hidden;flex:none;border:0;padding:0;font-family:inherit}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.av.s36{width:36px;height:36px;font-size:15px} .av.s28{width:28px;height:28px;font-size:12px} .av.s64{width:64px;height:64px;font-size:24px} .av.s96{width:96px;height:96px;font-size:34px}
+button.av{cursor:pointer}
+/* Khung trượt kiểu X */
+.dr-bg{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:40;opacity:0;transition:opacity .25s;pointer-events:none}
+.dr-bg.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(82vw,320px);z-index:41;background:var(--surface);transform:translateX(-102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 0 calc(16px + env(safe-area-inset-bottom,0px));box-shadow:2px 0 24px rgba(0,0,0,.18);overflow-y:auto}
+.drawer.on{transform:none}
+.dr-head{padding:0 20px 14px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line)}
+.dr-head b{font-size:19px;margin-top:6px}
+.dr-now{margin-top:6px;font-size:13px;background:var(--sunk);border-radius:10px;padding:8px 10px}
+.drawer .dr-item{display:flex;align-items:center;gap:16px;width:100%;font:inherit;font-size:18px;font-weight:700;color:var(--ink);background:none;border:0;padding:14px 20px;text-align:left;cursor:pointer}
+.drawer .dr-item:active{background:var(--sunk)}
+.drawer .dr-item svg{width:26px;height:26px;flex:none}
+.drawer hr{border:0;border-top:1px solid var(--line);margin:8px 20px}
+.drawer .dr-foot{margin-top:auto;padding:12px 20px 0;font-size:12px;color:var(--muted)}
+/* Thanh đang kiểm tra cho ai */
+.who{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.who .w-t{flex:1;min-width:0;font-size:13px;color:var(--muted)} .who .w-t b{display:block;color:var(--ink);font-size:15px;overflow-wrap:anywhere;line-height:1.25}
+.who .btn2{padding:8px 10px;font-size:13px;white-space:nowrap}
+/* Trang Tôi */
+.me-head{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.me-head b{font-size:20px}
+.me select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+.mrow{display:grid;grid-template-columns:1.6fr .7fr 1fr 1fr auto;gap:6px;align-items:end}
+.mrow input{min-width:0}
+.mrow .icon-btn{margin-bottom:2px}
+.mhead{display:grid;grid-template-columns:1.6fr .7fr 1fr 1fr 34px;gap:6px;font-size:11px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="brand"><img id="brandLogo" alt="Logo" hidden><h1><small>Tư vấn thẻ tín dụng</small>Kiểm tra mở thẻ</h1></div>
-    <button class="ghost" id="newCustomer" type="button">Khách mới</button>
+  <header class="topbar">
+    <button class="av s36" id="meBtn" type="button" aria-label="Mở menu tài khoản"></button>
+    <div class="tb-title" id="tbTitle">Mở thẻ</div>
+    <img id="brandLogo" alt="Smart-B" hidden>
   </header>
   <div class="policy" id="policyBar"><span class="dot" id="pDot"></span><span id="pText">…</span><button class="btn2" id="pEdit" type="button">Cập nhật</button></div>
   <input type="file" id="pFile" accept=".csv,text/csv,text/plain" hidden>
@@ -265,8 +299,9 @@ details.cbc>summary::-webkit-details-marker{display:none}
 
   <!-- ===== KIỂM TRA ===== -->
   <div class="view" id="v-check">
-    <div id="newConfirm" class="confirm" hidden>Xoá toàn bộ thông tin khách đang nhập?
-      <button class="btn2 danger" id="newYes" type="button">Xoá</button><button class="btn2" id="newNo" type="button">Huỷ</button></div>
+    <div class="who"><span class="av s36" id="whoAv"></span><div class="w-t" id="whoTxt"></div><button class="btn2" id="whoBack" type="button" hidden>Về tôi</button><button class="btn2 acc" id="newCustomer" type="button">Khách mới</button></div>
+    <div id="newConfirm" class="confirm" hidden>Bắt đầu hồ sơ khách mới? Hồ sơ đang nhập chưa lưu sẽ mất (hồ sơ của bạn vẫn giữ nguyên).
+      <button class="btn2 danger" id="newYes" type="button">Tạo mới</button><button class="btn2" id="newNo" type="button">Huỷ</button></div>
 
     <section id="cicSec">
       <div class="sec-head"><h2>Đọc CIC tự động</h2></div>
@@ -435,6 +470,12 @@ details.cbc>summary::-webkit-details-marker{display:none}
     </div>
   </div>
   <div class="view" id="v-cb" hidden>
+    <form class="panel stack" id="cbLock" autocomplete="off" hidden>
+      <h2>Hoàn tiền</h2>
+      <p class="note" style="margin:0">Nhập mật khẩu để xem chính sách hoàn tiền và kế hoạch chi tiêu.</p>
+      <label class="f" for="cbPass">Mật khẩu<input id="cbPass" type="password" inputmode="numeric" autocomplete="off"></label>
+      <div class="row-btns"><button class="btn2 acc" type="submit">Mở khoá</button><span class="note" id="cbPassErr" hidden style="color:var(--bad)">Sai mật khẩu</span></div>
+    </form>
     <div class="seg cbseg" id="cbSeg" role="group" aria-label="Chế độ xem hoàn tiền">
       <button type="button" data-seg="cat" aria-pressed="true">Danh mục thẻ</button>
       <button type="button" data-seg="plan" aria-pressed="false">Kế hoạch cho khách</button>
@@ -496,13 +537,63 @@ details.cbc>summary::-webkit-details-marker{display:none}
       </div>
     </section>
   </div>
+  <!-- ===== TÔI ===== -->
+  <div class="view me" id="v-me" hidden>
+    <section class="panel me-head">
+      <button class="av s96" id="meAv" type="button" aria-label="Đổi ảnh đại diện"></button>
+      <div class="row-btns" style="justify-content:center"><button class="btn2" id="meAvPick" type="button">Đổi ảnh</button><button class="btn2 danger" id="meAvDel" type="button" hidden>Xoá ảnh</button></div>
+      <input type="file" id="meAvFile" accept="image/*" hidden>
+      <b id="meTitle"></b><span class="note" id="meSub"></span>
+    </section>
+    <section>
+      <h2>Thông tin</h2>
+      <div class="panel stack">
+        <label class="f" for="meName">Họ tên<input id="meName" type="text" placeholder="Họ và tên" autocomplete="name"></label>
+        <label class="f" for="mePhone">Số điện thoại<input id="mePhone" type="tel" inputmode="tel" placeholder="Không bắt buộc" autocomplete="tel"></label>
+      </div>
+    </section>
+    <section>
+      <h2>Việc làm &amp; tín dụng</h2>
+      <div class="panel stack">
+        <label class="f" for="meJob">Việc làm<select id="meJob"></select></label>
+        <label class="switch" for="meBhxh"><span><span style="font-weight:600">Có đóng BHXH</span><br><span class="note">Đang tham gia bảo hiểm xã hội</span></span><input type="checkbox" id="meBhxh"></label>
+        <label class="f" for="meDebt">Nhóm nợ trên CIC<select id="meDebt">
+          <option value="1">Nhóm 1 – nợ đủ tiêu chuẩn / không có nợ</option><option value="2">Nhóm 2 – nợ cần chú ý</option><option value="3">Nhóm 3 – nợ dưới tiêu chuẩn</option><option value="4">Nhóm 4 – nợ nghi ngờ</option><option value="5">Nhóm 5 – nợ có khả năng mất vốn</option></select></label>
+        <label class="f" for="meFin">Số công ty tài chính đang có dư nợ<input id="meFin" type="number" inputmode="numeric" min="0" class="num"></label>
+      </div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Thẻ tín dụng đang có</h2><span class="note" id="meCardSum"></span></div>
+      <div class="panel stack">
+        <div class="mhead"><span>Ngân hàng</span><span>Số thẻ</span><span>HM (tr)</span><span>Đã dùng (tr)</span><span></span></div>
+        <div class="stack" id="meCards"></div>
+        <button class="add" id="meAddCard" type="button"><b>+</b> Thêm ngân hàng</button>
+        <div class="note" id="meCb"></div>
+        <div class="row-btns"><button class="btn2" id="meToCb" type="button">Thẻ hoàn tiền &amp; kế hoạch chi tiêu</button></div>
+      </div>
+    </section>
+    <button class="primary" id="meSave" type="button">Lưu trên máy</button>
+    <button class="btn2" id="meCheck" type="button" style="width:100%">Kiểm tra mở thẻ cho tôi</button>
+    <p class="note" style="margin:0;text-align:center">Thông tin chỉ lưu trên điện thoại này, không gửi đi đâu.</p>
+  </div>
 </div>
 
+<div class="dr-bg" id="drBg"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Menu tài khoản">
+  <div class="dr-head"><span class="av s64" id="drAv"></span><b id="drName"></b><span class="note" id="drSub"></span><div class="dr-now" id="drNow"></div></div>
+  <button class="dr-item" type="button" data-go="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Hồ sơ của tôi</button>
+  <button class="dr-item" type="button" data-go="back" id="drBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>Kiểm tra cho tôi</button>
+  <button class="dr-item" type="button" data-go="custs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 6"/></svg>Khách hàng</button>
+  <button class="dr-item" type="button" data-go="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="4"/><path d="M3 21c0-4 3.1-7 7-7M18 14v7M14.5 17.5h7"/></svg>Khách mới</button>
+  <hr>
+  <button class="dr-item" type="button" data-go="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện mở thẻ</button>
+  <div class="dr-foot" id="drFoot"></div>
+</aside>
+
 <nav class="tabs"><div class="in" role="tablist">
-  <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Kiểm tra</button>
-  <button role="tab" aria-selected="false" data-tab="custs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 6"/></svg>Khách hàng</button>
-  <button role="tab" aria-selected="false" data-tab="rules" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện</button>
+  <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Mở thẻ</button>
   <button role="tab" aria-selected="false" data-tab="cb" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg>Hoàn tiền</button>
+  <button role="tab" aria-selected="false" data-tab="me" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Tôi</button>
 </div></nav>
 <div class="savebar" id="saveBar" hidden><div class="in"><span id="saveText">Chưa có thay đổi</span><button id="cancelEdit" type="button" class="cancel">Huỷ</button><button id="saveRules" type="button">Lưu</button></div></div>
 <div class="toast" id="toast"></div>
@@ -873,8 +964,12 @@ function condHtml(r){
 }
 
 /* ---------- Thông tin khách ---------- */
-let cust=load(K_CUST)||clone(EXAMPLE_CUSTOMER);
-function saveCust(){save(K_CUST,cust)}
+/* Hồ sơ "Tôi" là hồ sơ mặc định; khi tư vấn khách thì cust là khách đang chọn */
+const K_ME="kmt.me.v1";
+const ME_BLANK={isMe:true,name:"",phone:"",note:"",avatar:"",rows:[],finCos:0,job:"hdld",bhxh:false,badDebt:false,debtGroup:1,example:false};
+let me=Object.assign(clone(ME_BLANK),load(K_ME)||{});me.isMe=true;
+let cust=(()=>{const c=load(K_CUST);return!c||c.isMe?me:c})();
+function saveCust(){if(cust.isMe){me=cust;save(K_ME,me);save(K_CUST,{isMe:true})}else save(K_CUST,cust);renderWho()}
 function edited(){if(cust.example){cust.example=false;$("#exampleTag").hidden=true}saveCust()}
 function renderRows(){
   $("#cards").innerHTML=cust.rows.map((r,i)=>`
@@ -1661,6 +1756,86 @@ $("#cpFromHist").addEventListener("click",()=>{const d=cpData();const pers=[...n
   d.needs=Object.fromEntries(Object.entries(n).map(([k,v])=>[k,String(Math.round(v*100)/100)]));cpSave();renderPlan();toast(`Đã lấy nhu cầu theo tháng ${cpPerTxt(last)}`)});
 $("#cpClearNeeds").addEventListener("click",()=>{cpData().needs={};cpSave();renderPlan()});
 
+/* ---------- Avatar, khung trượt kiểu X, trang Tôi, khoá Hoàn tiền ---------- */
+function initials(n){const w=String(n||"").trim().split(/\s+/).filter(Boolean);return w.length?w[w.length-1][0].toUpperCase():""}
+const AV_ICON=`<svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>`;
+function avHtml(p){return p&&p.avatar?`<img src="${esc(p.avatar)}" alt="">`:(initials(p&&p.name)||AV_ICON)}
+const jobTxt=j=>JOBS[j]||"";
+const debtTxt=p=>p.badDebt?`nợ nhóm ${p.debtGroup>1?p.debtGroup:"2+"}`:"không nợ xấu";
+function renderWho(){
+  $("#meBtn").innerHTML=avHtml(me);
+  if(!$("#whoTxt"))return;
+  $("#whoAv").innerHTML=avHtml(cust.isMe?me:{name:cust.name});
+  $("#whoTxt").innerHTML=cust.isMe?`Đang kiểm tra cho<b>Hồ sơ của tôi${me.name?" · "+esc(me.name):""}</b>`:`Đang tư vấn khách<b>${esc(cust.name||"Khách chưa đặt tên")}</b>`;
+  $("#whoBack").hidden=!!cust.isMe;
+}
+function useMe(){if(cust.isMe)return;cust=me;cicFiles={};xState=null;$("#results").hidden=true;saveCust();renderCust();toast("Đã chuyển về hồ sơ của bạn")}
+$("#whoBack").addEventListener("click",()=>{useMe();showTab("check")});
+/* khung trượt */
+function drOpen(){
+  $("#drAv").innerHTML=avHtml(me);$("#drName").textContent=me.name||"Chưa đặt tên";
+  $("#drSub").textContent=[jobTxt(me.job),me.bhxh?"có BHXH":"chưa BHXH",debtTxt(me)].filter(Boolean).join(" · ");
+  $("#drNow").innerHTML=cust.isMe?"Đang dùng: <b>hồ sơ của tôi</b>":`Đang tư vấn: <b>${esc(cust.name||"khách chưa đặt tên")}</b>`;
+  $("#drBack").hidden=!!cust.isMe;
+  $("#drFoot").textContent=`Kiểm Tra Mở Thẻ · ${rules.length} ngân hàng có điều kiện`;
+  $("#drawer").classList.add("on");$("#drBg").classList.add("on");$("#drawer").setAttribute("aria-hidden","false");
+}
+function drClose(){$("#drawer").classList.remove("on");$("#drBg").classList.remove("on");$("#drawer").setAttribute("aria-hidden","true")}
+$("#meBtn").addEventListener("click",drOpen);
+$("#drBg").addEventListener("click",drClose);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")drClose()});
+{let x0=null;const d=$("#drawer");d.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
+ d.addEventListener("touchmove",e=>{if(x0!=null&&e.touches[0].clientX-x0<-60){x0=null;drClose()}},{passive:true})}
+$("#drawer").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(!b)return;const g=b.dataset.go;drClose();
+  if(g==="me")showTab("me");else if(g==="custs")showTab("custs");else if(g==="rules")showTab("rules");
+  else if(g==="back"){useMe();showTab("check")}else if(g==="new"){showTab("check");$("#newConfirm").hidden=false}});
+/* trang Tôi */
+function meRows(){
+  $("#meCards").innerHTML=me.rows.length?me.rows.map((r,i)=>`<div class="mrow" data-i="${i}"><input data-mf="bank" type="text" list="bankList" placeholder="Ngân hàng" value="${esc(r.bank)}" aria-label="Ngân hàng"><input data-mf="cards" class="num" type="number" inputmode="numeric" min="0" value="${esc(r.cards)}" aria-label="Số thẻ"><input data-mf="limit" class="num" type="text" inputmode="decimal" value="${esc(r.limit)}" aria-label="Hạn mức triệu"><input data-mf="used" class="num" type="text" inputmode="decimal" value="${esc(r.used)}" aria-label="Đã dùng triệu"><button class="icon-btn" type="button" data-mdel="${i}" aria-label="Xoá dòng">×</button></div>`).join(""):`<p class="note" style="margin:0">Chưa có thẻ nào.</p>`;
+  const st=stats(me);$("#meCardSum").textContent=st.cards?`${fmt(st.cards)} thẻ · ${fmt(st.limit)} tr · dùng ${Math.round(st.util)}%`:"";
+}
+function renderMe(){
+  $("#meAv").innerHTML=avHtml(me);$("#meAvDel").hidden=!me.avatar;
+  $("#meTitle").textContent=me.name||"Hồ sơ của tôi";
+  $("#meSub").textContent=[jobTxt(me.job),me.bhxh?"có BHXH":"chưa BHXH",debtTxt(me)].join(" · ");
+  $("#meName").value=me.name||"";$("#mePhone").value=me.phone||"";
+  if(!$("#meJob").options.length)$("#meJob").innerHTML=Object.entries(JOBS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
+  $("#meJob").value=me.job||"hdld";$("#meBhxh").checked=!!me.bhxh;$("#meDebt").value=String(me.debtGroup||(me.badDebt?2:1));$("#meFin").value=me.finCos||0;
+  meRows();
+  const cb=(me.cb&&me.cb.cards||[]).map(e=>cbAll().find(c=>c.id===e.id)).filter(Boolean);
+  $("#meCb").textContent=cb.length?`Thẻ hoàn tiền: ${cb.map(c=>c.bank+" "+c.name).join(", ")}`:"Chưa chọn dòng thẻ hoàn tiền nào.";
+}
+function meChanged(full){save(K_ME,me);if(cust.isMe)cust=me;renderWho();if(full)renderMe();else{$("#meAv").innerHTML=avHtml(me);$("#meTitle").textContent=me.name||"Hồ sơ của tôi";$("#meSub").textContent=[jobTxt(me.job),me.bhxh?"có BHXH":"chưa BHXH",debtTxt(me)].join(" · ")}}
+[["#meName","name"],["#mePhone","phone"]].forEach(([sel,f])=>$(sel).addEventListener("input",e=>{me[f]=e.target.value;meChanged(false)}));
+$("#meJob").addEventListener("change",e=>{me.job=e.target.value;meChanged(false)});
+$("#meBhxh").addEventListener("change",e=>{me.bhxh=e.target.checked;meChanged(false)});
+$("#meDebt").addEventListener("change",e=>{me.debtGroup=+e.target.value;me.badDebt=me.debtGroup>=2;meChanged(false)});
+$("#meFin").addEventListener("input",e=>{me.finCos=Math.max(0,parseInt(e.target.value)||0);meChanged(false)});
+$("#meCards").addEventListener("input",e=>{const f=e.target.dataset.mf;if(!f)return;me.rows[+e.target.closest(".mrow").dataset.i][f]=e.target.value;const st=stats(me);$("#meCardSum").textContent=st.cards?`${fmt(st.cards)} thẻ · ${fmt(st.limit)} tr · dùng ${Math.round(st.util)}%`:"";save(K_ME,me)});
+$("#meCards").addEventListener("click",e=>{const d=e.target.closest("[data-mdel]");if(!d)return;me.rows.splice(+d.dataset.mdel,1);meRows();save(K_ME,me)});
+$("#meAddCard").addEventListener("click",()=>{me.rows.push({bank:"",cards:1,limit:"",used:""});meRows();save(K_ME,me);const el=$("#meCards .mrow:last-child input");el&&el.focus()});
+$("#meSave").addEventListener("click",()=>{save(K_ME,me);if(cust.isMe)cust=me;renderWho();toast("Đã lưu hồ sơ của bạn trên máy")});
+$("#meCheck").addEventListener("click",()=>{save(K_ME,me);if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("check");renderCust();runCheck(true)});
+$("#meToCb").addEventListener("click",()=>{if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("cb");if(cbOk){$('#cbSeg [data-seg="plan"]').click()}});
+$("#meAvPick").addEventListener("click",()=>$("#meAvFile").click());
+$("#meAv").addEventListener("click",()=>$("#meAvFile").click());
+$("#meAvDel").addEventListener("click",()=>{me.avatar="";meChanged(true);toast("Đã xoá ảnh đại diện")});
+$("#meAvFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  const url=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{const S=192,c=document.createElement("canvas");c.width=c.height=S;const k=Math.min(im.width,im.height);
+    c.getContext("2d").drawImage(im,(im.width-k)/2,(im.height-k)/2,k,k,0,0,S,S);URL.revokeObjectURL(url);
+    me.avatar=c.toDataURL("image/jpeg",.85);meChanged(true);toast("Đã đổi ảnh đại diện")};
+  im.onerror=()=>{URL.revokeObjectURL(url);toast("Không đọc được ảnh này")};im.src=url});
+/* khoá Hoàn tiền (mật khẩu riêng, hỏi lại mỗi lần mở app) */
+const CB_HASH="af93a1e927415b01268324206b0591c0b8ec8fc51dc16fc0eb5616b73aded122";
+let cbOk=false;try{cbOk=sessionStorage.getItem("kmt.cbUnlock")==="1"}catch(e){}
+function cbShowLock(){$("#cbLock").hidden=cbOk;$("#cbSeg").hidden=!cbOk;
+  if(!cbOk){$("#cpView").hidden=true;$("#cbCatA").hidden=true;$("#cbCatB").hidden=true;setTimeout(()=>$("#cbPass").focus(),50)}
+  else{const plan=$('#cbSeg [data-seg="plan"]').getAttribute("aria-pressed")==="true";$("#cpView").hidden=!plan;$("#cbCatA").hidden=plan;$("#cbCatB").hidden=plan}}
+$("#cbLock").addEventListener("submit",async e=>{e.preventDefault();
+  const ok=(await hashPass($("#cbPass").value.trim()))===CB_HASH;$("#cbPass").value="";$("#cbPassErr").hidden=ok;if(!ok)return;
+  cbOk=true;try{sessionStorage.setItem("kmt.cbUnlock","1")}catch(err){}cbShowLock();renderCb();if(!$("#cpView").hidden)renderPlan()});
+
 /* ---------- Đối chiếu ---------- */
 function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].filter(x=>bkey(x)).map(canon).some(k=>s.banks.has(k))}
 function jobFail(j,job){
@@ -1792,7 +1967,7 @@ function runCheck(scroll){
   const R=$("#results");
   R.innerHTML=`
     <div class="sec-head"><h2>Kết quả</h2><span class="note">${esc(JOBS[cust.job])} · ${cust.bhxh?"Có":"Không"} BHXH · ${cust.finCos} CTTC</span></div>
-    <div class="res-acts"><button class="btn2 acc" type="button" data-act="save">Lưu khách hàng</button><button class="btn2" type="button" data-act="pdf">Xuất PDF</button></div>
+    <div class="res-acts"><button class="btn2 acc" type="button" data-act="save">${cust.isMe?"Lưu hồ sơ":"Lưu khách hàng"}</button><button class="btn2" type="button" data-act="pdf">Xuất PDF</button></div>
     <div class="sum"><div class="s-ok"><strong>${n("ok")}</strong><span>Có thể mở</span></div><div class="s-warn"><strong>${n("warn")}</strong><span>Cần giảm dư nợ</span></div><div class="s-bad"><strong>${n("bad")}</strong><span>Không phù hợp</span></div></div>
     <div class="res">${good.length?good.map(card).join(""):`<div class="panel note">Chưa có ngân hàng nào phù hợp với hồ sơ này. Xem gợi ý bên dưới.</div>`}</div>
     ${tipsHtml(tips)}
@@ -1840,9 +2015,13 @@ $("#lockAgain").addEventListener("click",()=>{
   showLock();showAdmin();
 });
 function showTab(t){
-  ["check","custs","rules","cb"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  ["check","custs","rules","cb","me"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  $("#tbTitle").textContent={check:"Mở thẻ",cb:"Hoàn tiền",me:"Tôi",custs:"Khách hàng",rules:"Điều kiện"}[t]||"";
+  $("#policyBar").hidden=t!=="check";
+  if(t==="me")renderMe();
+  if(t==="check")renderCust();
   if(t==="custs")renderCustList();
-  if(t==="cb"){renderCb();if(!$("#cpView").hidden)renderPlan()}
+  if(t==="cb"){cbShowLock();if(cbOk){renderCb();if(!$("#cpView").hidden)renderPlan()}}
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   window.scrollTo(0,0);
   if(t!=="rules")wantEdit=false;
@@ -1935,6 +2114,7 @@ function showSavedTag(){
   $("#savedTag").hidden=!rec;if(rec)$("#savedTag").textContent="Đã lưu "+fmtTime(rec.at);
 }
 function saveCustomer(){
+  if(cust.isMe){saveCust();toast("Đã lưu hồ sơ của bạn trên máy");return}
   if(!String(cust.name||"").trim()){showTab("check");$("#cName").focus();toast("Nhập tên khách hàng trước khi lưu");return}
   const list=custList();
   if(!cust.id)cust.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -2135,7 +2315,7 @@ async function exportPdf(btn){
   finally{btn.disabled=false}
 }
 
-renderCust();showPolicy();showLock();showLogo();
+renderCust();showPolicy();showLock();showLogo();renderWho();
 if(cust.example)runCheck(false);
 renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}

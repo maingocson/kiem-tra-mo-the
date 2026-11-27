@@ -18,6 +18,13 @@
    - bấm **Lưu** ở thanh dưới cùng. **Huỷ** để bỏ thay đổi.
 3. Tab **Kiểm tra**: nhập thẻ khách đang có, số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**.
 
+## Giao diện
+
+- Thanh dưới: **Mở thẻ** · **Hoàn tiền** (mật khẩu riêng) · **Tôi**.
+- Thanh trên: avatar của bạn (góc trái), logo Smart-B (góc phải).
+- Bấm avatar → khung trượt: Hồ sơ của tôi, Kiểm tra cho tôi, Khách hàng, Khách mới, Điều kiện mở thẻ (mật khẩu như cũ).
+- **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có → **Lưu trên máy**. Đây là hồ sơ mặc định: Mở thẻ và Hoàn tiền tính theo hồ sơ này; khi tư vấn khách (Khách mới, mở khách đã lưu, đọc CIC của khách) thì tính theo khách, bấm **Về tôi** để quay lại.
+
 ## Đọc CIC tự động
 
 - Tab **Kiểm tra** → **Chọn file CIC**: chọn file PDF **CIC vay** ("Báo cáo chi tiết quan hệ tín dụng") và/hoặc **CIC thẻ** ("Báo cáo thông tin thẻ tín dụng"), chọn 1 hoặc cả 2 file cùng lúc. App tự nhận file nào là vay, file nào là thẻ.
