@@ -203,6 +203,8 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .cb-filter button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .cb-opt{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 details.cbc{padding:0}
+details.cbc.exp>summary,details.cbc.exp .cbt-wrap,details.cbc.exp .kv{opacity:.5}
+.cbexp{font-size:13px;font-weight:600;color:var(--bad);background:var(--bad-soft);border-radius:10px;padding:8px 10px;margin:0}
 details.cbc>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
 details.cbc>summary::-webkit-details-marker{display:none}
 .cbh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -1152,7 +1154,7 @@ tcb-spark,Techcombank,Spark,,Đang phát hành,B,699000,,Tháng,Lương chuyển
 tcb-everyday,Techcombank,Everyday,,Đang phát hành,B,599000,2.95,Tháng,Tổng chi tháng này,Dưới 15tr,0,15–30tr,15000000,Từ 30tr,30000000,,500000,700000,,,,,,"Điểm U-Point, đổi trên Techcombank OneU",,,,,Chỉ giao dịch online từ 200k. Từ 15tr/tháng được gấp đôi; mức từ 30tr trang không ghi rõ tỷ lệ.,https://techcombank.com/khach-hang-ca-nhan/chi-tieu/the/the-tin-dung/techcombank-everyday
 vpb-stepup,VPBank,StepUp,Mastercard,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ này,Dưới 10tr,0,10–100tr,10000000,Từ 100tr,100000000,,,,,0.1,,,Hoàn 400.000đ khi có ít nhất 3 giao dịch và chi từ 2tr trong 30 ngày đầu (chỉ khách chưa có thẻ tín dụng VPBank),"Tài khoản hoàn tiền VPBank, tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",500000,21/11/2025,20/11/2026,"Ví điện tử (MoMo, ZaloPay, VNPay…); trả góp; xăng dầu; điện, gas, nước; viễn thông, dịch vụ CNTT; giao dịch qua VPBank NEO; chuyển tiền qua Paypal, Skrill; nạp thẻ trả trước; chứng khoán, ngoại hối; thuế, phí, lãi","Kỳ sao kê từ ngày 21 đến ngày 20 tháng sau. Thể lệ này hết hạn 20/11/2026 – chưa thấy bản mới, cần kiểm tra lại với VPBank. Tính cả thẻ chính và phụ.",https://www.vpbank.com.vn/-/media/vpbank-latest/1retail/files/cards/2025/TnC-Step-Up-082025-.pdf
 vpb-z,VPBank,Z JCB,JCB,Đang phát hành,B,,,Kỳ sao kê,,,,,,,,1000000,,,,,,,Hoàn 300.000đ cho khách mở thẻ,"Tài khoản hoàn tiền VPBank, tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",,27/08/2026,,,"Từ 27/08/2026: nâng lên 15%, trần 500k mỗi ngành, bỏ điều kiện chi tối thiểu (trước đó 10%, cần chi từ 4tr). Trang tin không ghi MCC.",https://www.vpbank.com.vn/tin-tuc/tin-vpbank/2026/the-vpbank-z-jcb-nang-muc-ti-le-hoan-tien-khung
-vpb-lady,VPBank,Lady Mastercard,Mastercard,Đang phát hành,B,,,Kỳ sao kê,Tổng chi kỳ này,Dưới 15tr,0,Từ 15tr,15000000,,,,,,,0.1,,,Trang thẻ: hoàn 400.000đ khi chi từ 2tr trong 30 ngày đầu,"Tài khoản hoàn tiền VPBank, tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",500000,,,"Ví điện tử (MoMo, ZaloPay, VNPay…); trả góp; xăng dầu; điện, gas, nước; viễn thông, dịch vụ CNTT; giao dịch qua VPBank NEO; chuyển tiền qua Paypal, Skrill; nạp thẻ trả trước; chứng khoán, ngoại hối; thuế, phí, lãi","Bảng tỷ lệ theo thể lệ chính thức mới nhất tìm được (06/10/2023 – 30/09/2024, đã hết hạn). Trang thẻ hiện ghi 'đến 15%' và có thêm thời trang, giải trí – cần đối chiếu thể lệ mới. Miễn phí năm sau khi chi từ 120tr.",https://www.vpbank.com.vn/ca-nhan/the-tin-dung/vpbank-lady-mastercard;https://www.vpbank.com.vn/-/media/vpbank-latest/1retail/cards/credit-cards/Website--The---le---tinh---nang---the-Step-Up--2025-final.pdf
+vpb-lady,VPBank,Lady Mastercard,Mastercard,Đang phát hành,B,,,Kỳ sao kê,Tổng chi kỳ này,Dưới 15tr,0,Từ 15tr,15000000,,,,,,,0.1,,,Trang thẻ: hoàn 400.000đ khi chi từ 2tr trong 30 ngày đầu,"Tài khoản hoàn tiền VPBank, tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",500000,06/10/2023,30/09/2024,"Ví điện tử (MoMo, ZaloPay, VNPay…); trả góp; xăng dầu; điện, gas, nước; viễn thông, dịch vụ CNTT; giao dịch qua VPBank NEO; chuyển tiền qua Paypal, Skrill; nạp thẻ trả trước; chứng khoán, ngoại hối; thuế, phí, lãi","Bảng tỷ lệ theo thể lệ chính thức mới nhất tìm được. Trang thẻ hiện ghi 'đến 15%' và có thêm thời trang, giải trí – cần đối chiếu thể lệ mới. Miễn phí năm sau khi chi từ 120tr.",https://www.vpbank.com.vn/ca-nhan/the-tin-dung/vpbank-lady-mastercard;https://www.vpbank.com.vn/-/media/vpbank-latest/1retail/cards/credit-cards/Website--The---le---tinh---nang---the-Step-Up--2025-final.pdf
 vpb-diamond-lady,VPBank,Diamond World Lady,Mastercard,Đang phát hành,B,1199000,,Kỳ sao kê,Tổng chi kỳ này,4–30tr,4000000,Từ 30tr,30000000,,,,,,,0.3,,,,"Tài khoản hoàn tiền VPBank, tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",,28/06/2024,,,"Khách hàng ưu tiên VPBank Diamond. Theo thông báo điều chỉnh 28/06/2024 – chưa thấy bản mới hơn. Phí thường niên chưa VAT, miễn nếu năm trước chi từ 150tr.",https://www.vpbank.com.vn/tin-tuc/tin-vpbank/2024/vpbank-dieu-chinh-uu-dai-hoan-tien-cua-the-tin-dung-vpbank-diamond-world
 vpb-diamond-world,VPBank,Diamond World,Mastercard,Đang phát hành,B,1199000,,Kỳ sao kê,Tổng chi kỳ này,4–30tr,4000000,Từ 30tr,30000000,,,,,,,0.3,,,,"Tài khoản hoàn tiền VPBank, tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",,28/06/2024,,,"Khách hàng ưu tiên VPBank Diamond. Theo thông báo điều chỉnh 28/06/2024 – chưa thấy bản mới hơn. Phí thường niên chưa VAT, miễn nếu năm trước chi từ 150tr.",https://www.vpbank.com.vn/tin-tuc/tin-vpbank/2024/vpbank-dieu-chinh-uu-dai-hoan-tien-cua-the-tin-dung-vpbank-diamond-world
 vpb-super-shopee,VPBank,Super Shopee Platinum,Visa,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ này,Từ 4tr,4000000,,,,,,,,,0.1,,,Mã giảm giá Shopee 400.000đ khi chi từ 2tr trong 30 ngày đầu,"Tài khoản hoàn tiền VPBank (ghi nhận trong 60 ngày sau ngày sao kê), tự chuyển về thẻ trên VPBank NEO khi đủ 500k; hết hạn sau 24 tháng",500000,08/2025,,"Ví điện tử (MoMo, ZaloPay, VNPay…); trả góp; xăng dầu; điện, gas, nước; viễn thông, dịch vụ CNTT; giao dịch qua VPBank NEO; chuyển tiền qua Paypal, Skrill; nạp thẻ trả trước; chứng khoán, ngoại hối",Kỳ sao kê từ ngày 26 đến ngày 25 tháng sau. Tính cả thẻ chính và thẻ phụ. MCC theo bảng của Visa.,https://www.vpbank.com.vn/-/media/vpbank-latest/1retail/files/cards/2025/Tnc-Super-Shopee-Platinum-082025.pdf
@@ -1289,6 +1291,9 @@ const cbN=v=>{let s=String(v??"").replace(/[\s%đ₫]/g,"");if(!s)return null;
 const cbList=v=>String(v||"").split(/[;\n]/).map(x=>x.trim()).filter(Boolean);
 function cbMoney(n){if(n==null)return"";if(n>=1e6)return(Math.round(n/1e4)/100).toLocaleString("vi-VN")+"tr";if(n>=1e3)return(Math.round(n/100)/10).toLocaleString("vi-VN")+"k";return n.toLocaleString("vi-VN")+"đ"}
 const cbPct=n=>n==null?"":(n.toLocaleString("vi-VN",{maximumFractionDigits:2})+"%");
+/* "Hiệu lực đến" dạng dd/mm/yyyy (hoặc mm/yyyy): đã qua ngày đó thì coi là hết hạn */
+function cbExpired(v){const m=String(v||"").trim().match(/^(?:(\d{1,2})\/)?(\d{1,2})\/(\d{4})$/);if(!m)return false;
+  const end=m[1]?new Date(+m[3],+m[2]-1,+m[1],23,59,59):new Date(+m[3],+m[2],0,23,59,59);return Date.now()>end.getTime()}
 function cbFill(a,n){const o=[];for(let i=0;i<n;i++)o.push(a[i]!=null?a[i]:(i?o[i-1]:null));return o}
 function cbBuild(src){
   const T=parseCSV(src.the),G=parseCSV(src.nhom),S=parseCSV(src.tc||""),X=parseCSV(src.lt||"");
@@ -1300,7 +1305,7 @@ function cbBuild(src){
       capT:cbFill([cbN(r["Trần thẻ M1"]),cbN(r["Trần thẻ M2"]),cbN(r["Trần thẻ M3"])],nt),capY:cbN(r["Trần năm"]),base:cbN(r["Hoàn cơ bản (%)"]),
       minTxn:cbN(r["Số GD tối thiểu"]),pick:r["Số nhóm được chọn"]||"",welcome:r["Ưu đãi mở mới"]||"",pay:r["Cách nhận"]||"",redeem:cbN(r["Ngưỡng đổi điểm"]),
       from:r["Hiệu lực từ"]||"",to:r["Hiệu lực đến"]||"",excl:r["Loại trừ riêng"]||"",note:r["Ghi chú"]||"",src:cbList(r["Nguồn"]),groups:[],shared:[],
-      stop:/ngừng/i.test(r["Trạng thái"]||"")};
+      stop:/ngừng/i.test(r["Trạng thái"]||""),exp:cbExpired(r["Hiệu lực đến"])};
   });
   const byId=Object.fromEntries(cards.map(c=>[c.id,c]));
   G.forEach(r=>{const c=byId[r["Mã thẻ"]];if(!c||!r["Nhóm"])return;
@@ -1333,7 +1338,7 @@ function cbMcc(list){if(!list.length)return"";const sh=list.slice(0,8).join(", "
 function cbCard(c,hit){
   const per=cbPer(c),nt=c.nt,capMax=Math.max(0,...c.capT.filter(v=>v!=null));
   const chips=[c.top!=null?`<span class="chip ok">đến ${cbPct(c.top)}</span>`:"",capMax?`<span class="chip ch">trần ${cbMoney(capMax)}/${per}</span>`:"",
-    c.pick?`<span class="chip ch">khách chọn nhóm</span>`:"",c.stop?`<span class="chip bad">ngừng phát hành</span>`:""].join("");
+    c.pick?`<span class="chip ch">khách chọn nhóm</span>`:"",c.stop?`<span class="chip bad">ngừng phát hành</span>`:"",c.exp?`<span class="chip bad">hết hạn ${esc(c.to)}</span>`:""].join("");
   const head=`<div class="cbh"><div><b>${esc(c.name)}</b><div class="cbsub">${esc([c.bank,c.net].filter(Boolean).join(" · "))}</div></div><span class="lv ${esc(c.lv)}" title="Mức tin cậy">${esc(c.lv)}</span></div><div class="chips">${chips}</div>`;
   const kv=[["Chu kỳ",c.cyc],["Xếp mức theo",c.by],["Hoàn cơ bản",c.base!=null?cbPct(c.base)+" chi tiêu khác":""],["Trần năm",c.capY!=null?cbMoney(c.capY):""],
     ["Phí thường niên",c.fee!=null?(c.fee?cbMoney(c.fee):"Miễn phí"):""],["Phí ngoại tệ",c.fx!=null?cbPct(c.fx):""],["Số GD tối thiểu",c.minTxn?c.minTxn+" giao dịch/"+per:""],
@@ -1361,7 +1366,8 @@ function cbCard(c,hit){
     ${c.note?`<div><div class="cbk">Ghi chú</div><p class="note" style="margin:0;color:var(--ink)">${esc(c.note)}</p></div>`:""}
     <div class="cbsrc"><div class="cbk">Nguồn · mức tin cậy ${esc(lvTxt)}</div>${c.src.map(u=>/^https?:\/\//.test(u)?`<div><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`:`<div class="note">${esc(u)}</div>`).join("")}</div>
   </div>`;
-  return`<details class="panel cbc" data-id="${esc(c.id)}"${hit.size||cbOpenIds.has(c.id)?" open":""}><summary>${head}</summary>${body}</details>`;
+  const expNote=c.exp?`<p class="cbexp">Chương trình hoàn tiền đã hết hạn ngày ${esc(c.to)}. Tỷ lệ bên dưới là của bản cũ – hỏi lại ngân hàng trước khi tư vấn.</p>`:"";
+  return`<details class="panel cbc${c.exp?" exp":""}" data-id="${esc(c.id)}"${hit.size||cbOpenIds.has(c.id)?" open":""}><summary>${head}</summary>${body.replace('<div class="cbb">','<div class="cbb">'+expNote)}</details>`;
 }
 let cbOpenIds=new Set();
 function renderCb(){
@@ -1370,8 +1376,8 @@ function renderCb(){
   $("#cbInfo").textContent=`${CB.length} thẻ · dữ liệu ngày ${fmtDay(src.at)}${cbStore&&cbStore.the?" (đã cập nhật trên máy này)":""}. Tỷ lệ và trần theo web, thể lệ ngân hàng – luôn đối chiếu nguồn trước khi tư vấn.`;
   $("#cbBanks").innerHTML=["",...banks].map(b=>`<button type="button" data-b="${esc(b)}" aria-pressed="${b===cbBank}">${esc(b||"Tất cả")}</button>`).join("");
   const hide=$("#cbHide").checked,q=cbQ.trim();
-  const list=CB.filter(c=>(!cbBank||c.bank===cbBank)&&(!hide||!c.stop)).map(c=>[c,cbHit(c,q)]).filter(([,h])=>h.ok);
-  if(q)list.sort((a,b)=>{const ra=Math.max(-1,...[...a[1].g].map(i=>Math.max(...a[0].groups[i].r.filter(v=>v!=null)))),rb=Math.max(-1,...[...b[1].g].map(i=>Math.max(...b[0].groups[i].r.filter(v=>v!=null))));return rb-ra});
+  const list=CB.filter(c=>(!cbBank||c.bank===cbBank)&&(!hide||!c.stop)).map(c=>[c,cbHit(c,q)]).filter(([,h])=>h.ok).sort((a,b)=>a[0].exp-b[0].exp);
+  if(q)list.sort((a,b)=>{const ra=Math.max(-1,...[...a[1].g].map(i=>Math.max(...a[0].groups[i].r.filter(v=>v!=null)))),rb=Math.max(-1,...[...b[1].g].map(i=>Math.max(...b[0].groups[i].r.filter(v=>v!=null))));return (a[0].exp-b[0].exp)||rb-ra});
   $("#cbCount").textContent=q?`${list.length} thẻ khớp “${q}”${/^\d{4}$/.test(q)?" (theo mã MCC, xếp theo tỷ lệ hoàn cao nhất)":""}`:`${list.length} thẻ`;
   $("#cbList").innerHTML=list.map(([c,h])=>cbCard(c,q?h.g:new Set())).join("")||`<div class="panel note">Không có thẻ nào khớp.</div>`;
   $("#cbReset").hidden=!(cbStore&&cbStore.the);

@@ -116,6 +116,7 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 
 - Tìm theo tên thẻ, nhóm chi tiêu ("ăn uống", "siêu thị") hoặc mã MCC ("5411") – các thẻ khớp được xếp theo tỷ lệ hoàn cao nhất.
 - Lọc theo ngân hàng; mặc định ẩn thẻ đã ngừng phát hành.
+- Thẻ có "Hiệu lực đến" đã qua ngày hôm nay được làm mờ, ghi "hết hạn" và xếp cuối danh sách.
 - Mức tin cậy: **A** có thể lệ đầy đủ · **B** theo trang thẻ · **C** chỉ có câu quảng cáo.
 
 Dữ liệu theo form mẫu `du-lieu-hoan-tien/mau-hoan-tien.xlsx` (trang Hướng dẫn giải thích từng cột):
