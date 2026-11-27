@@ -93,6 +93,22 @@ tcb-spark,"Du lịch, thời trang",,,,,,,8,10,12,,,,,
 tcb-spark,"Siêu thị, nhà hàng, mua sắm online",,,,,,,2,4,6,,,,,
 tcb-everyday,Online quốc tế,,,,,"Online, ngoại tệ",,8,16,,,,,,Giao dịch từ 200k
 tcb-everyday,Online nội địa,,,,,Online,,5,10,,,,,,Giao dịch từ 200k
+vpb-stepup,Chi tiêu online,,,5960;6300,,Online,,6,15,15,300000,700000,1500000,,"Mọi MCC online, trừ bảo hiểm (5960, 6300), Shopee/ShopeeFood và các mã không hoàn tiền"
+vpb-stepup,Ăn uống,,5811;5812;5813;5814;5921,,,,,2,4,4,100000,200000,200000,,
+vpb-z,Ăn uống,,,,,,,15,,,500000,,,,
+vpb-z,"Giải trí, Fitness",,,,,,,15,,,500000,,,,
+vpb-z,Gọi xe,,,,,,,15,,,500000,,,,
+vpb-z,Đặt đồ ăn,,,,,,,15,,,500000,,,,
+vpb-lady,Bảo hiểm trực tuyến,,,,,,,7.5,15,,150000,300000,,,
+vpb-lady,Giáo dục,,,,,,,7.5,15,,100000,200000,,,
+vpb-lady,"Chăm sóc sắc đẹp, y tế",,,,,,,5,10,,150000,300000,,,
+vpb-lady,Siêu thị,,,,,,,2.5,5,,100000,200000,,,
+vpb-diamond-lady,"Ăn uống, thời trang",,,,,,,5,10,,,,,,
+vpb-diamond-lady,Siêu thị,,5411,,,,,3,5,,,,,,
+vpb-diamond-lady,Golf,,,,,,,0.5,1,,500000,1000000,,,
+vpb-diamond-world,"Ăn uống, thời trang",,,,,,,5,10,,,,,,
+vpb-diamond-world,Siêu thị,,5411,,,,,3,5,,,,,,
+vpb-diamond-world,Golf,,,,,,,0.5,1,,500000,1000000,,,
 vpb-super-shopee,"Shopee, ShopeeFood",,,,Shopee;ShopeeFood,,,10,,,400000,,,,
 vpb-super-shopee,"Ăn uống, siêu thị, Grab/Be",,,,Co.op;BigC;Lotte Mart;WinMart;Grab;Be,,,2,,,200000,,,,Siêu thị theo các chuỗi trong thể lệ
 vpb-shopee,"Shopee, ShopeeFood",,,,Shopee;ShopeeFood,,,6,,,250000,,,,
