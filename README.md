@@ -18,6 +18,24 @@
    - bấm **Lưu** ở thanh dưới cùng. **Huỷ** để bỏ thay đổi.
 3. Tab **Kiểm tra**: nhập thẻ khách đang có, số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**.
 
+## Đọc CIC tự động
+
+- Tab **Kiểm tra** → **Chọn file CIC**: chọn file PDF **CIC vay** ("Báo cáo chi tiết quan hệ tín dụng") và/hoặc **CIC thẻ** ("Báo cáo thông tin thẻ tín dụng"), chọn 1 hoặc cả 2 file cùng lúc. App tự nhận file nào là vay, file nào là thẻ.
+- App hiện bảng xem trước, gồm:
+  - tên khách, ngày CIC, điểm tín dụng;
+  - thẻ đang hoạt động theo từng ngân hàng: số thẻ, hạn mức, dư nợ;
+  - số công ty tài chính đang có dư nợ;
+  - nợ quá hạn hiện tại;
+  - lịch sử chậm thanh toán, nợ xấu, nợ cần chú ý, số lượt tra cứu CIC.
+- Bấm **Điền vào hồ sơ & kiểm tra** để app điền vào hồ sơ và ra kết quả ngay. **Công việc** và **BHXH** không có trên CIC nên vẫn phải tự chọn.
+- Nguồn số liệu:
+  - Dư nợ thẻ lấy theo "số tiền phải thanh toán" trên CIC.
+  - Số thẻ lấy từ CIC vay (mục 2.2). Nếu chỉ có CIC thẻ thì app đếm theo tên thẻ.
+  - Công ty tài chính chỉ đếm được khi có CIC vay.
+- Ngân hàng chưa có trong danh sách sẽ hiện dấu **?**. Thêm tên gọi khác ở tab **Điều kiện → Danh sách ngân hàng** để app nhận ra lần sau.
+- File PDF phải là bản có chữ (tải từ hệ thống CIC). Ảnh chụp màn hình thì chưa đọc được.
+- File chỉ được đọc trên máy. Lần đầu dùng cần có mạng để tải bộ đọc PDF.
+
 ## Khách hàng
 
 - Tab **Kiểm tra** có ô **Tên khách hàng**, số điện thoại và ghi chú.

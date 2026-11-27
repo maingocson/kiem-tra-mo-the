@@ -183,6 +183,15 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .vrow .btn2.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
 .vrow.cur{border-color:var(--accent);background:var(--accent-soft)}
 #lockErr{color:var(--bad);font-weight:600}
+.ctbl{width:100%;border-collapse:collapse;font-size:13px}
+.ctbl th{font-size:11px;font-weight:600;color:var(--muted);text-align:right;padding:4px;border-bottom:1px solid var(--line)}
+.ctbl td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.ctbl th:first-child,.ctbl td:first-child{text-align:left;padding-left:0}
+.ctbl tr.tot td{font-weight:700;border-bottom:0}
+.cnotes{margin:0;padding-left:18px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.cnotes .b{color:var(--bad);font-weight:600} .cnotes .w,.cnotes .u{color:var(--warn)}
+.cic-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cic-head b{font-size:16px}
 .confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px}
 @media (max-width:380px){.rule.edit .grid3{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.grid3 label:first-child{grid-column:1/-1}.totals strong{font-size:13px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -203,6 +212,17 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
   <div class="view" id="v-check">
     <div id="newConfirm" class="confirm" hidden>Xoá toàn bộ thông tin khách đang nhập?
       <button class="btn2 danger" id="newYes" type="button">Xoá</button><button class="btn2" id="newNo" type="button">Huỷ</button></div>
+
+    <section id="cicSec">
+      <div class="sec-head"><h2>Đọc CIC tự động</h2></div>
+      <div class="panel stack">
+        <p class="note" style="margin:0">Chọn file PDF <b>CIC vay</b> (quan hệ tín dụng) và <b>CIC thẻ</b>, một hoặc cả hai file cùng lúc. App tự điền hồ sơ và kiểm tra. File chỉ đọc trên máy này, không gửi đi đâu.</p>
+        <button class="btn2 acc" id="cicPick" type="button">Chọn file CIC</button>
+        <input type="file" id="cicFile" accept="application/pdf,.pdf" multiple hidden>
+        <div id="cicPrev" class="stack" hidden></div>
+        <div id="cicInfo" class="stack" hidden></div>
+      </div>
+    </section>
 
     <section>
       <div class="sec-head"><h2>Khách hàng</h2><span class="saved-tag" id="savedTag" hidden></span></div>
@@ -382,7 +402,7 @@ const BANK_DIR=[
  "VCBNeo|CBBank|Xây dựng","MBV|OceanBank|Đại Dương","Vikki Bank|Vikki|DongA Bank|Đông Á","GPBank|Dầu khí toàn cầu",
  // Ngân hàng thương mại cổ phần
  "Techcombank|TCB|Kỹ thương","VPBank|VPB|VP|Việt Nam Thịnh Vượng","MB Bank|MB|MBBank|Quân đội","ACB|Á Châu",
- "Sacombank|STB|Sài Gòn Thương Tín","TPBank|TPB|Tiên Phong","VIB|Quốc tế","HDBank|HDB|Phát triển TP.HCM",
+ "Sacombank|STB|Sài Gòn Thương Tín","TPBank|TPB|Tiên Phong","VIB|Quốc tế","HDBank|HDB|Phát triển TP.HCM|Phát triển Thành phố Hồ Chí Minh",
  "SHB|Sài Gòn - Hà Nội","OCB|Phương Đông","MSB|Maritime Bank|Hàng Hải","SeABank|SEA|SSB|Đông Nam Á",
  "Eximbank|EIB|Exim|Xuất nhập khẩu","LPBank|LPB|LienVietPostBank|Lộc Phát","NCB|Quốc Dân|National Citizen Bank",
  "Nam A Bank|NamABank|NAB|Nam Á","Bac A Bank|BAB|Bắc Á","PVcomBank|PVB|PVcom|Đại chúng","Kienlongbank|KLB|Kiên Long",
@@ -779,6 +799,7 @@ function renderCust(){
   setPressed("#job","job",cust.job);
   $("#badDebt").checked=!!cust.badDebt;
   $("#bhxh").checked=!!cust.bhxh;
+  renderCic();
 }
 $("#cards").addEventListener("input",e=>{const f=e.target.dataset.f;if(!f)return;cust.rows[+e.target.closest(".crow").dataset.i][f]=e.target.value;updateTotals();edited()});
 $("#cards").addEventListener("click",e=>{const d=e.target.closest("[data-del]");if(!d)return;cust.rows.splice(+d.dataset.del,1);renderRows();edited()});
@@ -793,7 +814,240 @@ $("#newCustomer").addEventListener("click",()=>{showTab("check");$("#newConfirm"
 $("#newNo").addEventListener("click",()=>$("#newConfirm").hidden=true);
 $("#newYes").addEventListener("click",()=>{
   cust={id:null,name:"",phone:"",note:"",rows:[{bank:"",cards:1,limit:"",used:""}],finCos:0,job:"hdld",bhxh:false,badDebt:false,example:false};
-  xState=null;$("#newConfirm").hidden=true;$("#results").hidden=true;renderCust();saveCust();toast("Đã tạo hồ sơ khách mới");
+  cicFiles={};xState=null;$("#newConfirm").hidden=true;$("#results").hidden=true;renderCust();saveCust();toast("Đã tạo hồ sơ khách mới");
+});
+
+/* ---------- Đọc CIC tự động: PDF "Báo cáo chi tiết quan hệ tín dụng" (vay) và "Báo cáo thông tin thẻ tín dụng" ---------- */
+const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfjsP=null,cicFiles={},cicBusy=false;
+function loadPdfJs(){
+  if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);
+  return pdfjsP||(pdfjsP=loadScript(PDFJS+"pdf.min.js").then(()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";return pdfjsLib}).catch(e=>{pdfjsP=null;throw e}));
+}
+/* đọc chữ trong PDF, gom thành từng dòng theo toạ độ */
+async function pdfLines(file){
+  const lib=await loadPdfJs();
+  const doc=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false}).promise;
+  const L=[];
+  try{
+    for(let p=1;p<=doc.numPages;p++){
+      const tc=await (await doc.getPage(p)).getTextContent(),rows=[];
+      tc.items.forEach(it=>{
+        const t=String(it.str||"").normalize("NFC").replace(/\u00d0/g,"Đ").replace(/\u00f0/g,"đ").trim();
+        const x=it.transform[4],y=it.transform[5];
+        if(!t||/^(Hệ thống tra cứu|User in:)/.test(t)||(y<45&&/^[\d\s\/]+$/.test(t)))return;
+        let r=rows.find(r=>Math.abs(r.y-y)<=2);if(!r)rows.push(r={p,y,it:[]});r.it.push({x,s:t});
+      });
+      rows.sort((a,b)=>b.y-a.y).forEach(r=>{r.it.sort((a,b)=>a.x-b.x);r.t=r.it.map(i=>i.s).join(" ").replace(/\s+/g," ");L.push(r)});
+    }
+  }finally{doc.destroy()}
+  return L;
+}
+const cInt=v=>{const n=parseInt(String(v).replace(/[.,\s]/g,""),10);return isNaN(n)?0:n};
+const NUM=/^-?[\d.,]+$/;
+function cSlice(L,from,to){const i=L.findIndex(l=>from.test(l.t));if(i<0)return null;let j=L.findIndex((l,k)=>k>i&&to.test(l.t));if(j<0)j=L.length;return L.slice(i+1,j)}
+function cText(L,from,to){const s=cSlice(L,from,to);return s?s.map(l=>l.t).join(" "):""}
+function cField(L,re){for(const l of L){const m=l.t.match(re);if(m)return m[1].trim()}return""}
+/* gom các dòng của một bảng thành từng hàng, dựa vào cột STT */
+function cRows(lines){
+  const rows=[];let cur=null;
+  lines.forEach(l=>{
+    if(/^STT\b/.test(l.t)){cur=null;return}
+    const f=l.it[0];
+    if(/^\d+$/.test(f.s)&&f.x<85){cur={it:l.it.slice(1)};rows.push(cur);return}
+    if(cur)cur.it=cur.it.concat(l.it);
+  });
+  return rows;
+}
+function cicCommon(L){
+  const t=L.map(l=>l.t).join("\n");
+  return{name:cField(L,/^Tên khách hàng:?\s+(.+)$/),cic:cField(L,/^Mã số CIC:?\s+(\d+)/),id:cField(L,/^Số CMTND\/MST HKD\s+(\d+)/),
+    at:(t.match(/Thời gian gửi báo cáo:\s*(\d{2}\/\d{2}\/\d{4})/)||t.match(/Thời gian yêu cầu:\s*(\d{2}\/\d{2}\/\d{4})/)||[])[1]||""};
+}
+function parseQhtd(L){
+  const r={kind:"qhtd",...cicCommon(L),loans:[],cards:null,flags:[],lookups:[]};
+  const sc=(cSlice(L,/^II\.\s/,/^(III\.|Lưu ý)/)||[]).flatMap(l=>l.it.filter(i=>i.x<200).map(i=>i.s)).join(" ");
+  const m=sc.match(/Điểm tín dụng\s+(\d{3})\s+Hạng\s+(\d{1,2})/);if(m){r.score=+m[1];r.rank=+m[2]}
+  let cur=null,wrap=false;
+  (cSlice(L,/^2\.1\.\s/,/^2\.2\.\s/)||[]).forEach(l=>{
+    if(/^(Đơn vị tính|Loại dư nợ)/.test(l.t))return;
+    const h=l.t.match(/^\d+\.\s*(\d{6,})\s*-\s*(.+)$/);
+    if(h){cur={code:h[1],raw:h[2],total:null,usd:0,bad:[]};r.loans.push(cur);wrap=true;return}
+    if(!cur)return;
+    if(/^Ngày báo cáo/.test(l.t)){wrap=false;return}
+    if(wrap){cur.raw+=" "+l.t;return}
+    const v=l.t.match(/^(.*?)\s+(-?[\d.,]+)\s+(-?[\d.,]+)$/);if(!v)return;
+    if(/^Tổng cộng/.test(v[1])){if(cur.total==null){cur.total=cInt(v[2]);cur.usd=cInt(v[3])}return}
+    if(!/^-/.test(v[1])&&/(cần chú ý|dưới tiêu chuẩn|nghi ngờ|mất vốn|quá hạn|nhóm\s*[2-5])/i.test(v[1])&&cInt(v[2])+cInt(v[3])>0)cur.bad.push(v[1]);
+  });
+  const s22=cSlice(L,/^2\.2\.\s/,/^(2\.3\.|B\.\s)/);
+  if(s22){
+    r.cards=[];let c=null,w=false;
+    s22.forEach(l=>{
+      const h=l.t.match(/^\d+\s+Tên tổ chức phát hành thẻ\s+(.+)$/);
+      if(h){c={raw:h[1],limit:0,used:0,late:0,count:0};r.cards.push(c);w=true;return}
+      if(!c||/^(Đơn vị tính|Loại dư nợ)/.test(l.t))return;
+      if(/^\d+\.\d+\s/.test(l.t)){
+        w=false;const v=l.t.match(/^\d+\.\d+\s+(.+?)\s+(-?[\d.,]+)$/);if(!v)return;
+        const k=plain(v[1]),n=cInt(v[2]);
+        if(k.includes("han muc"))c.limit=n;else if(k.includes("phai thanh toan"))c.used=n;else if(k.includes("cham thanh toan"))c.late=n;else if(k.includes("so luong"))c.count=n;
+        return;
+      }
+      if(w)c.raw+=" "+l.t;
+    });
+  }
+  const h25=cText(L,/^2\.5\.\s/,/^2\.6\.\s/);
+  if(h25&&!/không có nợ xấu/i.test(h25))r.flags.push(["b","Có nợ xấu trong 5 năm gần nhất (mục 2.5 trên CIC)"]);
+  const h26=cText(L,/^2\.6\.\s/,/^2\.7\.\s/);
+  if(h26&&!/không bị chậm|không có/i.test(h26)){const mx=h26.match(/lớn nhất\s+(\d+)/),n=h26.match(/Số lần chậm thanh toán thẻ\s+(\d+)/);r.late3y={max:mx?+mx[1]:null,count:n?+n[1]:null}}
+  const h27=cText(L,/^2\.7\.\s/,/^(Ghi chú|IV\.)/);
+  if(h27&&!/không có nợ cần chú ý/i.test(h27))r.flags.push(["w","Có nợ cần chú ý (nhóm 2) trong 12 tháng gần nhất"]);
+  (cSlice(L,/^3\.3\.\s/,/^(V\.\s|KẾT THÚC)/)||[]).forEach(l=>{const d=l.t.match(/(\d{2})\/(\d{2})\/(\d{4})\s+\d{2}:\d{2}/);if(d)r.lookups.push(new Date(+d[3],d[2]-1,+d[1]).getTime())});
+  return r;
+}
+function parseThe(L){
+  const r={kind:"the",...cicCommon(L),cards:[],pay:[],late:[]};
+  const s12=cSlice(L,/^1\.2\.\s/,/^(1\.3\.|2\.\s)/)||[];
+  const hd=s12.find(l=>l.it.some(i=>i.s==="Tình"));
+  if(hd){
+    const tens=hd.it.filter(i=>i.s==="Tên"),xs=hd.it.find(i=>i.s==="Tình").x-6;
+    const xc=(tens[1]||{x:xs-70}).x-15,xl=(hd.it.find(i=>i.s==="Hạn")||{x:xs+62}).x-8;
+    cRows(s12).forEach(row=>{
+      const g=[[],[],[],[]];row.it.forEach(i=>g[i.x>=xl?3:i.x>=xs?2:i.x>=xc?1:0].push(i.s));
+      r.cards.push({raw:g[0].join(" "),card:g[1].join(" "),status:g[2].join(" "),limit:cInt(g[3].join(""))});
+    });
+  }
+  const s21=cSlice(L,/^2\.1\.\s/,/^2\.2\.\s/)||[];
+  const h2=s21.find(l=>/^STT/.test(l.t));
+  if(h2){
+    const xn=(h2.it.find(i=>i.s==="Số")||{x:320}).x-10;
+    cRows(s21).forEach(row=>{
+      const nums=row.it.filter(i=>i.x>=xn&&NUM.test(i.s)).map(i=>cInt(i.s));
+      r.pay.push({raw:row.it.filter(i=>i.x<xn).map(i=>i.s).join(" "),due:nums[0]||0,late:nums[1]||0,days:nums[2]||0});
+    });
+  }
+  cRows(cSlice(L,/^2\.2\.\s/,/^(Ghi chú|2\.3\.)/)||[]).forEach(row=>{
+    const t=row.it.map(i=>i.s).join(" "),m=t.match(/(\d{2}\/\d{2}\/\d{4})\s+(-?[\d.,]+)\s+(\d+)/);
+    if(m)r.late.push({date:m[1],amount:cInt(m[2]),days:+m[3],raw:t.replace(m[0],"").trim()});
+  });
+  return r;
+}
+/* tên tổ chức trên CIC → tên ngân hàng trong danh sách của app */
+const FC_NAMES=[["smbc","FE Credit"],["home credit","Home Credit"],["hd saison","HD Saison"],["shinhan","Shinhan Finance"],["shinsei","Mcredit (MB Shinsei)"],["jaccs","JACCS"],["lotte","Lotte Finance"],["mirae","Mirae Asset"],["toyota","Toyota Finance"],["tnex","TNEX Finance"],["buu dien","PTF"],["dien luc","EVNFinance"],["cong nghiep","Vietcredit"],["vietcredit","Vietcredit"]];
+function cicBank(raw){
+  const full=String(raw).replace(/\s*-\s*(Chi nhánh|CN\b|Hội sở|Sở giao dịch|Phòng giao dịch|PGD|Trụ sở).*$/i,"").replace(/\s+/g," ").trim();
+  const p=" "+plain(full).replace(/[^a-z0-9]+/g," ").trim()+" ";
+  const fc=/^ cong ty /.test(p)&&p.includes(" tai chinh ");
+  if(fc){const f=FC_NAMES.find(([k])=>p.includes(" "+k+" "));if(f)return{name:f[1],known:true,fc}}
+  let best=null,bl=0;
+  if(!fc)banksNow().forEach(b=>[b.name,...b.aliases].forEach(a=>{const w=plain(a).replace(/[^a-z0-9]+/g," ").trim();if(w.length>=3&&w.length>bl&&p.includes(" "+w+" ")){best=b.name;bl=w.length}}));
+  if(best)return{name:best,known:true,fc};
+  const short=full.replace(/^(Ngân hàng|Công ty Tài chính)\s+((TMCP|TNHH|MTV|Thương mại cổ phần|Cổ phần|tín dụng tiêu dùng)\s+)*/i,"").trim()||full;
+  return{name:short,known:false,fc};
+}
+const fmtD=t=>new Date(t).toLocaleDateString("vi-VN",{day:"2-digit",month:"2-digit",year:"numeric"});
+function cicCombine(q,t){
+  const a=q||t,notes=[],why=[];
+  const rows=new Map(),add=(raw,cards,limit,used)=>{const b=cicBank(raw),k=canon(b.name);const o=rows.get(k)||{bank:b.name,cards:0,limit:0,used:0,known:b.known};o.cards+=cards;o.limit+=limit;o.used+=used;rows.set(k,o)};
+  if(q&&q.cards)q.cards.forEach(c=>{if(c.count||c.limit||c.used)add(c.raw,c.count||1,c.limit,c.used)});
+  else if(t){
+    const due=new Map();t.pay.forEach(p=>{const k=canon(cicBank(p.raw).name);due.set(k,(due.get(k)||0)+p.due)});
+    const seen=new Set();
+    t.cards.filter(c=>plain(c.status).includes("dang hoat dong")).forEach(c=>{
+      const k=canon(cicBank(c.raw).name),n=c.card.split(",").filter(x=>/[a-z]/i.test(x)).length||1;
+      add(c.raw,n,c.limit,seen.has(k)?0:(due.get(k)||0));seen.add(k);
+    });
+  }
+  if(q)q.loans.forEach(l=>{if(l.bad.length)why.push(`${cicBank(l.raw).name}: ${l.bad.join(", ")}`)});
+  if(q&&q.cards)q.cards.forEach(c=>{if(c.late>0)why.push(`Thẻ ${cicBank(c.raw).name} đang chậm thanh toán ${fmt(c.late)} tr`)});
+  if(t)t.pay.forEach(p=>{if(p.late>0||p.days>0)why.push(`Thẻ ${cicBank(p.raw).name} đang chậm thanh toán ${fmt(p.late)} tr, ${p.days} ngày`)});
+  const fcs=new Map(),bl=new Map();
+  if(q)q.loans.forEach(l=>{if(!((l.total||0)+(l.usd||0)>0))return;const b=cicBank(l.raw);if(b.fc)fcs.set(plain(b.name),b.name);else bl.set(b.name,(bl.get(b.name)||0)+(l.total||0))});
+  if(q&&q.late3y)notes.push(["w",`Từng chậm thanh toán thẻ trong 3 năm: ${q.late3y.count??"?"} lần, lâu nhất ${q.late3y.max??"?"} ngày${t&&t.late.length?`, gần nhất ${t.late.map(x=>x.date).sort((x,y)=>x.split("/").reverse().join("")<y.split("/").reverse().join("")?1:-1)[0]}`:""}`]);
+  else if(t&&t.late.length){const mx=Math.max(...t.late.map(x=>x.days));notes.push(["w",`Từng chậm thanh toán thẻ trong 3 năm: ${t.late.length} lần, lâu nhất ${mx} ngày`])}
+  if(q)notes.push(...q.flags);
+  const unk=[...rows.values()].filter(r=>!r.known).map(r=>r.bank);
+  if(unk.length)notes.push(["u",`Chưa nhận ra ngân hàng: ${unk.join(", ")}. Có thể thêm tên gọi khác ở tab Điều kiện → Danh sách ngân hàng.`]);
+  if(q&&q.lookups.length&&a.at){const[d,mo,y]=a.at.split("/").map(Number),end=new Date(y,mo-1,d).getTime(),n3=q.lookups.filter(x=>end-x<=92*864e5).length;notes.push(["",`Đã có ${q.lookups.length} lượt tra cứu CIC trong 12 tháng (${n3} lượt trong 3 tháng gần nhất).`])}
+  if(!q)notes.push(["u","Chưa có CIC vay nên chưa đếm được công ty tài chính và nợ vay. Nên chọn thêm file CIC vay."]);
+  if(!t&&!(q&&q.cards))notes.push(["u","Chưa đọc được thông tin thẻ. Nên chọn thêm file CIC thẻ."]);
+  return{name:a.name,at:a.at,score:q?q.score:null,rank:q?q.rank:null,rows:[...rows.values()],finCos:q?fcs.size:null,fcs:[...fcs.values()],
+    loans:[...bl].map(([n,v])=>`${n} ${fmt(v)} tr`),badDebt:why.length>0,why:[...new Set(why)],notes,has:{qhtd:!!q,the:!!t}};
+}
+function cicNotesHtml(c){
+  const li=[...(c.why||[]).map(w=>["b","Đang quá hạn: "+w]),...(c.notes||[])];
+  if(c.fcs&&c.fcs.length)li.push(["",`Công ty tài chính đang có dư nợ: ${c.fcs.join(", ")}`]);
+  if(c.loans&&c.loans.length)li.push(["",`Đang vay ngân hàng: ${c.loans.join(", ")}`]);
+  return li.length?`<ul class="cnotes">${li.map(([k,t])=>`<li${k?` class="${k}"`:""}>${esc(t)}</li>`).join("")}</ul>`:"";
+}
+function cicHead(c){return`<div class="cic-head"><div><b>${esc(c.name||"(không rõ tên)")}</b><div class="note">CIC ngày ${esc(c.at||"?")}${c.score?` · Điểm tín dụng <b>${c.score}</b> (hạng ${c.rank})`:""}</div></div></div>`}
+function cicResult(){
+  const{qhtd,the}=cicFiles;
+  if(qhtd&&the&&(qhtd.id||qhtd.cic)!==(the.id||the.cic))return{err:`Hai file không cùng một khách: ${qhtd.name} và ${the.name}. Hãy chọn lại.`};
+  return cicCombine(qhtd,the);
+}
+function renderCic(){
+  const busy=Object.keys(cicFiles).length>0,P=$("#cicPrev"),I=$("#cicInfo");
+  P.hidden=!busy;I.hidden=busy||!cust.cic;
+  if(busy){
+    const R=cicResult(),{qhtd,the}=cicFiles;
+    const chips=`<div class="chips"><span class="chip ${qhtd?"ok":"own"}">${qhtd?"✓":"–"} CIC vay</span><span class="chip ${the?"ok":"own"}">${the?"✓":"–"} CIC thẻ</span></div>`;
+    if(R.err){P.innerHTML=`${chips}<div class="confirm">${esc(R.err)}</div><div class="row-btns"><button class="btn2" type="button" data-cic="cancel">Huỷ</button></div>`;return}
+    const s=R.rows.reduce((a,r)=>({c:a.c+r.cards,l:a.l+r.limit,u:a.u+r.used}),{c:0,l:0,u:0});
+    P.innerHTML=`${cicHead(R)}${chips}
+      ${R.rows.length?`<table class="ctbl"><thead><tr><th>Thẻ đang có</th><th>Số thẻ</th><th>HM (tr)</th><th>Dùng (tr)</th></tr></thead><tbody>
+        ${R.rows.map(r=>`<tr><td>${esc(r.bank)}${r.known?"":" <span class=\"chip warn\">?</span>"}</td><td>${r.cards}</td><td>${fmt(r.limit)}</td><td>${fmt(r.used)}</td></tr>`).join("")}
+        ${R.rows.length>1?`<tr class="tot"><td>Tổng</td><td>${s.c}</td><td>${fmt(s.l)}</td><td>${fmt(s.u)}</td></tr>`:""}</tbody></table>`
+        :`<p class="note" style="margin:0">Không có thẻ tín dụng đang hoạt động.</p>`}
+      <div class="kv two"><div><span>Công ty tài chính có dư nợ</span><strong>${R.finCos==null?"Chưa rõ":R.finCos}</strong></div><div><span>Nợ quá hạn / nợ xấu</span><strong style="color:var(--${R.badDebt?"bad":"ok"})">${R.badDebt?"Đang có":"Không"}</strong></div></div>
+      ${cicNotesHtml(R)}
+      <div class="row-btns"><button class="btn2 acc" type="button" data-cic="apply">Điền vào hồ sơ &amp; kiểm tra</button>${qhtd&&the?"":`<button class="btn2" type="button" data-cic="more">Thêm file ${qhtd?"CIC thẻ":"CIC vay"}</button>`}<button class="btn2" type="button" data-cic="cancel">Huỷ</button></div>`;
+    return;
+  }
+  if(cust.cic)I.innerHTML=`<div class="note"><b>Hồ sơ được điền từ CIC</b> ngày ${esc(cust.cic.at||"?")}${cust.cic.score?` · Điểm tín dụng <b>${cust.cic.score}</b> (hạng ${cust.cic.rank})`:""}</div>${cicNotesHtml(cust.cic)}`;
+}
+async function cicRead(files){
+  if(cicBusy||!files.length)return;
+  const b=$("#cicPick"),old=b.textContent;cicBusy=true;b.disabled=true;b.textContent="Đang đọc file…";
+  const errs=[];
+  try{
+    for(const f of files){
+      if(!/pdf$/i.test(f.type)&&!/\.pdf$/i.test(f.name)){errs.push(`${f.name}: không phải file PDF`);continue}
+      let L;
+      try{L=await pdfLines(f)}catch(e){console.error(e);if(!window.pdfjsLib){errs.push("Chưa tải được bộ đọc PDF – kiểm tra kết nối mạng");break}errs.push(`${f.name}: không mở được file`);continue}
+      const all=L.map(l=>l.t).join(" ");
+      if(!L.length){errs.push(`${f.name}: file là ảnh chụp, không có chữ để đọc`);continue}
+      const kind=/BÁO CÁO THÔNG TIN THẺ TÍN DỤNG/i.test(all)?"the":/QUAN HỆ TÍN DỤNG/i.test(all)?"qhtd":null;
+      if(!kind){errs.push(`${f.name}: không phải báo cáo CIC vay hoặc CIC thẻ`);continue}
+      const r=kind==="the"?parseThe(L):parseQhtd(L);
+      const other=cicFiles[kind==="the"?"qhtd":"the"];
+      if(other&&(other.id||other.cic)!==(r.id||r.cic)){cicFiles={};errs.push(`Các file không cùng một khách – chỉ giữ file của ${r.name}`)}
+      cicFiles[kind]=r;
+    }
+  }finally{cicBusy=false;b.disabled=false;b.textContent=old}
+  if(errs.length)toast(errs[0]);
+  renderCic();
+  if(Object.keys(cicFiles).length)$("#cicSec").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function cicApply(){
+  const R=cicResult();if(R.err)return;
+  if(cust.example||plain(cust.name).trim()!==plain(R.name).trim())
+    cust={id:null,name:"",phone:"",note:"",rows:[],finCos:0,job:"hdld",bhxh:false,badDebt:false,example:false};
+  cust.example=false;cust.name=R.name;
+  cust.rows=R.rows.length?R.rows.map(r=>({bank:r.bank,cards:r.cards,limit:r.limit,used:r.used})):[{bank:"",cards:1,limit:"",used:""}];
+  if(R.finCos!=null)cust.finCos=R.finCos;
+  cust.badDebt=R.badDebt;
+  cust.cic={at:R.at,score:R.score,rank:R.rank,why:R.why,notes:R.notes,fcs:R.fcs,loans:R.loans};
+  cicFiles={};xState=null;saveCust();renderCust();
+  toast("Đã điền hồ sơ từ CIC. Nhớ chọn Công việc và BHXH của khách.");
+  runCheck(true);
+}
+$("#cicPick").addEventListener("click",()=>$("#cicFile").click());
+$("#cicFile").addEventListener("change",e=>{const f=[...e.target.files];e.target.value="";cicRead(f)});
+$("#cicSec").addEventListener("click",e=>{
+  const b=e.target.closest("[data-cic]");if(!b)return;
+  const a=b.dataset.cic;
+  if(a==="apply")cicApply();else if(a==="more")$("#cicFile").click();else if(a==="cancel"){cicFiles={};renderCic()}
 });
 
 /* ---------- Đối chiếu ---------- */
@@ -1194,9 +1448,14 @@ async function buildPdfDoc(){
   if(c.phone)info.push(["Số điện thoại",c.phone]);
   info.push(["Công việc",JOBS[c.job]]);
   info.push(["BHXH",c.bhxh?"Có đóng BHXH":"Không đóng BHXH"]);
-  info.push(["Công ty tài chính",`${c.finCos} công ty đang có dư nợ`]);
+  info.push(["Công ty tài chính",`${c.finCos} công ty đang có dư nợ`+(c.cic&&c.cic.fcs&&c.cic.fcs.length===c.finCos&&c.finCos?` (${c.cic.fcs.join(", ")})`:"")]);
   info.push(["Nợ quá hạn / nợ xấu",c.badDebt?{text:"Có",bold:true,color:C.bad}:"Không"]);
   if(c.note)info.push(["Ghi chú",c.note]);
+  if(c.cic){
+    info.push(["CIC",`Ngày ${c.cic.at||"?"}`+(c.cic.score?` · điểm tín dụng ${c.cic.score} (hạng ${c.cic.rank})`:"")]);
+    const cn=[...(c.cic.why||[]).map(w=>({text:"Đang quá hạn: "+w,color:C.bad})),...(c.cic.notes||[]).filter(n=>n[0]==="w"||n[0]==="b").map(n=>n[1])];
+    if(cn.length)info.push(["Lưu ý từ CIC",{ul:cn}]);
+  }
   const card=x=>{
     const r=x.rule,db=r.special&&x.status==="ok",why=[...x.fails,...x.warns].map(fx);
     const body=[{columns:[{text:r.name,bold:true,fontSize:11.5},{text:label[x.status]+(db?" · cần kiểm tra ĐB":""),color:C[x.status],bold:true,alignment:"right",fontSize:9.5}]}];
