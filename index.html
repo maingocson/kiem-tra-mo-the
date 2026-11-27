@@ -614,8 +614,11 @@ function shToken(){try{return localStorage.getItem(K_TOKEN)||""}catch(e){return"
 function shLocal(){return load(K_SHARED)||{}}
 function curText(){return usingSample||!cache||!cache.text?DEFAULT_CSV:cache.text}
 function validShared(d){return d&&typeof d.text==="string"&&d.at&&parseCSV(d.text).map(normRule).some(r=>r.name)}
+/* đọc qua API GitHub (luôn là bản mới nhất); API lỗi/hết lượt thì dùng raw (có thể chậm ~5 phút) */
 async function shFetch(){
-  const r=await fetch(SH_RAW+"?t="+Date.now(),{cache:"no-store"});
+  let r;
+  try{r=await fetch(SH_API+"?ref=main",{cache:"no-store",headers:{Accept:"application/vnd.github.raw+json"}});if(r.status!==200&&r.status!==404)r=null}catch(e){r=null}
+  if(!r)r=await fetch(SH_RAW,{cache:"no-store"});
   if(r.status===404)return null;
   if(!r.ok)throw new Error("HTTP "+r.status);
   const d=await r.json();if(!validShared(d))throw new Error("bad");return d;
@@ -625,8 +628,11 @@ async function shSync(manual){
   if(!manual&&Date.now()-shChecked<5*60e3)return;
   shChecked=Date.now();
   try{
-    const d=await shFetch();shRemote=d||false;
-    if(d&&(manual||d.at>(shLocal().at||""))){
+    let d=await shFetch();const known=shLocal().at||"";
+    /* bản tải về cũ hơn bản máy này đã nhận/đăng (bộ nhớ đệm chưa kịp đổi) → bỏ qua, không kéo lùi */
+    if(d&&d.at<known){d=null;if(manual)toast("Máy này đã có bản chung mới nhất");renderShared();return}
+    shRemote=d||false;
+    if(d&&(manual||d.at>known)){
       if(editing&&dirty){if(manual)toast("Đang sửa điều kiện – bấm Lưu hoặc Huỷ trước");renderShared();return}
       const same=d.text===curText();
       if(!same){applyPolicy({text:d.text,list:parseCSV(d.text)},"shared");if(editing){draft=rules.map(toModel);renderRules()}if(!$("#results").hidden)runCheck(false)}
