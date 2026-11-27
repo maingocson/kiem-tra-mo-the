@@ -540,9 +540,11 @@ button.av{cursor:pointer}
         <div id="cpHist"></div>
       </div>
       <div class="panel stack">
-        <div class="cbk">3. Nhu cầu chi tiêu tháng tới (triệu đồng)</div>
+        <div class="cbk">3. Nhu cầu chi tiêu trong tháng (triệu đồng)</div>
+        <label class="f" for="cpBudget">Ngân sách chi tiêu/tháng (tr) – bỏ trống để chi đủ lấy hết trần hoàn<input id="cpBudget" type="text" inputmode="decimal" placeholder="VD: 15"></label>
+        <p class="cp-tip" id="cpNeedsSrc" hidden></p>
         <div class="cp-needs" id="cpNeeds"></div>
-        <div class="row-btns"><button class="btn2" id="cpFromHist" type="button">Lấy theo tháng gần nhất</button><button class="btn2" id="cpClearNeeds" type="button">Xoá hết</button></div>
+        <div class="row-btns"><button class="btn2 acc" id="cpAuto" type="button">Tự tính theo thẻ</button><button class="btn2" id="cpFromHist" type="button">Lấy theo tháng gần nhất</button><button class="btn2" id="cpClearNeeds" type="button">Xoá hết</button></div>
       </div>
       <div class="panel stack cp-now">
         <div class="cbk" id="cpNowTitle">4. Chi tiêu tháng này</div>
@@ -1742,6 +1744,38 @@ function cpOptimize(owned,needs,fine,fix){
   const out=cards.map(x=>({...x,res:cpCalc(x.c,x.e,cpMerge(x.fix,x.sp))}));
   return{cards:out,cash:out.reduce((a,x)=>a+x.res.cash,0)};
 }
+/* tự tính nhu cầu chi tiêu từ thẻ đang có: mỗi thẻ chi vừa đủ để lấy hết trần các nhóm hoàn cao và đủ ngưỡng mức
+   (bỏ ưu đãi chỉ áp dụng vài ngày trong tuần; không dồn chi quá nhiều chỉ để lên mức);
+   nhóm không có trần thì tạm tính 3tr; có ngân sách (đồng) thì cắt phần tỷ lệ thấp trước */
+const CP_NOCAP=3*TRV;
+function cpCardMax(c,e,ti){
+  const rate=g=>{const v=g.r[ti];return v==null?null:v*cpDayF(g)};
+  let gs=c.groups.map((g,i)=>({g,i,cats:cpGroupCats(g),r:rate(g)})).filter(x=>x.r!=null&&x.r>(c.base||0)&&x.cats!=="ALL"&&x.cats.size&&cpDayF(x.g)===1);
+  const pickG=gs.filter(x=>x.g.pick);
+  if(pickG.length){const n=cpNPick(c,ti)||1,w=x=>x.g.cap[ti]!=null?x.g.cap[ti]:CP_NOCAP*x.r/100;
+    const ch=e&&e.pick&&e.pick.length?new Set(e.pick):new Set(pickG.slice().sort((a,b)=>w(b)-w(a)).slice(0,n).map(x=>x.i));
+    gs=gs.filter(x=>!x.g.pick||ch.has(x.i))}
+  gs.sort((a,b)=>b.r-a.r);
+  let cardLeft=c.capT[ti]!=null?c.capT[ti]:Infinity;const shLeft={};c.shared.forEach(s=>{if(s.cap[ti]!=null)shLeft[s.n]=s.cap[ti]});
+  const used=new Set(),out=[];
+  for(const x of gs){const k=CP_CATS.map(z=>z[0]).find(k=>x.cats.has(k)&&!used.has(k));if(!k)continue;
+    let cc=x.g.cap[ti]!=null?x.g.cap[ti]:Infinity;if(x.g.share&&shLeft[x.g.share]!=null)cc=Math.min(cc,shLeft[x.g.share]);cc=Math.min(cc,cardLeft);
+    if(cc<=0)continue;let amt=cc===Infinity?CP_NOCAP:cc/(x.r/100);amt=Math.ceil(amt/50000)*50000;
+    const got=Math.min(cc,amt*x.r/100);cardLeft-=got;if(x.g.share&&shLeft[x.g.share]!=null)shLeft[x.g.share]-=got;
+    used.add(k);out.push({k,amt,r:x.r})}
+  const t=c.tiers[ti],tot=out.reduce((a,b)=>a+b.amt,0);
+  if(cpSpendTier(c)&&t&&t.from&&tot<t.from){if(t.from-tot>Math.max(2*tot,5*TRV))return null;out.push({k:"khac",amt:t.from-tot,r:c.base||0})}
+  return out}
+function cpAutoNeeds(owned,budget){
+  let all=[];
+  owned.forEach(({c,e})=>{
+    const tis=cpSpendTier(c)?c.tiers.map((t,i)=>i):[Math.min(e.tier||0,c.nt-1)];let best=null,bs=-Infinity;
+    tis.forEach(ti=>{const ch=cpCardMax(c,e,ti);if(!ch)return;const sp={};ch.forEach(x=>sp[x.k]=(sp[x.k]||0)+x.amt);
+      const tot=ch.reduce((a,b)=>a+b.amt,0),sc=cpCalc(c,e,sp).cash-tot*0.01;if(sc>bs){bs=sc;best=ch}});
+    if(best)all=all.concat(best)});
+  if(budget>0){all.sort((a,b)=>b.r-a.r);let left=budget;all=all.map(x=>{const a=Math.min(x.amt,Math.max(0,left));left-=a;return{...x,amt:a}}).filter(x=>x.amt>0)}
+  const needs={};all.forEach(x=>needs[x.k]=(needs[x.k]||0)+x.amt);
+  return Object.fromEntries(Object.entries(needs).map(([k,v])=>[k,String(Math.round(v/1e4)/100)]))}
 function cbOf(p){if(!p.cb)p.cb={cards:[],hist:[],needs:{}};const d=p.cb;d.cards=d.cards||[];d.hist=d.hist||[];d.needs=d.needs||{};return d}
 function cpData(){return cbOf(cust)}
 function cpOwnedOf(p){const all=cbAll(),d=cbOf(p);return d.cards.map(e=>({c:all.find(c=>c.id===e.id),e})).filter(x=>x.c)}
@@ -1795,7 +1829,13 @@ function renderPlan(){
   const pers=[...new Set(d.hist.map(h=>h.p))].sort().reverse();
   $("#cpHist").innerHTML=pers.length?pers.map(p=>{const rows=d.hist.map((h,i)=>[h,i]).filter(([h])=>h.p===p);const sum=rows.reduce((a,[h])=>a+h.amt,0);
     return`<details class="grp"${p===pers[0]?" open":""}><summary>Tháng ${esc(cpPerTxt(p))} · ${fmt(sum)} tr</summary><table class="ctbl cp-hist"><tbody>${rows.map(([h,i])=>{const c=all.find(x=>x.id===h.card);return`<tr><td>${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}<div class="note">${esc(CP_NAME[h.cat]||h.cat)}</div></td><td>${fmt(h.amt)} tr <button class="x" type="button" data-cp-hdel="${i}" aria-label="Xoá dòng">✕</button></td></tr>`}).join("")}</tbody></table></details>`}).join(""):`<p class="note" style="margin:0">Chưa có lịch sử. Có thể bỏ qua và nhập thẳng nhu cầu ở bước 3.</p>`;
-  /* nhu cầu */
+  /* nhu cầu: tự tính theo thẻ đang có nếu chưa nhập tay */
+  if(document.activeElement!==$("#cpBudget"))$("#cpBudget").value=d.budget?String(d.budget).replace(".",","):"";
+  if(owned.length&&(d.needsSrc==="auto"||(!d.needsSrc&&!Object.keys(d.needs).length))){
+    const n=cpAutoNeeds(owned,cpTr(d.budget));if(JSON.stringify(n)!==JSON.stringify(d.needs)||d.needsSrc!=="auto"){d.needs=n;d.needsSrc="auto";cpSave()}}
+  const nTot=Object.values(d.needs).reduce((a,v)=>a+cpTr(v),0);
+  $("#cpNeedsSrc").hidden=!(d.needsSrc==="auto"&&owned.length);
+  $("#cpNeedsSrc").innerHTML=`App đã tự tính theo ${owned.length} thẻ đang có: chi tổng <b>${cbMoney(nTot)}</b>/tháng ${cpTr(d.budget)?"trong ngân sách, ưu tiên nhóm hoàn cao":"để lấy hết trần hoàn và đủ ngưỡng mức"}. Sửa số bất kỳ thì app giữ số của bạn.`;
   $("#cpNeeds").innerHTML=CP_CATS.map(([k,n])=>`<label>${esc(n)}<input type="text" inputmode="decimal" data-cp-need="${k}" value="${d.needs[k]!=null?esc(String(d.needs[k]).replace(".",",")):""}" placeholder="0"></label>`).join("");
   renderPlanOut();
 }
@@ -1874,7 +1914,7 @@ $("#cpAdd").addEventListener("click",()=>{const id=$("#cpCard").value;if(!id){to
 $("#cpView").addEventListener("click",e=>{
   const hd=e.target.closest("[data-cp-hdel]");if(hd){cpData().hist.splice(+hd.dataset.cpHdel,1);cpSave();renderPlan();return}});
 cpCardsBind("#cpCards",()=>cust,cpSave,full=>full?renderPlan():renderPlanOut());
-$("#cpView").addEventListener("input",e=>{const k=e.target.dataset.cpNeed;if(!k)return;const v=e.target.value.trim();const d=cpData();if(v==="")delete d.needs[k];else d.needs[k]=v;cpSave();clearTimeout(renderPlanOut.t);renderPlanOut.t=setTimeout(renderPlanOut,350)});
+$("#cpView").addEventListener("input",e=>{const k=e.target.dataset.cpNeed;if(!k)return;const v=e.target.value.trim();const d=cpData();if(v==="")delete d.needs[k];else d.needs[k]=v;d.needsSrc="tay";$("#cpNeedsSrc").hidden=true;cpSave();clearTimeout(renderPlanOut.t);renderPlanOut.t=setTimeout(renderPlanOut,350)});
 $("#cpHAdd").addEventListener("click",()=>{const p=$("#cpPer").value,card=$("#cpHCard").value,cat=$("#cpHCat").value,amt=cbN($("#cpHAmt").value);
   if(!card){toast("Thêm thẻ khách đang có ở bước 1 trước");return}if(!p){toast("Chọn tháng");return}if(!amt||amt<=0){toast("Nhập số tiền (triệu đồng)");return}
   cpData().hist.push({p,card,cat,amt});cpSave();$("#cpHAmt").value="";renderPlan();toast("Đã thêm vào lịch sử")});
@@ -1884,8 +1924,10 @@ $("#cpQAdd").addEventListener("click",()=>{const card=$("#cpQCard").value,cat=$(
 $("#cpQAmt").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#cpQAdd").click()}});
 $("#cpFromHist").addEventListener("click",()=>{const d=cpData();const pers=[...new Set(d.hist.map(h=>h.p))].filter(p=>p<cpNowPer()).sort();if(!pers.length){toast("Chưa có lịch sử chi tiêu");return}
   const last=pers[pers.length-1],n={};d.hist.filter(h=>h.p===last).forEach(h=>n[h.cat]=(n[h.cat]||0)+h.amt);
-  d.needs=Object.fromEntries(Object.entries(n).map(([k,v])=>[k,String(Math.round(v*100)/100)]));cpSave();renderPlan();toast(`Đã lấy nhu cầu theo tháng ${cpPerTxt(last)}`)});
-$("#cpClearNeeds").addEventListener("click",()=>{cpData().needs={};cpSave();renderPlan()});
+  d.needs=Object.fromEntries(Object.entries(n).map(([k,v])=>[k,String(Math.round(v*100)/100)]));d.needsSrc="hist";cpSave();renderPlan();toast(`Đã lấy nhu cầu theo tháng ${cpPerTxt(last)}`)});
+$("#cpClearNeeds").addEventListener("click",()=>{const d=cpData();d.needs={};d.needsSrc="tay";cpSave();renderPlan()});
+$("#cpAuto").addEventListener("click",()=>{const d=cpData();if(!cpOwned().length){toast("Thêm thẻ đang có ở bước 1 trước");return}d.needsSrc="auto";cpSave();renderPlan();toast("Đã tự tính nhu cầu theo thẻ đang có")});
+$("#cpBudget").addEventListener("input",e=>{const d=cpData();const v=e.target.value.trim();if(v)d.budget=v;else delete d.budget;if(d.needsSrc!=="auto"&&cpOwned().length)d.needsSrc="auto";cpSave();clearTimeout(renderPlan.t);renderPlan.t=setTimeout(renderPlan,400)});
 
 /* ---------- Avatar, khung trượt kiểu X, trang Tôi, khoá Hoàn tiền ---------- */
 function initials(n){const w=String(n||"").trim().split(/\s+/).filter(Boolean);return w.length?w[w.length-1][0].toUpperCase():""}
