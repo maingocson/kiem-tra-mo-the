@@ -36,23 +36,12 @@ App dùng sẵn logo **Smart-B** (Bank · Bridge · Benefit): `logo.svg` là b�
 
 Muốn dùng logo khác trên một máy: tab **Điều kiện** → **Logo công ty** → **Chọn ảnh logo** (bấm **Xoá logo** để quay về Smart-B).
 
-## Đăng điều kiện cho mọi người (tab Điều kiện)
+## Cập nhật điều kiện cho mọi người (bằng tay)
 
-Bảng điều kiện dùng chung nằm ở kho riêng [kiem-tra-mo-the-dieu-kien](https://github.com/maingocson/kiem-tra-mo-the-dieu-kien) (file `dieu-kien.json`), tách khỏi kho chứa app.
+Thanh đầu trang hiện *Điều kiện ngày … · N ngân hàng* – ngày của bảng điều kiện đang dùng trên máy.
 
-- **Thanh đầu trang:** hiện *Điều kiện mới nhất ngày …*; nếu máy đang khác bản chung thì hiện *Có điều kiện mới ngày … · nhấn để cập nhật*. Nhấn **Cập nhật** để tải bản chung mới nhất ngay.
-- **Người dùng:** mỗi lần mở app (hoặc quay lại app sau ít nhất 5 phút), app tự tải bản chung. Nếu có bản mới hơn thì tự dùng và báo *Đã cập nhật điều kiện mới*. Bản cũ vẫn nằm trong *Các bản đã lưu trên máy*. Bấm **Tải bản chung về máy** để lấy ngay.
-- **Người quản lý:** sửa điều kiện, bấm **Lưu**, rồi bấm **Đăng cho mọi người**. Máy khác nhận bản mới ngay khi mở app hoặc nhấn Cập nhật.
-
-### Tạo mã truy cập (làm 1 lần trên máy người quản lý)
-
-1. Đăng nhập GitHub → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
-2. **Expiration:** chọn thời hạn (ví dụ 1 năm). Hết hạn thì tạo mã mới.
-3. **Repository access:** **Only select repositories** → chỉ chọn `kiem-tra-mo-the-dieu-kien`. **Không** chọn kho `kiem-tra-mo-the`.
-4. **Permissions → Repository permissions → Contents:** **Read and write**. Không bật quyền nào khác.
-5. **Generate token**, chép mã, dán vào ô *Mã truy cập GitHub* trong app, bấm **Lưu mã**.
-
-Mã chỉ lưu trên máy đó, chỉ gửi tới GitHub. Nếu mất máy hoặc nghi bị lộ: vào lại trang Fine-grained tokens trên GitHub và bấm **Revoke**, rồi tạo mã mới. Nếu bản chung bị sửa sai, khôi phục bản đúng từ *Các bản đã lưu trên máy* rồi đăng lại (lịch sử mọi lần đăng cũng có trên GitHub).
+1. **Người quản lý:** sửa điều kiện ở tab Điều kiện, bấm **Lưu**, rồi **Sao lưu ra file** và gửi file CSV cho mọi người (Zalo, email…).
+2. **Người dùng:** nhấn **Cập nhật** ở thanh đầu trang, chọn file vừa nhận, bấm **Cập nhật** để xác nhận. Không cần mật khẩu. Bảng cũ vẫn giữ trong *Các bản đã lưu trên máy* (tab Điều kiện).
 
 ## Sao lưu & phục hồi (tab Điều kiện)
 
