@@ -249,11 +249,13 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
         <button type="button" data-job="tudo" aria-pressed="false">Làm tự do</button>
         <button type="button" data-job="none" aria-pressed="false">Chưa có công việc</button>
       </div>
+      <div class="panel" style="margin-top:10px">
+        <label class="switch" for="bhxh"><span><span style="font-weight:600">Có đóng bảo hiểm xã hội (BHXH)</span><br><span class="note">Đang tham gia BHXH tại nơi làm việc</span></span><input type="checkbox" id="bhxh"></label>
+      </div>
     </section>
 
     <section>
-      <div class="panel stack">
-        <label class="switch" for="bhxh"><span><span style="font-weight:600">Có đóng bảo hiểm xã hội (BHXH)</span><br><span class="note">Đang tham gia BHXH tại nơi làm việc</span></span><input type="checkbox" id="bhxh"></label>
+      <div class="panel">
         <label class="switch" for="badDebt"><span><span style="font-weight:600">Đang có nợ quá hạn / nợ xấu</span><br><span class="note">Nợ nhóm 2 trở lên trên CIC</span></span><input type="checkbox" id="badDebt"></label>
       </div>
     </section>
