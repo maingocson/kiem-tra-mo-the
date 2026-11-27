@@ -137,7 +137,7 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 
 - Hoàn tiền → Kế hoạch: nhập thẻ đang có (bước 1) và nhu cầu chi tiêu tháng (bước 3) → app lập kế hoạch: nhóm nào quẹt thẻ nào, bao nhiêu.
 - Khi đã có thẻ, bước 3 **tự tính nhu cầu chi tiêu**: mỗi thẻ chi vừa đủ để lấy hết trần các nhóm hoàn cao và đủ ngưỡng mức (bỏ ưu đãi chỉ vài ngày/tuần, nhóm không trần tạm tính 3tr). Nhập **Ngân sách/tháng** để app chỉ chi trong ngân sách, ưu tiên nhóm hoàn cao. Sửa số bất kỳ thì app giữ số nhập tay; bấm **Tự tính theo thẻ** để tính lại.
-- Nhanh nhất: trong kết quả kế hoạch, **bấm vào ô thẻ** (hoặc dòng nhóm trong phần Theo từng thẻ) → gõ số tiền hoặc chọn nhanh 100k/200k/500k/1tr/2tr/Còn lại → **Ghi chi tiêu**.
+- Nhanh nhất: trong kết quả kế hoạch, **bấm vào ô thẻ** (hoặc dòng nhóm, hay nút **＋ Ghi chi tiêu thẻ này** trong phần Theo từng thẻ – nút này cho chọn nhóm) → gõ số tiền hoặc chọn nhanh 100k/200k/500k/1tr/2tr/Còn lại → **Ghi chi tiêu**.
 - Bước 4 **Chi tiêu tháng này**: mỗi lần quẹt thẻ, chọn thẻ, nhóm, gõ số tiền (`150k`, `1,5tr`, `2tr5`, `1.200.000`) → **Ghi chi tiêu**. Kế hoạch tự tính lại cho phần còn lại của tháng: đã chi bao nhiêu %, còn chi gì ở thẻ nào, tiền hoàn đã có và dự kiến, tiến độ lên mức, nhóm đã chạm trần, nhóm vượt kế hoạch.
 - Khoản đã ghi nằm chung trong lịch sử chi tiêu (bước 2), sang tháng sau dùng "Lấy theo tháng gần nhất" để lập kế hoạch mới.
 

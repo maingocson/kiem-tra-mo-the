@@ -292,6 +292,8 @@ button.av{cursor:pointer}
 .qs-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start} .qs-h b{font-size:17px}
 .qs-h .x{font:inherit;font-size:18px;background:none;border:0;color:var(--muted);padding:2px 6px;cursor:pointer}
 .qs input{font:inherit;font-size:20px;font-weight:700;padding:12px;border:1.5px solid var(--accent);border-radius:12px;background:var(--surface);color:var(--ink)}
+.qs select{font:inherit;font-size:16px;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.cp-card .cp-log{font:inherit;font-size:14px;font-weight:700;color:var(--accent-ink);background:var(--accent);border:0;border-radius:10px;padding:9px 12px;cursor:pointer;align-self:stretch}
 .qs-chips{display:flex;flex-wrap:wrap;gap:8px}
 .qs-chips button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:var(--sunk);color:var(--ink);border-radius:99px;padding:8px 12px;cursor:pointer}
 .toast{z-index:50}
@@ -654,6 +656,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:last-child::after{content:" ＋";color:va
 <div class="dr-bg qs-bg" id="qsBg"></div>
 <div class="qs" id="qs" role="dialog" aria-modal="true" aria-labelledby="qsTitle" hidden>
   <div class="qs-h"><div><b id="qsTitle">Ghi chi tiêu</b><div class="note" id="qsSub"></div></div><button class="x" type="button" id="qsX" aria-label="Đóng">✕</button></div>
+  <select id="qsCat" aria-label="Nhóm chi tiêu" hidden></select>
   <input id="qsAmt" type="text" inputmode="decimal" placeholder="Số tiền vừa quẹt: 150k, 1,5tr" aria-label="Số tiền vừa quẹt" autocomplete="off">
   <div class="qs-chips" id="qsChips"></div>
   <button class="primary" id="qsOk" type="button">Ghi chi tiêu</button>
@@ -1724,6 +1727,7 @@ function cpCalc(c,e,sp){
   return{cash,total,ti,below,lines,capHit,chosen:chosen?[...chosen]:[]};
 }
 const cpMerge=(a,b)=>{const o={...a};for(const k in b)o[k]=(o[k]||0)+b[k];return o};
+let qsLeft={};
 const cpNowPer=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`};
 /* số tiền gõ tay: 150k, 1,5tr, 2.000.000 (đồng) hoặc 1,5 (triệu) → triệu đồng */
 function cpAmt(v){v=String(v||"").trim().toLowerCase().replace(/\s|đ|vnd/g,"");if(!v)return null;
@@ -1884,6 +1888,7 @@ function renderPlanOut(){
   const left={};for(const k in needs){const v=needs[k]-(spentCat[k]||0);if(v>0)left[k]=v}
   const leftTot=Object.values(left).reduce((a,b)=>a+b,0);
   const P=cpOptimize(owned,left,true,fix);
+  qsLeft={};P.cards.forEach(x=>{for(const k in x.sp)if(x.sp[k]>0)qsLeft[x.c.id+"|"+k]=x.sp[k]});
   const pct=Math.min(100,Math.round(spent/tot*100)),over=Object.keys(spentCat).filter(k=>spentCat[k]>(needs[k]||0)+1);
   const big=`<div class="cp-big"><div><span>Kế hoạch tháng ${esc(cpPerTxt(per))}</span><strong>${cbMoney(tot)}</strong></div><div><span>Đã chi</span><strong>${cbMoney(spent)}</strong></div>
     <div><span>Còn chi theo kế hoạch</span><strong>${cbMoney(leftTot)}</strong></div><div class="up"><span>Hoàn dự kiến cả tháng</span><strong>${cbMoney(P.cash)}</strong></div>
@@ -1907,7 +1912,8 @@ function renderPlanOut(){
     return`<div class="cp-card"><div class="t"><div class="cbh-l">${cbImg(c,1)}<div>${cbBk(c)}<b>${esc(c.name)}</b><div class="cbsub">${done?`Đã quẹt ${cbMoney(done)} · `:""}${plan>0?`nên quẹt thêm ${cbMoney(plan)}`:"không cần quẹt thêm"}${tierTxt?` · ${esc(tierTxt)}`:""}</div></div></div><b style="color:var(--ok)">+${cbMoney(r.cash)}</b></div>
       ${ls.length?`<table class="ctbl"><tbody>${ls.map(k=>{const l=r.lines.find(l=>l.k===k);return`<tr class="cp-row" data-q-card="${esc(c.id)}" data-q-cat="${k}" data-q-left="${x.sp[k]}" title="Bấm để ghi chi tiêu"><td>${esc(CP_NAME[k])}<div class="note">${l&&l.g?esc(l.g.g):"Hoàn cơ bản"}</div></td><td>${cbMoney(x.sp[k])}</td><td>${l?cbPct(Math.round(l.r*100)/100):""}</td></tr>`}).join("")}</tbody></table>`:""}
       ${tierProg}${capNow.length?`<div class="note" style="color:var(--warn)">Đã chạm trần (theo số đã chi): ${esc([...new Set(capNow)].join(", "))} – chi thêm nhóm này ở thẻ khác.</div>`:r.capHit.length?`<div class="note" style="color:var(--warn)">Sẽ chạm trần: ${esc([...new Set(r.capHit)].join(", "))}</div>`:""}${picked}
-      ${c.minTxn?`<div class="note">Nhớ đủ ${c.minTxn} giao dịch/${cbPer(c)}.</div>`:""}${c.exp?`<div class="note" style="color:var(--bad)">Chương trình đã hết hạn ${esc(c.to)} – tỷ lệ có thể đã đổi.</div>`:""}</div>`}).join(""):`<p class="note" style="margin:0">Chưa có thẻ nào trong danh sách – xem gợi ý mở thẻ bên dưới.</p>`;
+      ${c.minTxn?`<div class="note">Nhớ đủ ${c.minTxn} giao dịch/${cbPer(c)}.</div>`:""}${c.exp?`<div class="note" style="color:var(--bad)">Chương trình đã hết hạn ${esc(c.to)} – tỷ lệ có thể đã đổi.</div>`:""}
+      <button class="cp-log" type="button" data-q-card="${esc(c.id)}" data-q-cat="${ls[0]||""}" data-q-any="1">＋ Ghi chi tiêu thẻ này</button></div>`}).join(""):`<p class="note" style="margin:0">Chưa có thẻ nào trong danh sách – xem gợi ý mở thẻ bên dưới.</p>`;
   /* chi thêm để lên mức */
   const ups=[];P.cards.forEach((x,i)=>{const r=x.res,c=x.c;if(!cpSpendTier(c))return;const nt=r.below?0:r.ti+1;const t=c.tiers[nt];if(!t||t.from==null)return;
     const need=t.from-r.total;if(need<=0||need>Math.max(tot,5*TRV))return;
@@ -1950,13 +1956,17 @@ $("#cpFromHist").addEventListener("click",()=>{const d=cpData();const pers=[...n
 $("#cpClearNeeds").addEventListener("click",()=>{const d=cpData();d.needs={};d.needsSrc="tay";cpSave();renderPlan()});
 /* bấm vào mục kế hoạch → ghi chi tiêu nhanh cho đúng thẻ và nhóm */
 let qsCur=null;
-function qsOpen(card,cat,left){const c=cbAll().find(x=>x.id===card);if(!c)return;qsCur={card,cat};
-  $("#qsTitle").textContent=`${c.bank} ${c.name}`;$("#qsSub").textContent=`${CP_NAME[cat]||cat}${left>0?` · kế hoạch còn ${cbMoney(left)}`:""}`;
-  const ch=[100,200,500,1000,2000].map(v=>[v<1000?v+"k":v/1000+"tr",v/1000]);if(left>0)ch.push([`Còn lại ${cbMoney(left)}`,Math.round(left/1e4)/100]);
+function qsOpen(card,cat,left,any){const c=cbAll().find(x=>x.id===card);if(!c)return;cat=cat||"khac";qsCur={card,cat};
+  $("#qsTitle").textContent=`${c.bank} ${c.name}`;$("#qsCat").hidden=!any;
+  if(any){$("#qsCat").innerHTML=CP_CATS.map(([k,n])=>`<option value="${k}">${esc(n)}${qsLeft[card+"|"+k]>0?` – còn ${cbMoney(qsLeft[card+"|"+k])}`:""}</option>`).join("");$("#qsCat").value=cat;left=qsLeft[card+"|"+cat]||0}
+  qsSub(cat,left)}
+function qsSub(cat,left){const ch=[100,200,500,1000,2000].map(v=>[v<1000?v+"k":v/1000+"tr",v/1000]);if(left>0)ch.push([`Còn lại ${cbMoney(left)}`,Math.round(left/1e4)/100]);
+  $("#qsSub").textContent=`${$("#qsCat").hidden?(CP_NAME[cat]||cat):"Chọn nhóm chi tiêu"}${left>0?` · kế hoạch còn ${cbMoney(left)}`:""}`;
   $("#qsChips").innerHTML=ch.map(([t,v])=>`<button type="button" data-v="${v}">${esc(t)}</button>`).join("");
   $("#qsAmt").value="";$("#qs").hidden=false;$("#qsBg").classList.add("on");setTimeout(()=>$("#qsAmt").focus(),50)}
 function qsClose(){$("#qs").hidden=true;$("#qsBg").classList.remove("on");qsCur=null}
-$("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-q-card]");if(!b)return;qsOpen(b.dataset.qCard,b.dataset.qCat,+b.dataset.qLeft||0)});
+$("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-q-card]");if(!b)return;qsOpen(b.dataset.qCard,b.dataset.qCat,+b.dataset.qLeft||0,!!b.dataset.qAny)});
+$("#qsCat").addEventListener("change",e=>{if(!qsCur)return;qsCur.cat=e.target.value;qsSub(qsCur.cat,qsLeft[qsCur.card+"|"+qsCur.cat]||0)});
 $("#qsChips").addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(!b)return;$("#qsAmt").value=String(b.dataset.v).replace(".",",")+"tr"});
 $("#qsX").addEventListener("click",qsClose);$("#qsBg").addEventListener("click",qsClose);
 $("#qsAmt").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#qsOk").click()}});
