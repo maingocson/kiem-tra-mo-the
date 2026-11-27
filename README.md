@@ -133,7 +133,13 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - Thẻ có "Hiệu lực đến" đã qua ngày hôm nay được làm mờ, ghi "hết hạn" và xếp cuối danh sách.
 - Mức tin cậy: **A** có thể lệ đầy đủ · **B** theo trang thẻ · **C** chỉ có câu quảng cáo.
 
-### Hình thẻ
+### Theo dõi chi tiêu theo kế hoạch
+
+- Hoàn tiền → Kế hoạch: nhập thẻ đang có (bước 1) và nhu cầu chi tiêu tháng (bước 3) → app lập kế hoạch: nhóm nào quẹt thẻ nào, bao nhiêu.
+- Bước 4 **Chi tiêu tháng này**: mỗi lần quẹt thẻ, chọn thẻ, nhóm, gõ số tiền (`150k`, `1,5tr`, `2tr5`, `1.200.000`) → **Ghi chi tiêu**. Kế hoạch tự tính lại cho phần còn lại của tháng: đã chi bao nhiêu %, còn chi gì ở thẻ nào, tiền hoàn đã có và dự kiến, tiến độ lên mức, nhóm đã chạm trần, nhóm vượt kế hoạch.
+- Khoản đã ghi nằm chung trong lịch sử chi tiêu (bước 2), sang tháng sau dùng "Lấy theo tháng gần nhất" để lập kế hoạch mới.
+
+## Hình thẻ
 
 - Ảnh thẻ trong `du-lieu-hoan-tien/hinh-the/<Mã thẻ>.webp`, lấy từ trang chính thức của từng ngân hàng (11/2026), thu nhỏ còn tối đa 400px. Một số ảnh là ảnh quảng cáo có thẻ (MSB, SHB, Techcombank), không phải mặt thẻ phẳng.
 - Danh sách thẻ có ảnh nằm ở `CB_IMG` trong `index.html` (giá trị 2 = thẻ dọc, hiện đủ ảnh). Thẻ chưa có ảnh (OCB – web chặn tải ảnh; VPBank Diamond World, Super Shopee, Shopee Platinum, S Rewards) hiện hình vẽ theo màu ngân hàng.
