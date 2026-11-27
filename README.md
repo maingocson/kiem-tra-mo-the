@@ -110,10 +110,30 @@ Các cột `Cần công việc`, `Cần thẻ cũ`, `Bắt buộc BHXH` là tu�
 - **Gợi ý:** app thử các trường hợp như tất toán bớt CTTC, giảm tỷ lệ sử dụng về 30%, chuyển sang hồ sơ HĐLĐ, có BHXH, và báo ngân hàng nào mở thêm được.
 - **Chuyên gia sửa gợi ý:** ở phần Gợi ý bấm **✎ Chuyên gia sửa**, nhập mật khẩu chuyên gia (khác mật khẩu tab Điều kiện), sửa nội dung (mỗi dòng một gợi ý) rồi **Lưu gợi ý**. Gợi ý đã sửa có ghi chú *“Đã được chuyên gia chỉnh sửa”* kèm thời gian, trên app và trên file PDF; gợi ý tự động vẫn xem được ở mục *Gợi ý tự động (tham khảo)*. Bấm **Dùng lại gợi ý tự động** để bỏ bản đã sửa. Gợi ý đã sửa lưu theo từng khách – bấm **Lưu khách hàng** để lưu vào hồ sơ.
 
+## Hoàn tiền (tab Hoàn tiền)
+
+Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần theo từng mức chi tiêu, MCC, điều kiện, cách nhận tiền, loại trừ và link nguồn.
+
+- Tìm theo tên thẻ, nhóm chi tiêu ("ăn uống", "siêu thị") hoặc mã MCC ("5411") – các thẻ khớp được xếp theo tỷ lệ hoàn cao nhất.
+- Lọc theo ngân hàng; mặc định ẩn thẻ đã ngừng phát hành.
+- Mức tin cậy: **A** có thể lệ đầy đủ · **B** theo trang thẻ · **C** chỉ có câu quảng cáo.
+
+Dữ liệu theo form mẫu `du-lieu-hoan-tien/mau-hoan-tien.xlsx` (trang Hướng dẫn giải thích từng cột):
+
+| Trang | File CSV |
+|---|---|
+| Thẻ | `1-the.csv` |
+| Nhóm hoàn tiền | `2-nhom-hoan-tien.csv` |
+| Trần chung | `3-tran-chung.csv` |
+| Loại trừ ngân hàng | `4-loai-tru-ngan-hang.csv` |
+
+Cập nhật: sửa trong Excel → lưu từng trang thành CSV → mở khoá ở tab Điều kiện → tab Hoàn tiền → **Chọn file CSV** (chọn một hoặc nhiều file). App nhận ra file theo tiêu đề cột, đọc được CSV dấu phẩy hoặc dấu chấm phẩy. **Về dữ liệu gốc** để bỏ bản đã nạp. Dữ liệu nạp chỉ lưu trên máy đó.
+
 ## Cấu trúc thư mục
 
 ```
 index.html               ứng dụng (GitHub Pages)
+du-lieu-hoan-tien/       form mẫu Excel và 4 file CSV dữ liệu hoàn tiền
 icon.png                 biểu tượng trên màn hình chính
 logo.svg, logo.png       logo Smart-B
 mau-bang-dieu-kien.csv   bảng điều kiện mẫu (có thể Phục hồi từ file này)

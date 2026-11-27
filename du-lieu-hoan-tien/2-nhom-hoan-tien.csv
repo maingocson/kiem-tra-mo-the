@@ -1,0 +1,95 @@
+﻿Mã thẻ,Nhóm,Được chọn,MCC,MCC loại trừ,Đơn vị bán,Kênh,Ngày,Tỷ lệ M1 (%),Tỷ lệ M2 (%),Tỷ lệ M3 (%),Trần M1,Trần M2,Trần M3,Nhóm trần chung,Ghi chú
+sh-cb-chuan,Ẩm thực cuối tuần,,5812;5813;5814,,,,T7;CN,5,,,100000,,,,Thể lệ ghi 5% chi tiêu ẩm thực cuối tuần
+sh-cb-vang,Ẩm thực cuối tuần,,5812;5813;5814,,,,T7;CN,5,,,200000,,,,Thể lệ ghi 5% chi tiêu ẩm thực cuối tuần
+sh-cb-bk,Ẩm thực cuối tuần,,5812;5813;5814,,,,T7;CN,5,,,300000,,,,Thể lệ ghi 5% chi tiêu ẩm thực cuối tuần
+sh-pwm,Chi tiêu ngoại tệ tại nước ngoài,,,,,"POS nước ngoài, ngoại tệ",,15,,,500000,,,,
+sh-pwm,Ẩm thực,,5812;5813;5814,,,,,10,,,500000,,,,Chi tiêu bằng VND trong và ngoài nước
+sh-pwm,Mua sắm (thời trang),,5611;5621;5631;5641;5651;5655;5661;5681;5691;5697;5698;5699;7296,,,,,10,,,500000,,,,"Danh sách MCC theo phụ lục 1, có thể còn mã khác ở trang sau"
+sh-365,"Siêu thị, cửa hàng thực phẩm",,5411,,,Chỉ POS (không online),,10,,,400000,,,,12% nếu đồng thời có thẻ ghi nợ Shinhan Be-SAFE đã kích hoạt
+sh-365,Chi tiêu quốc tế,,,,,"POS nước ngoài, ngoại tệ",,3,,,200000,,,,
+sh-mylife,Di chuyển,,,,,,,10,,,300000,,,,
+sh-mylife,"Siêu thị, cửa hàng tiện lợi",,,,,,,10,,,300000,,,,
+sh-mylife,Ăn uống,,,,,,,10,,,300000,,,,
+sh-mylife,Giải trí,,,,,,,10,,,300000,,,,
+sh-tiki,Chi tiêu ngoài Tiki,,,,,,,3,,,100000,,,,Chi tiêu trên app/web Tiki không tích điểm
+sh-baemin,Chi tiêu ngoài BAEMIN,,,,,,,0.3,,,,,,,Không giới hạn
+sh-ecard,Online cuối tuần,,,,,Online,T7;CN,5,,,300000,,,,1.000đ cho mỗi 20.000đ
+sh-ecard,Online ngày thường,,,,,Online,T2;T3;T4;T5;T6,0.2,,,,,,,
+msb-online,Thương mại điện tử,,4814;5262;5399;5411;5611;5691;5722;5732;5734;5817;5999;7298;7311;7372;5499,,Shopee;Lazada;TikTok,,,10,,,,,,,Phải đúng cả MCC và tên đơn vị
+msb-sig,Ăn uống,,5811;5812;5813;5814,,,,,10,,,300000,,,,
+msb-sig,"Y tế, bảo hiểm, giáo dục",,,,,,,10,,,,,,,"Theo trang thẻ, cần đối chiếu thể lệ"
+msb-family,"Gym, Spa",,7997;7230;7298,,,,,10,20,30,,,,,
+msb-family,"Giáo dục, hiệu sách",,8299;8211;8220;8351,,,,,10,20,30,,,,,
+msb-family,"Nghệ thuật, triển lãm, bảo tàng",,5942;5970;5971;7991;7333,,,,,10,20,30,,,,,
+msb-family,Siêu thị,,5411,,Bách Hóa Xanh;7-Eleven;Circle K;Co.opmart;WinMart;WinMart+;Lotte Mart;Big C;Fujimart;Robins;MM Mega Market;Kohnan;AEON;Emart;GO!;SatraMart;HomeFarm;FamilyMart;Sakuko,,,5,,,,,,,Phải đúng MCC 5411 và đúng chuỗi trong danh sách
+msb-green,Hàng không,,4511;4582;3000-3298,,,,,5,,,,,,,
+msb-green,Xanh SM (GreenSM),,4121,,GSM;GreenSM,,,5,,,,,,,
+msb-green,Thực phẩm xanh,,5499;5331;5422,,Organica;Bác Tôm;Sói Biển;Langfarm,,,5,,,,,,,
+msb-green,Siêu thị điện máy,,5732,,Nguyễn Kim;Pico;Điện Máy Xanh;MediaMart;FPT Shop;Thế Giới Di Động;CellphoneS;Apple Store;Samsung,,,5,,,,,,,
+msb-green,Tàu điện Metro,,4111,,,,,100,,,500000,,,,Hoàn 100% vé metro
+msb-travel,Ăn uống tại nước ngoài,,5812;5813;5814,,,Nước ngoài,,6,,,,,,,
+msb-travel,Khách sạn,,7011,,,,,6,,,,,,,
+msb-elite,Hàng hiệu cao cấp,,,,,,,10,,,,,,,Danh sách đơn vị ở phụ lục 1 của thể lệ
+msb-mwave,Quảng cáo,,7311,,Apple;Google;Facebook;TikTok,,,3,5,10,,,,,
+msb-mwave,"Phần mềm, ứng dụng kinh doanh",,5734;7372;5411;5651;5311;5816;5818;5817,,KiotViet;Sapo;Cuccu;ChatGPT;Claude AI;Google Workspace;ZaloBusiness;ZaloAds;Google One;Google Cloud,,,3,5,10,,,,,
+msb-mwave,Thuế,,9311,,,,,3,5,10,,,,,
+vib-one,Mua sắm,Có,7296;7251;5999;5998;5997;5996;5995;5994;5993;5992;5977;5950;5949;5948;5947;5946;5945;5944;5943;5942;5941;5940;5937;5935;5933;5699;5698;5697;5691;5681;5661;5655;5651;5641;5631;5621;5611;5331;5311;5310;5309;5301;5300;5298;5296;5262;5200;5193;5192;5139;5137;5131;5111;5099;5094;5021;0046,,,,,3,6,9,,,,,
+vib-one,Du lịch,Có,7011;3000-3308;3501-3998;4511;4722;0070;0010,,,,,3,6,9,,,,,
+vib-one,Giáo dục,Có,8211;8220;8241;8244;8249;8299,,,,,3,6,9,,,,,
+vib-one,Bảo hiểm,Có,6300,,,,,3,6,9,,,,,
+vib-one,Chi tiêu nước ngoài,Có,,,,"POS, không chạm ở nước ngoài, ngoại tệ",,3,6,9,,,,,
+vib-super,Giao dịch nước ngoài,Có,,,,"POS, không chạm ở nước ngoài, ngoại tệ",,15,,,500000,,,,
+vib-super,Ẩm thực,Có,5811;5812;5813;5814,,,,,10,,,500000,,,,
+vib-super,Du lịch,Có,7011;3000-3308;3501-3998;4511;4722;0070;0010,,,,,10,,,500000,,,,
+vib-super,Mua sắm,Có,7296;7251;5999;5998;5997;5996;5995;5994;5993;5992;5977;5950;5949;5948;5947;5946;5945;5944;5943;5942;5941;5940;5937;5935;5933;5699;5698;5697;5691;5681;5661;5655;5651;5641;5631;5621;5611;5331;5311;5310;5309;5301;5300;5298;5296;5262;5200;5193;5192;5139;5137;5131;5111;5099;5094;5021;0046,,,,,10,,,500000,,,,
+vib-super,Giao dịch trực tuyến,Có,,6300;7399,,Online,,5,,,500000,,,,
+vib-cb,Ẩm thực,Có,5811;5812;5813;5814,,,,,5,8,10,,,,,
+vib-cb,Giải trí,Có,5815;5816;7829;7832;7841;7911;7922;7929;7932;7933;7941;7991-7999,,,,,5,8,10,,,,,
+vib-cb,"Marketing, quảng cáo",Có,5966;5967;5968;5969;7311,,,,,5,8,10,,,,,
+vib-family,Giáo dục,Có,8211;8220;8241;8244;8249;8299,,,,,5,8,10,500000,,,,
+vib-family,Y tế,Có,5047;5122;5975;5976;8011;8021;8031;8041;8042;8049;8050;8062;8071;8099;8351;7230,,,,,5,8,10,500000,,,,
+vib-family,Bảo hiểm,Có,6300,,,,,5,8,10,500000,,,,
+vib-online,Online nước ngoài,,,,,"Online, đơn vị ở nước ngoài, ngoại tệ",,5,,,,,,,
+vib-online,Online khác,,,,,Online,,3,,,,,,,
+vib-laz,Online nước ngoài,,,,,"Online, đơn vị ở nước ngoài, ngoại tệ",,6,,,,,,,
+vib-laz,Online khác,,,,,Online,,3,,,,,,,
+shb-cb,Siêu thị,Có,,,,,,5,10,,300000,600000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Giáo dục,Có,,,,,,5,10,,500000,1000000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Bảo hiểm,Có,,,,,,5,10,,300000,600000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Y tế,Có,,,,,,5,10,,500000,1000000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Thời trang,Có,,,,,,5,10,,300000,600000,,,"Trần gồm cả 0,3% chi tiêu khác"
+ocb-plat,Công nghệ,,,,Thế Giới Di Động;Điện Máy Xanh;Topzone;CellphoneS;Di Động Việt;FPT Shop,,,7,15,,600000,1200000,,,"Gồm cả phần mềm, dịch vụ số, công cụ AI"
+ocb-plat,Làm đẹp,,,,,,,7,15,,,,,Làm đẹp + TTTM,"Thời trang, spa, gym, pilates, salon"
+ocb-plat,"Trung tâm thương mại, siêu thị",,,,,,,3,3,,150000,150000,,Làm đẹp + TTTM,
+ocb-life,Giải trí,,,,Spotify;Netflix;CGV;BHD;Galaxy;Lotte Cinema;Ticketbox,,,7,15,,600000,1200000,,,"Xem phim, nhạc, vé sự kiện, game, khu vui chơi"
+ocb-life,"Làm đẹp, chăm sóc cá nhân",,,,,,,3,7,,150000,300000,,,"Thời trang, mỹ phẩm, spa, gym, salon"
+ocb-world,Ẩm thực,,,,,,,10,,,,,,,
+ocb-world,Thời trang,,,,,,,10,,,,,,,
+ocb-world,"Du lịch (vé máy bay, đại lý)",,,,,,,5,,,500000,,,,
+ocb-world,"Siêu thị, TTTM",,,,,,,5,,,500000,,,,
+ocb-world,Sức khỏe,,,,,,,5,,,500000,,,,
+ocb-world,Bảo hiểm,,,,,,,5,,,500000,,,,
+ocb-doctor,Sức khỏe,,,,,,,7,15,,150000,300000,,,"Bệnh viện, phòng khám, nhà thuốc"
+ocb-doctor,Bảo hiểm,,,,,,,7,15,,150000,300000,,,
+ocb-jcbp,Sức khỏe,,,,,,,7,15,,150000,300000,,,"Bệnh viện, phòng khám, nhà thuốc"
+ocb-jcbp,Bảo hiểm,,,,,,,7,15,,150000,300000,,,
+ocb-jcbg,Giáo dục,,,,,,,7,15,,150000,300000,,,
+ocb-jcbg,"Siêu thị, cửa hàng tiện lợi",,5411,,GS25;Circle K;FamilyMart;MiniStop;7-Eleven;Cheers,,,3,7,,150000,300000,,,
+ocb-igen,"Shopee, TikTok Shop",,,,Shopee;TikTok Shop,Online,,7,12,,350000,700000,,,
+ocb-igen,"Apple Pay, Google Pay",,,,,Ví Apple Pay/Google Pay,,3,3,,150000,300000,,,
+ocb-bamboo,Bamboo Airways,,,,Bamboo Airways,,,10,,,,,,,
+ocb-bamboo,"Du lịch (khách sạn, đại lý)",,,,,,,5,,,,,,,
+ctg-sig,Y tế,,5047;5122;5912;8011;8021;8031;8041;8042;8043;8049;8050;8062;8071;8099,,,,,10,,,300000,,,,
+ctg-sig,Giáo dục,,8211;8220;8241;8249;8299,,,,,10,,,,,,,
+ctg-sig,Golf,,7992,,,,,5,,,,,,,
+tcb-sig,Nhà hàng đối tác,,,,Dim Tu Tac;Le17 Bistro;Ginza Sushi Ichi;Crystal Jade;Isushi;Ashima;Hutong;Woomaster,,,10,,,,,,,Danh sách đầy đủ trong PDF của ngân hàng
+tcb-sig,Nhà hàng khác,,5812;5814,,,,,5,,,,,,,
+tcb-sig,"Du lịch, khách sạn",,4722;5962;7011;3501-3604;3607;4112;4121;4131;4411;4511;4789;7512;3000-3308,,,,,3,,,,,,,
+tcb-sig,Thêm: mua sắm nước ngoài (chi từ 50tr/tháng),,,,,Mua trực tiếp ở nước ngoài,,2,,,1000000,,,,Cộng thêm khi tổng chi tháng từ 50tr
+tcb-sig,"Thêm: nước ngoài, học phí, bảo hiểm (chi từ 100tr/tháng)",,,,,,,2,,,2000000,,,,Cộng thêm khi tổng chi tháng từ 100tr; mỗi giao dịch từ 30tr; tối đa 10tr/năm
+tcb-private,Nhà hàng đối tác,,,,,,,10,,,,,,,
+tcb-private,Nhà hàng trong và ngoài nước,,,,,,,5,,,,,,,
+tcb-spark,"Du lịch, thời trang",,,,,,,8,10,12,,,,,
+tcb-spark,"Siêu thị, nhà hàng, mua sắm online",,,,,,,2,4,6,,,,,
+tcb-everyday,Online quốc tế,,,,,"Online, ngoại tệ",,8,16,,,,,,Giao dịch từ 200k
+tcb-everyday,Online nội địa,,,,,Online,,5,10,,,,,,Giao dịch từ 200k

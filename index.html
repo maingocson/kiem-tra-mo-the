@@ -151,7 +151,8 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
-nav.tabs .in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:560px}
+nav.tabs button{white-space:nowrap}
+nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:560px}
 nav.tabs button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-radius:10px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-selected=true]{color:var(--accent)}
@@ -194,6 +195,37 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .cic-head b{font-size:16px}
 .confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px}
 @media (max-width:380px){.rule.edit .grid3{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.grid3 label:first-child{grid-column:1/-1}.totals strong{font-size:13px}}
+/* Hoàn tiền */
+.cb-tools{display:flex;flex-direction:column;gap:8px}
+.cb-filter{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.cb-filter::-webkit-scrollbar{display:none}
+.cb-filter button{font:inherit;font-size:13px;font-weight:600;white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:6px 12px;cursor:pointer}
+.cb-filter button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.cb-opt{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+details.cbc{padding:0}
+details.cbc>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+details.cbc>summary::-webkit-details-marker{display:none}
+.cbh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.cbh b{font-size:15px;line-height:1.3}
+.cbh .lv{flex:none;font-size:11px;font-weight:800;width:22px;height:22px;border-radius:6px;display:grid;place-items:center}
+.lv.A{background:var(--ok-soft);color:var(--ok)} .lv.B{background:var(--warn-soft);color:var(--warn)} .lv.C{background:var(--bad-soft);color:var(--bad)}
+.cbsub{font-size:12px;color:var(--muted)}
+.cbb{padding:0 14px 14px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:12px}
+.cbt-wrap{overflow-x:auto;margin:0 -2px}
+.cbt{width:100%;border-collapse:collapse;font-size:13px}
+.cbt th{font-size:11px;font-weight:600;color:var(--muted);text-align:center;padding:4px;border-bottom:1px solid var(--line);vertical-align:bottom}
+.cbt td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:center;vertical-align:top;font-variant-numeric:tabular-nums}
+.cbt th:first-child,.cbt td:first-child{text-align:left;padding-left:0;min-width:120px}
+.cbt td b{font-size:14px}
+.cbt small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.cbt .gd{font-size:11px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.cbt tr.hit td{background:var(--accent-soft)}
+.cbt tr.base td{color:var(--muted)}
+.cbt tr.tot td{font-weight:700;border-bottom:0}
+.cbl{margin:0;padding-left:18px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.cbk{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.cbsrc a{color:var(--accent);overflow-wrap:anywhere;font-size:12px}
+.cbpick{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -379,12 +411,38 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
     </section>
     </div>
   </div>
+  <div class="view" id="v-cb" hidden>
+    <section>
+      <h2>Hoàn tiền</h2>
+      <p class="note" style="margin:0" id="cbInfo"></p>
+      <div class="cb-tools">
+        <input id="cbSearch" type="text" enterkeyhint="search"placeholder="Tìm thẻ, nhóm chi tiêu hoặc mã MCC (vd 5411)" aria-label="Tìm thẻ hoàn tiền" autocomplete="off">
+        <div class="cb-filter" id="cbBanks" role="group" aria-label="Lọc theo ngân hàng"></div>
+        <label class="cb-opt"><input type="checkbox" id="cbHide" checked> Ẩn thẻ đã ngừng phát hành</label>
+      </div>
+      <p class="note" style="margin:0" id="cbCount"></p>
+      <div class="stack" id="cbList"></div>
+    </section>
+    <section>
+      <h2>Cập nhật dữ liệu</h2>
+      <div class="panel stack">
+        <p class="note" style="margin:0">Sửa trong form Excel, lưu từng trang thành file CSV rồi chọn các file đó ở đây (chọn 1 hoặc nhiều file cùng lúc). Cần mở khoá ở tab Điều kiện.</p>
+        <div class="row-btns">
+          <button class="btn2 acc" id="cbPick" type="button">Chọn file CSV</button>
+          <a class="btn2" href="du-lieu-hoan-tien/mau-hoan-tien.xlsx" download style="text-decoration:none">Tải form mẫu Excel</a>
+          <button class="btn2 danger" id="cbReset" type="button" hidden>Về dữ liệu gốc</button>
+        </div>
+        <input type="file" id="cbFile" accept=".csv,text/csv" multiple hidden>
+      </div>
+    </section>
+  </div>
 </div>
 
 <nav class="tabs"><div class="in" role="tablist">
   <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Kiểm tra</button>
   <button role="tab" aria-selected="false" data-tab="custs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 6"/></svg>Khách hàng</button>
   <button role="tab" aria-selected="false" data-tab="rules" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện</button>
+  <button role="tab" aria-selected="false" data-tab="cb" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg>Hoàn tiền</button>
 </div></nav>
 <div class="savebar" id="saveBar" hidden><div class="in"><span id="saveText">Chưa có thay đổi</span><button id="cancelEdit" type="button" class="cancel">Huỷ</button><button id="saveRules" type="button">Lưu</button></div></div>
 <div class="toast" id="toast"></div>
@@ -516,12 +574,14 @@ if(cache&&Array.isArray(cache.rules)&&cache.rules.length)setRules(cache.rules,tr
 /* ---------- Tải bảng điều kiện từ link CSV ---------- */
 function parseCSV(text){
   text=String(text).replace(/^\uFEFF/,"");
+  /* Excel b\u1EA3n ti\u1EBFng Vi\u1EC7t c\u00F3 th\u1EC3 l\u01B0u CSV b\u1EB1ng d\u1EA5u ; thay cho d\u1EA5u , \u2013 nh\u1EADn theo d\u00F2ng ti\u00EAu \u0111\u1EC1 */
+  const h0=text.split(/\r?\n/)[0].replace(/"[^"]*"/g,""),sep=(h0.split(";").length>h0.split(",").length)?";":",";
   const rows=[];let row=[],f="",q=false;
   for(let i=0;i<text.length;i++){
     const c=text[i];
     if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
     else if(c==='"')q=true;
-    else if(c===","){row.push(f);f=""}
+    else if(c===sep){row.push(f);f=""}
     else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}
     else f+=c;
   }
@@ -1050,6 +1110,271 @@ $("#cicSec").addEventListener("click",e=>{
   if(a==="apply")cicApply();else if(a==="more")$("#cicFile").click();else if(a==="cancel"){cicFiles={};renderCic()}
 });
 
+/* ---------- Hoàn tiền: dữ liệu theo form mẫu (4 bảng CSV), hiển thị và cập nhật ---------- */
+const CB_DEF={at:"2026-11-27",the:`Mã thẻ,Ngân hàng,Tên thẻ,Tổ chức thẻ,Trạng thái,Mức tin cậy,Phí thường niên,Phí ngoại tệ (%),Chu kỳ,Xếp mức theo,Mức 1,Mức 1 từ,Mức 2,Mức 2 từ,Mức 3,Mức 3 từ,Trần thẻ M1,Trần thẻ M2,Trần thẻ M3,Trần năm,Hoàn cơ bản (%),Số GD tối thiểu,Số nhóm được chọn,Ưu đãi mở mới,Cách nhận,Ngưỡng đổi điểm,Hiệu lực từ,Hiệu lực đến,Loại trừ riêng,Ghi chú,Nguồn
+sh-cb-chuan,Shinhan Bank,Visa Cash Back Chuẩn,Visa,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ này,Từ 10tr,10000000,,,,,,,,,0.3,,,Thưởng 350.000đ khi kích hoạt và chi tiêu lần đầu trong 60 ngày,Trừ vào dư nợ cuối kỳ sao kê,,,,,Hoàn cơ bản không giới hạn. Giao dịch đã hưởng hoàn đặc biệt thì không hưởng hoàn cơ bản. Chi dưới 10tr/kỳ: ẩm thực cuối tuần chỉ hưởng hoàn cơ bản.,https://shinhan.com.vn/public/uploads/card/PDF/TnC/TC_Cash-Back-Program-CashBack_VN_upload_01.pdf
+sh-cb-vang,Shinhan Bank,Visa Cash Back Vàng,Visa,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ này,Từ 10tr,10000000,,,,,,,,,0.3,,,Thưởng 550.000đ khi kích hoạt và chi tiêu lần đầu trong 60 ngày,Trừ vào dư nợ cuối kỳ sao kê,,,,,Hoàn cơ bản không giới hạn. Giao dịch đã hưởng hoàn đặc biệt thì không hưởng hoàn cơ bản. Chi dưới 10tr/kỳ: ẩm thực cuối tuần chỉ hưởng hoàn cơ bản.,https://shinhan.com.vn/public/uploads/card/PDF/TnC/TC_Cash-Back-Program-CashBack_VN_upload_01.pdf
+sh-cb-bk,Shinhan Bank,Visa Cash Back Bạch Kim,Visa,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ này,Từ 10tr,10000000,,,,,,,,,0.4,,,Thưởng 1.100.000đ khi kích hoạt và chi tiêu lần đầu trong 60 ngày,Trừ vào dư nợ cuối kỳ sao kê,,,,,Hoàn cơ bản không giới hạn. Giao dịch đã hưởng hoàn đặc biệt thì không hưởng hoàn cơ bản. Chi dưới 10tr/kỳ: ẩm thực cuối tuần chỉ hưởng hoàn cơ bản.,https://shinhan.com.vn/public/uploads/card/PDF/TnC/TC_Cash-Back-Program-CashBack_VN_upload_01.pdf
+sh-pwm,Shinhan Bank,Visa PWM Bạch Kim,Visa,Đang phát hành,A,0,0.99,Kỳ sao kê,Tổng chi kỳ này,Từ 10tr,10000000,,,,,1500000,,,,0.5,,,,Trừ vào dư nợ cuối kỳ sao kê,,,,,Chỉ dành cho khách hàng PWM. Trần thẻ là tổng trần các nhóm đặc biệt.,https://shinhan.com.vn/vi/card/the-tin-dung-quoc-te-shinhan-visa-pwm-hang-bach-kim.html
+sh-365,Shinhan Bank,365 Cashback Bạch Kim,Mastercard,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ này,Từ 3tr,3000000,,,,,,,,,0.4,,,,Trừ vào dư nợ cuối kỳ sao kê,,,,,"Mỗi giao dịch chỉ hưởng 1 loại: đặc biệt 1, rồi đặc biệt 2, rồi cơ bản. Chi dưới 3tr/kỳ: chỉ hưởng 0,4%.",https://shinhan.com.vn/vi/card/the-tin-dung-365-cashback-hang-bach-kim.html
+sh-mylife,Shinhan Bank,MyLife Bạch Kim,Visa,Đang phát hành,B,,,Kỳ sao kê,Tổng chi kỳ này,Từ 3tr,3000000,,,,,1200000,,,,0.4,,,Thưởng 1.100.000đ khi kích hoạt và chi từ 1tr trong 60 ngày,"Điểm (1 điểm = 1đ), đổi ra tiền mặt hoặc trừ dư nợ",15000,,,,"MCC theo bảng mã của Visa, trang thẻ không liệt kê",https://shinhan.com.vn/vi/card/the-tin-dung-shinhan-mylife-hang-bach-kim.html
+sh-tiki,Shinhan Bank,"Tiki – Shinhan (Chuẩn, Bạch Kim)",,Đang phát hành,B,,,Kỳ sao kê,,,,,,,,100000,,,,,,,,Điểm (1 điểm = 1đ),15000,,,,,https://shinhan.com.vn/vi/card/the-tin-dung-tiki-shinhan-hang-bach-kim.html
+sh-baemin,Shinhan Bank,BAEMIN – Shinhan,,Đang phát hành,B,,,Kỳ sao kê,,,,,,,,,,,,,,,,Điểm (1 điểm = 1đ),15000,,,,,https://shinhan.com.vn/vi/card/the-tin-dung-baemin-shinhan.html
+sh-ecard,Shinhan Bank,Visa E-Card,Visa,Đang phát hành,B,,,Tháng,,,,,,,,,,,3000000,0.1,,,,Ghi có vào tài khoản VND tại Shinhan,,,,,,https://shinhan.com.vn/vi/card/the-tin-dung-quoc-te-visa-ca-nhan-e-card.html
+msb-online,MSB,Visa Online,Visa,Đang phát hành,A,399000,,Kỳ sao kê,Tổng chi kỳ này,Từ 3tr,3000000,,,,,300000,,,3600000,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",,26/05/2026,,,"Trang thẻ có nhắc thêm rạp phim (CGV, BHD, Galaxy, Lotte, Cinestar) – chưa thấy trong thể lệ",https://www.msb.com.vn/msb-website/2026/06/Visa-online-26.5.2026.pdf
+msb-sig,MSB,Visa Signature,Visa,Đang phát hành,A,1499000,,Kỳ sao kê,Tổng chi kỳ này,Từ 15tr,15000000,,,,,1000000,,,12000000,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",1000000,26/09/2025,,,"Trang thẻ ghi thêm y tế, bảo hiểm, giáo dục – phần này chưa đọc rõ trong thể lệ (bản scan)",https://www.msb.com.vn/msb-website/2026/06/Visa-Signature-26.9.2025.pdf
+msb-family,MSB,Mastercard Family,Mastercard,Đang phát hành,A,899000,,Kỳ sao kê,Tổng chi kỳ này,Dưới 10tr,0,10–30tr,10000000,Từ 30tr,30000000,500000,700000,900000,10800000,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",500000,01/01/2025,,,"Đổi điểm theo các mốc 500k, 700k hoặc 900k điểm",https://www.msb.com.vn/msb-website/2026/06/Family-01.1.2025-.pdf
+msb-green,MSB,Mastercard Green World,Mastercard,Đang phát hành,A,1699000,1,Kỳ sao kê,Tổng chi kỳ này,Từ 15tr,15000000,,,,,2000000,,,24000000,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",,29/05/2026,,,Kèm ưu đãi Xanh SM (5 lượt/tháng) và 6 lượt phòng chờ nội địa – không phải hoàn tiền,https://www.msb.com.vn/msb-website/2026/06/Greenworld-29.05.2026.pdf
+msb-travel,MSB,Visa Travel,Visa,Đang phát hành,A,599000,,Kỳ sao kê,,,,,,,,,,,7200000,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",,01/01/2025,,,Trần năm lấy từ trang thẻ; phần trần trong thể lệ scan bị mờ,https://www.msb.com.vn/msb-website/2026/06/Visa-travel-01.01.2025.pdf
+msb-elite,MSB,Mastercard World Elite,Mastercard,Đang phát hành,A,15000000,0,Kỳ sao kê,,,,,,,,3000000,,,36000000,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",3000000,,,,Hạn mức tối thiểu 500tr,https://www.msb.com.vn/msb-website/2026/06/MasterCard-World-Elite-01.01.2025.pdf
+msb-mwave,MSB,Visa M.Wave (kinh doanh),Visa,Đang phát hành,A,499000,,Kỳ sao kê,Gói hội viên,Sapphire (miễn phí),,Ruby (100k/kỳ),,Diamond (200k/kỳ),,500000,800000,1000000,,,,,,"Điểm Loyalty (1 điểm = 1đ), tự đổi trên app vào hạn mức thẻ; điểm hết hạn sau 12 tháng",500000,10/10/2026,,,Gói Diamond: trần 3tr nếu tổng chi kỳ từ 100tr. Đổi gói có hiệu lực từ kỳ sao kê sau.,https://www.msb.com.vn/msb-website/The-le-CTKM-Visa-MWave-2.pdf
+vib-one,VIB,One Card,Visa,Đang phát hành,A,,,Kỳ sao kê,Hạng thẻ (theo hạn mức),Gold,,Platinum,,Signature,,500000,1000000,1500000,,0.1,,1 / 2 / 3 theo hạng,,"Điểm thưởng, đổi ra tiền hoàn hoặc phí thường niên trên MyVIB",,06/03/2025,,,"Đổi nhóm đã chọn tối đa 1 lần/kỳ. Giao dịch đặc biệt (thẻ game, thẻ nạp…) tối đa 10.000 điểm/kỳ.",https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+vib-super,VIB,Super Card,,Đang phát hành,A,,,Kỳ sao kê,,,,,,,,1000000,,,,0.1,,1,,"Điểm thưởng, đổi ra tiền hoàn hoặc phí thường niên trên MyVIB",,06/03/2025,,,Tối đa 500.000 điểm mỗi nhóm mỗi kỳ,https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+vib-cb,VIB,Cash Back,Mastercard,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ liền trước,Đến 50tr,0,50–100tr,50000000,Trên 100tr,100000000,800000,1000000,2000000,,0.1,,1,"Hoàn 50.000đ/giao dịch lưu thông tin thẻ/đơn vị (Grab, Netflix, Tiki, Agoda…), tối đa 100k/kỳ, 300k cho 3 kỳ đầu","Điểm thưởng, đổi ra tiền hoàn hoặc phí thường niên trên MyVIB",,06/03/2025,,,"Chưa đăng ký nhóm thì chưa được hưởng. Có thể chọn chương trình 0,1% mọi chi tiêu không giới hạn thay cho chương trình nhóm.",https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+vib-family,VIB,Family Link,Visa,Đang phát hành,A,,,Kỳ sao kê,Tổng chi kỳ liền trước,Đến 50tr,0,50–100tr,50000000,Trên 100tr,100000000,1000000,1000000,1000000,,0.1,,1,,"Điểm thưởng, đổi ra tiền hoàn hoặc phí thường niên trên MyVIB",,06/03/2025,,,"Áp dụng thẻ phát hành từ 27/04/2024. Bảo hiểm từ giao dịch thứ 3 trong kỳ phải gửi chứng từ. Chưa đăng ký nhóm: chỉ 0,1%.",https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+vib-online,VIB,Online Plus 2in1,,Đang phát hành,A,,,Kỳ sao kê,,,,,,,,600000,,,,0.1,,,"Hoàn 50.000đ/giao dịch lưu thông tin thẻ/đơn vị, tối đa 100k/kỳ, 300k cho 3 kỳ đầu","Điểm thưởng, đổi ra tiền hoàn hoặc phí thường niên trên MyVIB",,06/03/2025,,,,https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+vib-laz,VIB,LazCard,,Đang phát hành,A,,,Kỳ sao kê,,,,,,,,600000,,,,0.1,,,"Hoàn 50.000đ/giao dịch lưu thông tin thẻ/đơn vị, tối đa 100k/kỳ, 300k cho 3 kỳ đầu","Điểm thưởng, đổi ra tiền hoàn hoặc phí thường niên trên MyVIB",,06/03/2025,,,,https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+shb-cb,SHB,Mastercard Cashback,Mastercard,Đang phát hành,B,799000,,Kỳ sao kê,Tổng chi kỳ này,Dưới 50tr,0,Từ 50tr,50000000,,,,,,,0.3,,1,,"Điểm (1 điểm = 1đ) vào Quỹ điểm SHB Rewards, đổi vào thẻ trên SHB SAHA; hết hạn 12 tháng",100000,05/11/2026,,,"Trần đã gồm cả điểm từ chi tiêu khác (0,3%). Điểm chỉ ghi nhận khi đạt từ 100k điểm/kỳ. Phải đăng ký SHB SAHA. Miễn phí thường niên năm đầu. MCC từng nhóm nằm trong thể lệ PDF (chưa đọc được).",https://www.shb.com.vn/the-tin-dung-quoc-te-shb-mastercard-cashback/
+ocb-plat,OCB,Mastercard Platinum,Mastercard,Đang phát hành,B,999000,,Tháng dương lịch,Tổng chi tháng này,Dưới 30tr,0,Từ 30tr,30000000,,,700000,1500000,,,,7,,Hoàn 100% phí năm đầu khi chi 3tr trong 45 ngày,,,,,,Danh mục theo MCC của đơn vị (thể lệ PDF chưa đọc được),https://ocb.com.vn/vi/ca-nhan/the/the-tin-dung/vi-ocb-mastercard-platinum
+ocb-life,OCB,Mastercard Lifestyle,Mastercard,Đang phát hành,B,399000,,Tháng dương lịch,Tổng chi tháng này,Dưới 30tr,0,Từ 30tr,30000000,,,700000,1500000,,,,7,,Hoàn 100% phí năm đầu khi chi 1tr trong 45 ngày,,,,,,,https://ocb.com.vn/vi/ca-nhan/the/the-tin-dung/ocb-mastercard-lifestyle
+ocb-world,OCB,Mastercard World 2in1,Mastercard,Đang phát hành,B,1999000,0.9,Tháng dương lịch,Tổng chi tháng này,Từ 50tr (KH ưu tiên: từ 20tr),50000000,,,,,5000000,,,,0.3,,,,,,,,,KH ưu tiên Gold/Diamond/Elite chỉ cần 20tr/tháng; nếu chi từ 200tr được 5tr thay cho hoàn theo nhóm. Chi tiêu thẻ chính và phụ tính chung.,https://ocb.com.vn/vi/ca-nhan/the/the-tin-dung/ocb-mastercard-word-2in1
+ocb-doctor,OCB,Doctor Mastercard Platinum,Mastercard,Ngừng phát hành từ 22/10/2026 (chủ thẻ cũ vẫn hưởng),B,999000,,Tháng dương lịch,Tổng chi tháng này,Dưới 30tr,0,Từ 30tr,30000000,,,,,,18000000,0.1,7,,,,,,,,,https://ocb.com.vn/vi/ca-nhan/the/chuong-trinh-khuyen-mai
+ocb-jcbp,OCB,JCB Platinum,JCB,Ngừng phát hành từ 22/10/2026 (chủ thẻ cũ vẫn hưởng),B,999000,,Tháng dương lịch,Tổng chi tháng này,Dưới 30tr,0,Từ 30tr,30000000,,,,,,18000000,0.1,7,,,,,,,,,https://ocb.com.vn/vi/ca-nhan/the/chuong-trinh-khuyen-mai
+ocb-jcbg,OCB,JCB Gold,JCB,Ngừng phát hành từ 22/10/2026 (chủ thẻ cũ vẫn hưởng),B,399000,,Tháng dương lịch,Tổng chi tháng này,Dưới 30tr,0,Từ 30tr,30000000,,,,,,18000000,0.1,7,,,,,,,,"Trang ghi ngừng phát hành từ 13/6/2026 ở một chỗ, cần kiểm tra lại",https://ocb.com.vn/vi/ca-nhan/the/chuong-trinh-khuyen-mai
+ocb-igen,OCB,iGen Mastercard Platinum,Mastercard,Ngừng phát hành từ 22/10/2026 (chủ thẻ cũ vẫn hưởng),B,999000,,Tháng dương lịch,Tổng chi tháng này,5–30tr,5000000,Từ 30tr,30000000,,,500000,1000000,,12000000,,,,,,,,,,,https://ocb.com.vn/vi/ca-nhan/the/chuong-trinh-khuyen-mai
+ocb-bamboo,OCB,Bamboo Airways Mastercard Platinum,Mastercard,Ngừng phát hành từ 22/10/2026 (chủ thẻ cũ vẫn hưởng),B,999000,,Tháng dương lịch,,,,,,,,500000,,,6000000,,,,,,,,,,,https://ocb.com.vn/vi/ca-nhan/the/chuong-trinh-khuyen-mai
+ctg-sig,VietinBank,Visa Signature,Visa,Đang phát hành,A,,,Tháng,Tổng chi tháng này,Từ 10tr,10000000,,,,,800000,,,,,,,,Hoàn tiền sau khi kết thúc mỗi tháng,,01/08/2026,31/12/2026,,Dành cho khách hàng ưu tiên. Chương trình kết thúc sớm nếu hết ngân sách. Y tế tối đa 300k/tháng.,https://www.vietinbank.vn/ca-nhan/san-pham-dich-vu/danh-sach-the/vietinbank-visa-signature-20-html
+ctg-visacb,VietinBank,Visa Platinum Cashback,Visa,Đang phát hành,C,,,,,,,,,,,,,,,,,,,,,,,,"Trang thẻ chỉ ghi ""Hoàn tiền đến 6%"". Mở mới: hoàn 200.000đ khi chi tiêu hợp lệ trong 30 ngày đầu.",https://www.vietinbank.vn/ca-nhan/san-pham-dich-vu/danh-sach-the
+ctg-mccb,VietinBank,Mastercard Platinum Cashback,Mastercard,Đang phát hành,C,,,,,,,,,,,,,,,,,,,,,,,,"Trang thẻ chỉ ghi ""Hoàn tiền không giới hạn"". Có bản thẻ ảo (Virtual).",https://www.vietinbank.vn/ca-nhan/san-pham-dich-vu/danh-sach-the
+tcb-sig,Techcombank,Visa Signature,Visa,Đang phát hành,B,1499000,1.1,Tháng,,,,,,,,5000000,,,46000000,,,,,"Điểm U-Point, đổi trên Techcombank OneU",,,,,"Khách Priority miễn phí thường niên. Trang có chỗ ghi mức khác (50 điểm/1.000đ nhà hàng, trần 3tr) – cần đối chiếu thể lệ.",https://techcombank.com/khach-hang-ca-nhan/chi-tieu/the/the-tin-dung/techcombank-visa-signature
+tcb-private,Techcombank,Private Visa Infinite,Visa,Đang phát hành,B,25000000,1.1,Tháng,,,,,,,,5000000,,,60000000,,,,,Rút tiền qua Techcombank Rewards,,,,,Hoàn phí thường niên khi kích hoạt. Khách Private.,https://techcombank.com/khach-hang-ca-nhan/chi-tieu/the/the-tin-dung/techcombank-private-visa-infinite
+tcb-spark,Techcombank,Spark,,Đang phát hành,B,699000,,Tháng,Lương chuyển về Techcombank,Không có hoặc dưới 20tr,0,20–40tr,20000000,Từ 40tr,40000000,500000,700000,1000000,,0.1,,,,"Điểm U-Point, đổi trên Techcombank OneU",,,,,Mức tháng sau tính theo lương tháng trước. Trang có chỗ liệt kê nhóm chọn được khác nhau – cần đối chiếu thể lệ.,https://techcombank.com/khach-hang-ca-nhan/chi-tieu/the/the-tin-dung/techcombank-spark
+tcb-everyday,Techcombank,Everyday,,Đang phát hành,B,599000,2.95,Tháng,Tổng chi tháng này,Dưới 15tr,0,15–30tr,15000000,Từ 30tr,30000000,,500000,700000,,,,,,"Điểm U-Point, đổi trên Techcombank OneU",,,,,Chỉ giao dịch online từ 200k. Từ 15tr/tháng được gấp đôi; mức từ 30tr trang không ghi rõ tỷ lệ.,https://techcombank.com/khach-hang-ca-nhan/chi-tieu/the/the-tin-dung/techcombank-everyday
+vpb-stepup,VPBank,StepUp,Mastercard,Đang phát hành,C,,,,,,,,,,,,,,,,,,,,,,,,"Trang thẻ: hoàn đến 15%, tối đa 1.700.000đ. Mở mới hoàn 400k. Web không công bố thể lệ chi tiết.",https://www.vpbank.com.vn/ca-nhan/the-tin-dung
+vpb-z,VPBank,Z JCB,JCB,Đang phát hành,C,,,,,,,,,,,,,,,,,,,,,,,,Trang thẻ: hoàn 15% mọi chi tiêu. Mở mới hoàn 300k. Web không công bố thể lệ chi tiết.,https://www.vpbank.com.vn/ca-nhan/the-tin-dung
+vpb-lady,VPBank,Lady Mastercard,Mastercard,Đang phát hành,C,,,,,,,,,,,,,,,,,,,,,,,,"Trang thẻ: hoàn đến 15% cho giáo dục, bảo hiểm, y tế, làm đẹp, thời trang, giải trí, siêu thị. Mở mới 400k. Miễn phí năm sau khi chi từ 120tr. Web không công bố thể lệ chi tiết.",https://www.vpbank.com.vn/ca-nhan/the-tin-dung
+vpb-diamond,VPBank,Diamond World Lady,Mastercard,Đang phát hành,C,,,,,,,,,,,,,,,,,,,,,,,,"Trang thẻ: hoàn tới 10%; hoàn 1,2tr cho chủ thẻ mới. Web không công bố thể lệ chi tiết.",https://www.vpbank.com.vn/ca-nhan/the-tin-dung`,nhom:`Mã thẻ,Nhóm,Được chọn,MCC,MCC loại trừ,Đơn vị bán,Kênh,Ngày,Tỷ lệ M1 (%),Tỷ lệ M2 (%),Tỷ lệ M3 (%),Trần M1,Trần M2,Trần M3,Nhóm trần chung,Ghi chú
+sh-cb-chuan,Ẩm thực cuối tuần,,5812;5813;5814,,,,T7;CN,5,,,100000,,,,Thể lệ ghi 5% chi tiêu ẩm thực cuối tuần
+sh-cb-vang,Ẩm thực cuối tuần,,5812;5813;5814,,,,T7;CN,5,,,200000,,,,Thể lệ ghi 5% chi tiêu ẩm thực cuối tuần
+sh-cb-bk,Ẩm thực cuối tuần,,5812;5813;5814,,,,T7;CN,5,,,300000,,,,Thể lệ ghi 5% chi tiêu ẩm thực cuối tuần
+sh-pwm,Chi tiêu ngoại tệ tại nước ngoài,,,,,"POS nước ngoài, ngoại tệ",,15,,,500000,,,,
+sh-pwm,Ẩm thực,,5812;5813;5814,,,,,10,,,500000,,,,Chi tiêu bằng VND trong và ngoài nước
+sh-pwm,Mua sắm (thời trang),,5611;5621;5631;5641;5651;5655;5661;5681;5691;5697;5698;5699;7296,,,,,10,,,500000,,,,"Danh sách MCC theo phụ lục 1, có thể còn mã khác ở trang sau"
+sh-365,"Siêu thị, cửa hàng thực phẩm",,5411,,,Chỉ POS (không online),,10,,,400000,,,,12% nếu đồng thời có thẻ ghi nợ Shinhan Be-SAFE đã kích hoạt
+sh-365,Chi tiêu quốc tế,,,,,"POS nước ngoài, ngoại tệ",,3,,,200000,,,,
+sh-mylife,Di chuyển,,,,,,,10,,,300000,,,,
+sh-mylife,"Siêu thị, cửa hàng tiện lợi",,,,,,,10,,,300000,,,,
+sh-mylife,Ăn uống,,,,,,,10,,,300000,,,,
+sh-mylife,Giải trí,,,,,,,10,,,300000,,,,
+sh-tiki,Chi tiêu ngoài Tiki,,,,,,,3,,,100000,,,,Chi tiêu trên app/web Tiki không tích điểm
+sh-baemin,Chi tiêu ngoài BAEMIN,,,,,,,0.3,,,,,,,Không giới hạn
+sh-ecard,Online cuối tuần,,,,,Online,T7;CN,5,,,300000,,,,1.000đ cho mỗi 20.000đ
+sh-ecard,Online ngày thường,,,,,Online,T2;T3;T4;T5;T6,0.2,,,,,,,
+msb-online,Thương mại điện tử,,4814;5262;5399;5411;5611;5691;5722;5732;5734;5817;5999;7298;7311;7372;5499,,Shopee;Lazada;TikTok,,,10,,,,,,,Phải đúng cả MCC và tên đơn vị
+msb-sig,Ăn uống,,5811;5812;5813;5814,,,,,10,,,300000,,,,
+msb-sig,"Y tế, bảo hiểm, giáo dục",,,,,,,10,,,,,,,"Theo trang thẻ, cần đối chiếu thể lệ"
+msb-family,"Gym, Spa",,7997;7230;7298,,,,,10,20,30,,,,,
+msb-family,"Giáo dục, hiệu sách",,8299;8211;8220;8351,,,,,10,20,30,,,,,
+msb-family,"Nghệ thuật, triển lãm, bảo tàng",,5942;5970;5971;7991;7333,,,,,10,20,30,,,,,
+msb-family,Siêu thị,,5411,,Bách Hóa Xanh;7-Eleven;Circle K;Co.opmart;WinMart;WinMart+;Lotte Mart;Big C;Fujimart;Robins;MM Mega Market;Kohnan;AEON;Emart;GO!;SatraMart;HomeFarm;FamilyMart;Sakuko,,,5,,,,,,,Phải đúng MCC 5411 và đúng chuỗi trong danh sách
+msb-green,Hàng không,,4511;4582;3000-3298,,,,,5,,,,,,,
+msb-green,Xanh SM (GreenSM),,4121,,GSM;GreenSM,,,5,,,,,,,
+msb-green,Thực phẩm xanh,,5499;5331;5422,,Organica;Bác Tôm;Sói Biển;Langfarm,,,5,,,,,,,
+msb-green,Siêu thị điện máy,,5732,,Nguyễn Kim;Pico;Điện Máy Xanh;MediaMart;FPT Shop;Thế Giới Di Động;CellphoneS;Apple Store;Samsung,,,5,,,,,,,
+msb-green,Tàu điện Metro,,4111,,,,,100,,,500000,,,,Hoàn 100% vé metro
+msb-travel,Ăn uống tại nước ngoài,,5812;5813;5814,,,Nước ngoài,,6,,,,,,,
+msb-travel,Khách sạn,,7011,,,,,6,,,,,,,
+msb-elite,Hàng hiệu cao cấp,,,,,,,10,,,,,,,Danh sách đơn vị ở phụ lục 1 của thể lệ
+msb-mwave,Quảng cáo,,7311,,Apple;Google;Facebook;TikTok,,,3,5,10,,,,,
+msb-mwave,"Phần mềm, ứng dụng kinh doanh",,5734;7372;5411;5651;5311;5816;5818;5817,,KiotViet;Sapo;Cuccu;ChatGPT;Claude AI;Google Workspace;ZaloBusiness;ZaloAds;Google One;Google Cloud,,,3,5,10,,,,,
+msb-mwave,Thuế,,9311,,,,,3,5,10,,,,,
+vib-one,Mua sắm,Có,7296;7251;5999;5998;5997;5996;5995;5994;5993;5992;5977;5950;5949;5948;5947;5946;5945;5944;5943;5942;5941;5940;5937;5935;5933;5699;5698;5697;5691;5681;5661;5655;5651;5641;5631;5621;5611;5331;5311;5310;5309;5301;5300;5298;5296;5262;5200;5193;5192;5139;5137;5131;5111;5099;5094;5021;0046,,,,,3,6,9,,,,,
+vib-one,Du lịch,Có,7011;3000-3308;3501-3998;4511;4722;0070;0010,,,,,3,6,9,,,,,
+vib-one,Giáo dục,Có,8211;8220;8241;8244;8249;8299,,,,,3,6,9,,,,,
+vib-one,Bảo hiểm,Có,6300,,,,,3,6,9,,,,,
+vib-one,Chi tiêu nước ngoài,Có,,,,"POS, không chạm ở nước ngoài, ngoại tệ",,3,6,9,,,,,
+vib-super,Giao dịch nước ngoài,Có,,,,"POS, không chạm ở nước ngoài, ngoại tệ",,15,,,500000,,,,
+vib-super,Ẩm thực,Có,5811;5812;5813;5814,,,,,10,,,500000,,,,
+vib-super,Du lịch,Có,7011;3000-3308;3501-3998;4511;4722;0070;0010,,,,,10,,,500000,,,,
+vib-super,Mua sắm,Có,7296;7251;5999;5998;5997;5996;5995;5994;5993;5992;5977;5950;5949;5948;5947;5946;5945;5944;5943;5942;5941;5940;5937;5935;5933;5699;5698;5697;5691;5681;5661;5655;5651;5641;5631;5621;5611;5331;5311;5310;5309;5301;5300;5298;5296;5262;5200;5193;5192;5139;5137;5131;5111;5099;5094;5021;0046,,,,,10,,,500000,,,,
+vib-super,Giao dịch trực tuyến,Có,,6300;7399,,Online,,5,,,500000,,,,
+vib-cb,Ẩm thực,Có,5811;5812;5813;5814,,,,,5,8,10,,,,,
+vib-cb,Giải trí,Có,5815;5816;7829;7832;7841;7911;7922;7929;7932;7933;7941;7991-7999,,,,,5,8,10,,,,,
+vib-cb,"Marketing, quảng cáo",Có,5966;5967;5968;5969;7311,,,,,5,8,10,,,,,
+vib-family,Giáo dục,Có,8211;8220;8241;8244;8249;8299,,,,,5,8,10,500000,,,,
+vib-family,Y tế,Có,5047;5122;5975;5976;8011;8021;8031;8041;8042;8049;8050;8062;8071;8099;8351;7230,,,,,5,8,10,500000,,,,
+vib-family,Bảo hiểm,Có,6300,,,,,5,8,10,500000,,,,
+vib-online,Online nước ngoài,,,,,"Online, đơn vị ở nước ngoài, ngoại tệ",,5,,,,,,,
+vib-online,Online khác,,,,,Online,,3,,,,,,,
+vib-laz,Online nước ngoài,,,,,"Online, đơn vị ở nước ngoài, ngoại tệ",,6,,,,,,,
+vib-laz,Online khác,,,,,Online,,3,,,,,,,
+shb-cb,Siêu thị,Có,,,,,,5,10,,300000,600000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Giáo dục,Có,,,,,,5,10,,500000,1000000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Bảo hiểm,Có,,,,,,5,10,,300000,600000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Y tế,Có,,,,,,5,10,,500000,1000000,,,"Trần gồm cả 0,3% chi tiêu khác"
+shb-cb,Thời trang,Có,,,,,,5,10,,300000,600000,,,"Trần gồm cả 0,3% chi tiêu khác"
+ocb-plat,Công nghệ,,,,Thế Giới Di Động;Điện Máy Xanh;Topzone;CellphoneS;Di Động Việt;FPT Shop,,,7,15,,600000,1200000,,,"Gồm cả phần mềm, dịch vụ số, công cụ AI"
+ocb-plat,Làm đẹp,,,,,,,7,15,,,,,Làm đẹp + TTTM,"Thời trang, spa, gym, pilates, salon"
+ocb-plat,"Trung tâm thương mại, siêu thị",,,,,,,3,3,,150000,150000,,Làm đẹp + TTTM,
+ocb-life,Giải trí,,,,Spotify;Netflix;CGV;BHD;Galaxy;Lotte Cinema;Ticketbox,,,7,15,,600000,1200000,,,"Xem phim, nhạc, vé sự kiện, game, khu vui chơi"
+ocb-life,"Làm đẹp, chăm sóc cá nhân",,,,,,,3,7,,150000,300000,,,"Thời trang, mỹ phẩm, spa, gym, salon"
+ocb-world,Ẩm thực,,,,,,,10,,,,,,,
+ocb-world,Thời trang,,,,,,,10,,,,,,,
+ocb-world,"Du lịch (vé máy bay, đại lý)",,,,,,,5,,,500000,,,,
+ocb-world,"Siêu thị, TTTM",,,,,,,5,,,500000,,,,
+ocb-world,Sức khỏe,,,,,,,5,,,500000,,,,
+ocb-world,Bảo hiểm,,,,,,,5,,,500000,,,,
+ocb-doctor,Sức khỏe,,,,,,,7,15,,150000,300000,,,"Bệnh viện, phòng khám, nhà thuốc"
+ocb-doctor,Bảo hiểm,,,,,,,7,15,,150000,300000,,,
+ocb-jcbp,Sức khỏe,,,,,,,7,15,,150000,300000,,,"Bệnh viện, phòng khám, nhà thuốc"
+ocb-jcbp,Bảo hiểm,,,,,,,7,15,,150000,300000,,,
+ocb-jcbg,Giáo dục,,,,,,,7,15,,150000,300000,,,
+ocb-jcbg,"Siêu thị, cửa hàng tiện lợi",,5411,,GS25;Circle K;FamilyMart;MiniStop;7-Eleven;Cheers,,,3,7,,150000,300000,,,
+ocb-igen,"Shopee, TikTok Shop",,,,Shopee;TikTok Shop,Online,,7,12,,350000,700000,,,
+ocb-igen,"Apple Pay, Google Pay",,,,,Ví Apple Pay/Google Pay,,3,3,,150000,300000,,,
+ocb-bamboo,Bamboo Airways,,,,Bamboo Airways,,,10,,,,,,,
+ocb-bamboo,"Du lịch (khách sạn, đại lý)",,,,,,,5,,,,,,,
+ctg-sig,Y tế,,5047;5122;5912;8011;8021;8031;8041;8042;8043;8049;8050;8062;8071;8099,,,,,10,,,300000,,,,
+ctg-sig,Giáo dục,,8211;8220;8241;8249;8299,,,,,10,,,,,,,
+ctg-sig,Golf,,7992,,,,,5,,,,,,,
+tcb-sig,Nhà hàng đối tác,,,,Dim Tu Tac;Le17 Bistro;Ginza Sushi Ichi;Crystal Jade;Isushi;Ashima;Hutong;Woomaster,,,10,,,,,,,Danh sách đầy đủ trong PDF của ngân hàng
+tcb-sig,Nhà hàng khác,,5812;5814,,,,,5,,,,,,,
+tcb-sig,"Du lịch, khách sạn",,4722;5962;7011;3501-3604;3607;4112;4121;4131;4411;4511;4789;7512;3000-3308,,,,,3,,,,,,,
+tcb-sig,Thêm: mua sắm nước ngoài (chi từ 50tr/tháng),,,,,Mua trực tiếp ở nước ngoài,,2,,,1000000,,,,Cộng thêm khi tổng chi tháng từ 50tr
+tcb-sig,"Thêm: nước ngoài, học phí, bảo hiểm (chi từ 100tr/tháng)",,,,,,,2,,,2000000,,,,Cộng thêm khi tổng chi tháng từ 100tr; mỗi giao dịch từ 30tr; tối đa 10tr/năm
+tcb-private,Nhà hàng đối tác,,,,,,,10,,,,,,,
+tcb-private,Nhà hàng trong và ngoài nước,,,,,,,5,,,,,,,
+tcb-spark,"Du lịch, thời trang",,,,,,,8,10,12,,,,,
+tcb-spark,"Siêu thị, nhà hàng, mua sắm online",,,,,,,2,4,6,,,,,
+tcb-everyday,Online quốc tế,,,,,"Online, ngoại tệ",,8,16,,,,,,Giao dịch từ 200k
+tcb-everyday,Online nội địa,,,,,Online,,5,10,,,,,,Giao dịch từ 200k`,tc:`Mã thẻ,Nhóm trần chung,Trần M1,Trần M2,Trần M3,Ghi chú
+ocb-plat,Làm đẹp + TTTM,300000,300000,,`,lt:`Ngân hàng,MCC loại trừ,Loại giao dịch loại trừ,Nguồn
+Shinhan Bank,,Rút/ứng tiền mặt; tạm ứng linh hoạt; trả góp 0%; thanh toán hóa đơn qua Shinhan; phí; lãi; hoàn thuế; giao dịch nợ quá hạn; giao dịch nộp thanh toán sau ngày đến hạn; giao dịch hủy/tranh chấp/hoàn trả,https://shinhan.com.vn/public/uploads/card/PDF/TnC/TC_Cash-Back-Program-CashBack_VN_upload_01.pdf
+MSB,,"Trả góp; rút tiền mặt; giao dịch hoàn, hủy; giao dịch khống, gian lận",Thể lệ các thẻ MSB
+VIB,4900;4814,"Thuế; trả góp; giao dịch không có MCC (QR, hóa đơn qua MyVIB); bất động sản; điện nước, viễn thông; bảo hiểm không đứng tên chủ thẻ; quảng cáo trực tuyến (trừ thẻ có quy định riêng); giao dịch đặc biệt (thẻ game, thẻ nạp, thẻ quà tặng, nơi làm việc) có trần riêng rất thấp",https://www.vib.com.vn/vn/the-tin-dung/diem-thuong-hoan-tien
+VietinBank,6010;6011;4111;4112;5541;5542;7311;6211;4829;6051,"Rút tiền mặt; phí và lãi; vận chuyển; xăng dầu; quảng cáo; chứng khoán, ngoại hối; chuyển tiền; giao dịch DCC; giao dịch qua VietinBank iPay; giao dịch gian lận",Thể lệ Visa Signature`};
+const K_CB="kmt.cashback.v1";
+let cbStore=load(K_CB),CB=null,cbBank="",cbQ="";
+const cbSrc=()=>cbStore&&cbStore.the?cbStore:CB_DEF;
+/* số từ Excel: chấp nhận 300000, 300.000, 300,000 (phân cách nghìn) và 0,1 / 0.1 (thập phân) */
+const cbN=v=>{let s=String(v??"").replace(/[\s%đ₫]/g,"");if(!s)return null;
+  if(/^\d{1,3}([.,]\d{3})+$/.test(s))s=s.replace(/[.,]/g,"");else s=s.replace(",",".");
+  const n=Number(s);return isNaN(n)?null:n};
+const cbList=v=>String(v||"").split(/[;\n]/).map(x=>x.trim()).filter(Boolean);
+function cbMoney(n){if(n==null)return"";if(n>=1e6)return(Math.round(n/1e4)/100).toLocaleString("vi-VN")+"tr";if(n>=1e3)return(Math.round(n/100)/10).toLocaleString("vi-VN")+"k";return n.toLocaleString("vi-VN")+"đ"}
+const cbPct=n=>n==null?"":(n.toLocaleString("vi-VN",{maximumFractionDigits:2})+"%");
+function cbFill(a,n){const o=[];for(let i=0;i<n;i++)o.push(a[i]!=null?a[i]:(i?o[i-1]:null));return o}
+function cbBuild(src){
+  const T=parseCSV(src.the),G=parseCSV(src.nhom),S=parseCSV(src.tc||""),X=parseCSV(src.lt||"");
+  const cards=T.filter(r=>r["Mã thẻ"]&&r["Tên thẻ"]).map(r=>{
+    const tiers=[1,2,3].map(i=>({n:r["Mức "+i]||"",from:cbN(r["Mức "+i+" từ"])})).filter((t,i)=>i===0||t.n);
+    const nt=Math.max(1,tiers.length);
+    return{id:r["Mã thẻ"],bank:r["Ngân hàng"]||"",name:r["Tên thẻ"],net:r["Tổ chức thẻ"]||"",st:r["Trạng thái"]||"",lv:(r["Mức tin cậy"]||"C").trim().toUpperCase().slice(0,1),
+      fee:cbN(r["Phí thường niên"]),fx:cbN(r["Phí ngoại tệ (%)"]),cyc:r["Chu kỳ"]||"",by:r["Xếp mức theo"]||"",tiers,nt,
+      capT:cbFill([cbN(r["Trần thẻ M1"]),cbN(r["Trần thẻ M2"]),cbN(r["Trần thẻ M3"])],nt),capY:cbN(r["Trần năm"]),base:cbN(r["Hoàn cơ bản (%)"]),
+      minTxn:cbN(r["Số GD tối thiểu"]),pick:r["Số nhóm được chọn"]||"",welcome:r["Ưu đãi mở mới"]||"",pay:r["Cách nhận"]||"",redeem:cbN(r["Ngưỡng đổi điểm"]),
+      from:r["Hiệu lực từ"]||"",to:r["Hiệu lực đến"]||"",excl:r["Loại trừ riêng"]||"",note:r["Ghi chú"]||"",src:cbList(r["Nguồn"]),groups:[],shared:[],
+      stop:/ngừng/i.test(r["Trạng thái"]||"")};
+  });
+  const byId=Object.fromEntries(cards.map(c=>[c.id,c]));
+  G.forEach(r=>{const c=byId[r["Mã thẻ"]];if(!c||!r["Nhóm"])return;
+    c.groups.push({g:r["Nhóm"],pick:isYes(r["Được chọn"]),mcc:cbList(r["MCC"]),mccX:cbList(r["MCC loại trừ"]),mer:cbList(r["Đơn vị bán"]),ch:r["Kênh"]||"",day:r["Ngày"]||"",
+      r:cbFill([cbN(r["Tỷ lệ M1 (%)"]),cbN(r["Tỷ lệ M2 (%)"]),cbN(r["Tỷ lệ M3 (%)"])],c.nt),cap:cbFill([cbN(r["Trần M1"]),cbN(r["Trần M2"]),cbN(r["Trần M3"])],c.nt),share:r["Nhóm trần chung"]||"",note:r["Ghi chú"]||""})});
+  S.forEach(r=>{const c=byId[r["Mã thẻ"]];if(c&&r["Nhóm trần chung"])c.shared.push({n:r["Nhóm trần chung"],cap:cbFill([cbN(r["Trần M1"]),cbN(r["Trần M2"]),cbN(r["Trần M3"])],c.nt),note:r["Ghi chú"]||""})});
+  const excl={};X.forEach(r=>{if(r["Ngân hàng"])excl[canon(r["Ngân hàng"])]={mcc:cbList(r["MCC loại trừ"]),txt:cbList(r["Loại giao dịch loại trừ"]),src:r["Nguồn"]||""}});
+  cards.forEach(c=>{c.bk=canon(c.bank);c.bankX=excl[c.bk]||null;
+    const rs=c.groups.flatMap(g=>g.r).filter(v=>v!=null&&v<50);c.top=rs.length?Math.max(...rs):c.base;
+    c.key=plain([c.name,c.bank,c.net,...c.groups.map(g=>g.g+" "+g.mer.join(" ")+" "+g.ch)].join(" "))});
+  return cards;
+}
+function cbMccHit(list,code){const n=+code;return list.some(x=>{const m=x.match(/^(\d{3,4})\s*-\s*(\d{3,4})$/);return m?n>=+m[1]&&n<=+m[2]:x.replace(/\D/g,"")===code})}
+/* từ đồng nghĩa để tìm theo nhóm chi tiêu; mã MCC phổ biến → nhóm (cho nhóm chỉ ghi mô tả, không ghi MCC) */
+const CB_SYN=[["an uong","am thuc","nha hang"],["sieu thi","cua hang tien loi","thuc pham"],["y te","suc khoe","benh vien"],["du lich","khach san","hang khong"],["mua sam","thoi trang"],["online","truc tuyen","thuong mai dien tu"],["giai tri","xem phim"],["giao duc","hoc phi"],["lam dep","spa","cham soc"],["bao hiem"],["nuoc ngoai","quoc te","ngoai te"]];
+const CB_MCC={5411:"sieu thi",5811:"an uong",5812:"an uong",5813:"an uong",5814:"an uong",6300:"bao hiem",7011:"khach san",8211:"giao duc",8220:"giao duc",8299:"giao duc",8062:"y te",5912:"y te",5122:"y te"};
+const cbTerms=p=>{const s=CB_SYN.find(a=>a.some(w=>p.includes(w)||w.includes(p)&&p.length>=3));return s?[p,...s]:[p]};
+function cbHit(c,q){
+  if(!q)return{ok:true,g:new Set()};
+  const g=new Set();
+  if(/^\d{4}$/.test(q)){const cat=CB_MCC[q];
+    c.groups.forEach((x,i)=>{if(cbMccHit(x.mcc,q)&&!cbMccHit(x.mccX,q))g.add(i);else if(cat&&!x.mcc.length&&cbTerms(cat).some(t=>plain(x.g).includes(t)))g.add(i)});
+    return{ok:g.size>0,g}}
+  const p=plain(q).trim(),ts=cbTerms(p);
+  c.groups.forEach((x,i)=>{const k=plain(x.g+" "+x.mer.join(" ")+" "+x.ch);if(ts.some(t=>k.includes(t)))g.add(i)});
+  return{ok:g.size>0||c.key.includes(p),g};
+}
+const cbPer=c=>/tháng/i.test(c.cyc)?"tháng":"kỳ";
+function cbMcc(list){if(!list.length)return"";const sh=list.slice(0,8).join(", ");return"MCC "+esc(sh)+(list.length>8?` <span title="${esc(list.join(", "))}">+${list.length-8} mã</span>`:"")}
+function cbCard(c,hit){
+  const per=cbPer(c),nt=c.nt,capMax=Math.max(0,...c.capT.filter(v=>v!=null));
+  const chips=[c.top!=null?`<span class="chip ok">đến ${cbPct(c.top)}</span>`:"",capMax?`<span class="chip ch">trần ${cbMoney(capMax)}/${per}</span>`:"",
+    c.pick?`<span class="chip ch">khách chọn nhóm</span>`:"",c.stop?`<span class="chip bad">ngừng phát hành</span>`:""].join("");
+  const head=`<div class="cbh"><div><b>${esc(c.name)}</b><div class="cbsub">${esc([c.bank,c.net].filter(Boolean).join(" · "))}</div></div><span class="lv ${esc(c.lv)}" title="Mức tin cậy">${esc(c.lv)}</span></div><div class="chips">${chips}</div>`;
+  const kv=[["Chu kỳ",c.cyc],["Xếp mức theo",c.by],["Hoàn cơ bản",c.base!=null?cbPct(c.base)+" chi tiêu khác":""],["Trần năm",c.capY!=null?cbMoney(c.capY):""],
+    ["Phí thường niên",c.fee!=null?(c.fee?cbMoney(c.fee):"Miễn phí"):""],["Phí ngoại tệ",c.fx!=null?cbPct(c.fx):""],["Số GD tối thiểu",c.minTxn?c.minTxn+" giao dịch/"+per:""],
+    ["Chọn nhóm",c.pick],["Ngưỡng đổi điểm",c.redeem?cbMoney(c.redeem)+" điểm":""],["Hiệu lực",[c.from,c.to].filter(Boolean).join(" – ")]].filter(x=>x[1]);
+  const th=c.tiers.length>1||c.tiers[0].n?c.tiers.map((t,i)=>`<th>${esc(t.n||"Mức "+(i+1))}</th>`).join(""):`<th>Hoàn</th>`;
+  const cell=(r,cap)=>r==null?"–":`<b>${cbPct(r)}</b>${cap!=null?`<small>tối đa ${cbMoney(cap)}</small>`:""}`;
+  const rows=c.groups.map((g,i)=>{
+    const det=[cbMcc(g.mcc),g.mccX.length?"trừ MCC "+esc(g.mccX.join(", ")):"",g.mer.length?esc(g.mer.join(", ")):"",esc(g.ch),g.day?"Ngày: "+esc(g.day):"",g.share?"Trần chung: "+esc(g.share):"",esc(g.note)].filter(Boolean).join(" · ");
+    return`<tr class="${hit.has(i)?"hit":""}"><td>${esc(g.g)}${g.pick?'<span class="cbpick">chọn</span>':""}${det?`<div class="gd">${det}</div>`:""}</td>${Array.from({length:nt},(_,k)=>`<td>${cell(g.r[k],g.cap[k])}</td>`).join("")}</tr>`}).join("");
+  const base=c.base!=null?`<tr class="base"><td>Chi tiêu khác</td>${Array.from({length:nt},()=>`<td>${cbPct(c.base)}</td>`).join("")}</tr>`:"";
+  const tot=c.capT.some(v=>v!=null)?`<tr class="tot"><td>Trần cả thẻ/${per}</td>${c.capT.map(v=>`<td>${v!=null?cbMoney(v):"–"}</td>`).join("")}</tr>`:"";
+  const table=c.groups.length||base?`<div class="cbt-wrap"><table class="cbt"><thead><tr><th>Nhóm</th>${th}</tr></thead><tbody>${rows}${base}${tot}</tbody></table></div>`:"";
+  const tierNote=c.tiers[0].from>0?`<p class="note" style="margin:0">Chi dưới ${cbMoney(c.tiers[0].from)}/${per}: chỉ được hoàn cơ bản${c.base==null?" (không có)":""}.</p>`:"";
+  const tierFrom=c.tiers.length>1&&c.tiers.some(t=>t.from!=null)&&c.tiers.some(t=>!/\d/.test(t.n))?`<p class="note" style="margin:0">${c.tiers.map((t,i)=>`${esc(t.n||"Mức "+(i+1))}: từ ${cbMoney(t.from||0)}`).join(" · ")}</p>`:"";
+  const shared=c.shared.length?`<div><div class="cbk">Trần chung nhiều nhóm</div><ul class="cbl">${c.shared.map(s=>`<li>${esc(s.n)}: ${s.cap.filter(v=>v!=null).map(cbMoney).join(" / ")} mỗi ${per}${s.note?" · "+esc(s.note):""}</li>`).join("")}</ul></div>`:"";
+  const ex=[...(c.excl?cbList(c.excl):[]),...(c.bankX?c.bankX.txt:[])];
+  const exHtml=ex.length||c.bankX&&c.bankX.mcc.length?`<div><div class="cbk">Không được hoàn</div><ul class="cbl">${ex.map(x=>`<li>${esc(x)}</li>`).join("")}${c.bankX&&c.bankX.mcc.length?`<li>MCC ${esc(c.bankX.mcc.join(", "))}</li>`:""}</ul></div>`:"";
+  const lvTxt={A:"A – có thể lệ đầy đủ",B:"B – theo trang thẻ, chưa có thể lệ",C:"C – chỉ có câu quảng cáo, cần bổ sung"}[c.lv]||c.lv;
+  const body=`<div class="cbb">
+    ${kv.length?`<div class="kv two">${kv.map(([k,v])=>`<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`:""}
+    ${tierFrom}${table}${tierNote}${shared}
+    ${c.welcome?`<div><div class="cbk">Ưu đãi mở mới</div><p class="note" style="margin:0;color:var(--ink)">${esc(c.welcome)}</p></div>`:""}
+    ${c.pay?`<div><div class="cbk">Cách nhận tiền</div><p class="note" style="margin:0;color:var(--ink)">${esc(c.pay)}</p></div>`:""}
+    ${exHtml}
+    ${c.note?`<div><div class="cbk">Ghi chú</div><p class="note" style="margin:0;color:var(--ink)">${esc(c.note)}</p></div>`:""}
+    <div class="cbsrc"><div class="cbk">Nguồn · mức tin cậy ${esc(lvTxt)}</div>${c.src.map(u=>/^https?:\/\//.test(u)?`<div><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`:`<div class="note">${esc(u)}</div>`).join("")}</div>
+  </div>`;
+  return`<details class="panel cbc" data-id="${esc(c.id)}"${hit.size||cbOpenIds.has(c.id)?" open":""}><summary>${head}</summary>${body}</details>`;
+}
+let cbOpenIds=new Set();
+function renderCb(){
+  if(!CB)CB=cbBuild(cbSrc());
+  const src=cbSrc(),banks=[...new Set(CB.map(c=>c.bank))];
+  $("#cbInfo").textContent=`${CB.length} thẻ · dữ liệu ngày ${fmtDay(src.at)}${cbStore&&cbStore.the?" (đã cập nhật trên máy này)":""}. Tỷ lệ và trần theo web, thể lệ ngân hàng – luôn đối chiếu nguồn trước khi tư vấn.`;
+  $("#cbBanks").innerHTML=["",...banks].map(b=>`<button type="button" data-b="${esc(b)}" aria-pressed="${b===cbBank}">${esc(b||"Tất cả")}</button>`).join("");
+  const hide=$("#cbHide").checked,q=cbQ.trim();
+  const list=CB.filter(c=>(!cbBank||c.bank===cbBank)&&(!hide||!c.stop)).map(c=>[c,cbHit(c,q)]).filter(([,h])=>h.ok);
+  if(q)list.sort((a,b)=>{const ra=Math.max(-1,...[...a[1].g].map(i=>Math.max(...a[0].groups[i].r.filter(v=>v!=null)))),rb=Math.max(-1,...[...b[1].g].map(i=>Math.max(...b[0].groups[i].r.filter(v=>v!=null))));return rb-ra});
+  $("#cbCount").textContent=q?`${list.length} thẻ khớp “${q}”${/^\d{4}$/.test(q)?" (theo mã MCC, xếp theo tỷ lệ hoàn cao nhất)":""}`:`${list.length} thẻ`;
+  $("#cbList").innerHTML=list.map(([c,h])=>cbCard(c,q?h.g:new Set())).join("")||`<div class="panel note">Không có thẻ nào khớp.</div>`;
+  $("#cbReset").hidden=!(cbStore&&cbStore.the);
+}
+$("#cbSearch").addEventListener("input",e=>{cbQ=e.target.value;clearTimeout(renderCb.t);renderCb.t=setTimeout(renderCb,150)});
+$("#cbHide").addEventListener("change",renderCb);
+$("#cbBanks").addEventListener("click",e=>{const b=e.target.closest("[data-b]");if(!b)return;cbBank=b.dataset.b;renderCb()});
+$("#cbList").addEventListener("toggle",e=>{const d=e.target;if(d.dataset&&d.dataset.id){d.open?cbOpenIds.add(d.dataset.id):cbOpenIds.delete(d.dataset.id)}},true);
+/* cập nhật: nhận diện file theo tiêu đề cột */
+function cbKind(text){const h=plain((String(text).replace(/^﻿/,"").split(/\r?\n/)[0]||""));
+  if(h.includes("ty le m1"))return"nhom";if(h.includes("ten the"))return"the";if(h.includes("loai giao dich loai tru"))return"lt";if(h.includes("nhom tran chung")&&h.includes("tran m1"))return"tc";return null}
+$("#cbPick").addEventListener("click",()=>{if(!unlocked){toast("Mở khoá ở tab Điều kiện trước khi cập nhật");return}$("#cbFile").click()});
+$("#cbFile").addEventListener("change",async e=>{
+  const files=[...e.target.files];e.target.value="";if(!files.length)return;
+  const next={...cbSrc()},got=[],bad=[];
+  for(const f of files){const t=await f.text();const k=cbKind(t);if(k){next[k]=t;got.push(k)}else bad.push(f.name)}
+  if(!got.length){toast("Không nhận ra file – hãy lưu đúng các trang của form mẫu thành CSV");return}
+  let cards;try{cards=cbBuild(next)}catch(err){cards=[]}
+  if(!cards.length){toast("File Thẻ không có dòng hợp lệ – chưa cập nhật");return}
+  next.at=new Date().toISOString();cbStore=next;save(K_CB,next);CB=null;renderCb();
+  const nm={the:"Thẻ",nhom:"Nhóm",tc:"Trần chung",lt:"Loại trừ"};
+  toast(`Đã cập nhật ${got.map(k=>nm[k]).join(", ")} · ${cards.length} thẻ`+(bad.length?` · bỏ qua ${bad.length} file lạ`:""));
+});
+$("#cbReset").addEventListener("click",e=>{
+  const b=e.currentTarget;if(!b.classList.contains("armed")){b.classList.add("armed");b.textContent="Bấm lần nữa để về dữ liệu gốc";return}
+  b.classList.remove("armed");b.textContent="Về dữ liệu gốc";
+  try{localStorage.removeItem(K_CB)}catch(err){}cbStore=null;CB=null;renderCb();toast("Đã về dữ liệu hoàn tiền gốc");
+});
+
 /* ---------- Đối chiếu ---------- */
 function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].filter(x=>bkey(x)).map(canon).some(k=>s.banks.has(k))}
 function jobFail(j,job){
@@ -1229,8 +1554,9 @@ $("#lockAgain").addEventListener("click",()=>{
   showLock();showAdmin();
 });
 function showTab(t){
-  ["check","custs","rules"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  ["check","custs","rules","cb"].forEach(v=>$("#v-"+v).hidden=v!==t);
   if(t==="custs")renderCustList();
+  if(t==="cb")renderCb();
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   window.scrollTo(0,0);
   if(t!=="rules")wantEdit=false;
