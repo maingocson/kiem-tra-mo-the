@@ -281,6 +281,7 @@ button.av{cursor:pointer}
 .drawer .dr-item:active{background:var(--sunk)}
 .drawer .dr-item svg{width:26px;height:26px;flex:none}
 .drawer .dr-sec{padding:6px 20px 2px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.drawer .dr-note{padding:0 20px 6px 62px;font-size:13px;color:var(--muted)} .drawer .dr-note.w{color:var(--warn)}
 .drawer hr{border:0;border-top:1px solid var(--line);margin:8px 20px}
 .drawer .dr-foot{margin-top:auto;padding:12px 20px 0;font-size:12px;color:var(--muted)}
 /* Thanh đang kiểm tra cho ai */
@@ -309,6 +310,9 @@ button.av{cursor:pointer}
   <input type="file" id="pFile" accept=".csv,text/csv,text/plain" hidden>
   <div id="pConfirm" class="confirm" hidden style="margin:-6px 0 14px"><span id="pMsg"></span>
     <button class="btn2 danger" id="pYes" type="button">Cập nhật</button><button class="btn2" id="pNo" type="button">Huỷ</button></div>
+  <input type="file" id="bkFile" accept=".json,application/json,text/plain" hidden>
+  <div id="bkConfirm" class="confirm" hidden style="margin:0 0 14px"><span id="bkMsg"></span>
+    <button class="btn2 danger" id="bkYes" type="button">Phục hồi</button><button class="btn2" id="bkNo" type="button">Huỷ</button></div>
 
   <!-- ===== KIỂM TRA ===== -->
   <div class="view" id="v-check">
@@ -598,7 +602,7 @@ button.av{cursor:pointer}
       <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Lịch sử &amp; kế hoạch chi tiêu</b><small>Ghi chi tiêu theo tháng, gợi ý quẹt thẻ nào để đạt mức hoàn</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
     </section>
     <button class="primary" id="meSave" type="button">Lưu trên máy</button>
-    <p class="note" style="margin:0;text-align:center">Thông tin chỉ lưu trên điện thoại này, không gửi đi đâu.</p>
+    <p class="note" style="margin:0;text-align:center">Thông tin chỉ lưu trên điện thoại này, không gửi đi đâu. Xoá app khỏi màn hình chính là mất dữ liệu – nhớ <b>Sao lưu toàn bộ ra file</b> ở menu trái.<br><span id="meBk"></span></p>
   </div>
 </div>
 
@@ -615,6 +619,11 @@ button.av{cursor:pointer}
   <hr>
   <div class="dr-sec">Cấu hình</div>
   <button class="dr-item" type="button" data-go="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện mở thẻ</button>
+  <hr>
+  <div class="dr-sec">Sao lưu &amp; phục hồi</div>
+  <button class="dr-item" type="button" data-go="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Sao lưu toàn bộ ra file</button>
+  <button class="dr-item" type="button" data-go="rs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Phục hồi từ file</button>
+  <div class="dr-note" id="drBk"></div>
   <div class="dr-foot" id="drFoot"></div>
 </aside>
 
@@ -800,10 +809,10 @@ async function exportFile(text,name,type){
   const blob=new Blob([text],{type:type+";charset=utf-8"});
   try{
     const file=new File([blob],name,{type});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
-  }catch(e){if(e&&e.name==="AbortError")return}
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return true}
+  }catch(e){if(e&&e.name==="AbortError")return false}
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast("Đã tải file "+name);
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast("Đã tải file "+name);return true
 }
 $("#backupBtn").addEventListener("click",()=>{
   exportCsv(usingSample||!cache||!cache.text?DEFAULT_CSV:cache.text,`dieu-kien-mo-the_${stamp()}.csv`);
@@ -1818,6 +1827,7 @@ function useMe(){if(cust.isMe)return;cust=me;cicFiles={};xState=null;$("#results
 $("#whoBack").addEventListener("click",()=>{useMe();showTab("check")});
 /* khung trượt */
 function drOpen(){
+  bkInfo();
   $("#drAv").innerHTML=avHtml(me);$("#drName").textContent=me.name||"Chưa đặt tên";
   $("#drNow").innerHTML=cust.isMe?"Đang dùng: <b>hồ sơ của tôi</b>":`Đang tư vấn: <b>${esc(cust.name||"khách chưa đặt tên")}</b>`;
   $("#drBack").hidden=!!cust.isMe;
@@ -1833,13 +1843,39 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")drClose()});
 $("#drawer").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(!b)return;const g=b.dataset.go;drClose();
   if(g==="me")showTab("me");else if(g==="custs")showTab("custs");else if(g==="rules")showTab("rules");
   else if(g==="upd"){showTab("check");$("#pFile").click()}
+  else if(g==="bk")bkExport();else if(g==="rs")$("#bkFile").click();
   else if(g==="back"){useMe();showTab("check")}else if(g==="new"){showTab("check");$("#newConfirm").hidden=false}});
+/* Sao lưu & phục hồi toàn bộ dữ liệu trên máy (mọi khoá kmt.*) */
+const K_LASTBK="kmt.lastBackup.v1",BK_SKIP=new Set([K_LASTBK,"kmt.ghToken.v1","kmt.shared.v1"]);
+function bkKeys(){const ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("kmt.")&&!BK_SKIP.has(k))ks.push(k)}}catch(e){}return ks.sort()}
+function bkAgo(){const t=load(K_LASTBK);if(!t)return null;const d=Math.floor((Date.now()-new Date(t))/864e5);return{t,d,txt:d<=0?"hôm nay":d===1?"hôm qua":`${d} ngày trước`}}
+function bkInfo(){const a=bkAgo(),txt=a?`Sao lưu gần nhất: ${a.txt} (${fmtTime(a.t)})`:"Chưa sao lưu lần nào",warn=!a||a.d>=7;
+  const el=$("#drBk");if(el){el.textContent=txt;el.classList.toggle("w",warn)}const m=$("#meBk");if(m){m.textContent=txt;m.style.color=warn?"var(--warn)":""}}
+async function bkExport(){const data={};bkKeys().forEach(k=>{try{data[k]=localStorage.getItem(k)}catch(e){}});
+  const at=new Date().toISOString(),name=`kiem-tra-mo-the_sao-luu_${stamp()}.json`;
+  if(await exportFile(JSON.stringify({app:"kiem-tra-mo-the",v:1,at,data}),name,"application/json")){save(K_LASTBK,at);bkInfo()}}
+let bkCand=null;
+$("#bkFile").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  try{const j=JSON.parse((await f.text()).replace(/^\uFEFF/,""));
+    if(!j||j.app!=="kiem-tra-mo-the"||!j.data||typeof j.data!=="object")throw 0;
+    const ks=Object.keys(j.data).filter(k=>k.startsWith("kmt.")&&!BK_SKIP.has(k)&&typeof j.data[k]==="string");if(!ks.length)throw 0;
+    let nC=0,me2=null;try{nC=(JSON.parse(j.data["kmt.customers.v1"]||"[]")||[]).length}catch(e){}try{me2=JSON.parse(j.data["kmt.me.v1"]||"null")}catch(e){}
+    bkCand={ks,data:j.data};
+    $("#bkMsg").textContent=`File sao lưu ngày ${fmtTime(j.at)}: hồ sơ ${me2&&me2.name?"“"+me2.name+"”":"của tôi"}, ${nC} khách hàng. Phục hồi sẽ thay dữ liệu hiện tại trên máy bằng dữ liệu trong file.`;
+    $("#bkConfirm").hidden=false;window.scrollTo({top:0,behavior:"smooth"});
+  }catch(err){toast("File không phải bản sao lưu của app này")}});
+$("#bkNo").addEventListener("click",()=>{bkCand=null;$("#bkConfirm").hidden=true});
+$("#bkYes").addEventListener("click",()=>{if(!bkCand)return;const{ks,data}=bkCand;
+  try{ks.forEach(k=>localStorage.setItem(k,data[k]))}catch(e){toast("Bộ nhớ trên máy đã đầy – chưa phục hồi xong");return}
+  try{sessionStorage.setItem("kmt.restored","1")}catch(e){}location.reload()});
+try{if(sessionStorage.getItem("kmt.restored")){sessionStorage.removeItem("kmt.restored");setTimeout(()=>toast("Đã phục hồi dữ liệu từ file sao lưu"),300)}}catch(e){}
 /* trang Tôi */
 function meRows(){
   $("#meCards").innerHTML=me.rows.length?me.rows.map((r,i)=>`<div class="mrow" data-i="${i}"><input data-mf="bank" type="text" list="bankList" placeholder="Ngân hàng" value="${esc(r.bank)}" aria-label="Ngân hàng"><input data-mf="cards" class="num" type="number" inputmode="numeric" min="0" value="${esc(r.cards)}" aria-label="Số thẻ"><input data-mf="limit" class="num" type="text" inputmode="decimal" value="${esc(r.limit)}" aria-label="Hạn mức triệu"><input data-mf="used" class="num" type="text" inputmode="decimal" value="${esc(r.used)}" aria-label="Đã dùng triệu"><button class="icon-btn" type="button" data-mdel="${i}" aria-label="Xoá dòng">×</button></div>`).join(""):`<p class="note" style="margin:0">Chưa có thẻ nào.</p>`;
   const st=stats(me);$("#meCardSum").textContent=st.cards?`${fmt(st.cards)} thẻ · ${fmt(st.limit)} tr · dùng ${Math.round(st.util)}%`:"";
 }
 function renderMe(){
+  bkInfo();
   $("#meAv").innerHTML=avHtml(me);$("#meAvDel").hidden=!me.avatar;
   $("#meTitle").textContent=me.name||"Hồ sơ của tôi";
   $("#meName").value=me.name||"";$("#mePhone").value=me.phone||"";

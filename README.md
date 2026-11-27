@@ -25,6 +25,13 @@
 - Bấm avatar → khung trượt: Hồ sơ của tôi, Kiểm tra cho tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
 - **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có (kèm nút **Kiểm tra mở thẻ mới cho tôi**); mục **Quản lý hoàn tiền chi tiêu**: chọn dòng thẻ hoàn tiền đang có trong danh mục, hạng thẻ, nhóm đã đăng ký (dùng chung với Kế hoạch hoàn tiền), nút **Lịch sử & kế hoạch chi tiêu** → **Lưu trên máy**. Đây là hồ sơ mặc định: Mở thẻ và Hoàn tiền tính theo hồ sơ này; khi tư vấn khách (Khách mới, mở khách đã lưu, đọc CIC của khách) thì tính theo khách, bấm **Về tôi** để quay lại.
 
+## Sao lưu & phục hồi toàn bộ
+
+- Dữ liệu chỉ nằm trong bộ nhớ của app trên máy (localStorage). **Xoá app khỏi màn hình chính là mất hết**, không khôi phục được nếu chưa sao lưu.
+- Menu trái → **Sao lưu toàn bộ ra file**: gom hồ sơ Tôi, khách hàng, bảng điều kiện, danh sách ngân hàng, dữ liệu hoàn tiền vào một file `.json`; trên iPhone lưu vào app Tệp / iCloud Drive / gửi Zalo.
+- Menu trái → **Phục hồi từ file**: chọn file đó, xác nhận → app nạp lại và tải lại trang.
+- Menu trái và trang Tôi ghi ngày sao lưu gần nhất; chữ chuyển màu cam khi chưa sao lưu hoặc đã quá 7 ngày.
+
 ## Đọc CIC tự động
 
 - Tab **Kiểm tra** → **Chọn file CIC**: chọn file PDF **CIC vay** ("Báo cáo chi tiết quan hệ tín dụng") và/hoặc **CIC thẻ** ("Báo cáo thông tin thẻ tín dụng"), chọn 1 hoặc cả 2 file cùng lúc. App tự nhận file nào là vay, file nào là thẻ.
