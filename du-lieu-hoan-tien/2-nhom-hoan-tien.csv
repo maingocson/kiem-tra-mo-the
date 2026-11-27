@@ -93,3 +93,9 @@ tcb-spark,"Du lịch, thời trang",,,,,,,8,10,12,,,,,
 tcb-spark,"Siêu thị, nhà hàng, mua sắm online",,,,,,,2,4,6,,,,,
 tcb-everyday,Online quốc tế,,,,,"Online, ngoại tệ",,8,16,,,,,,Giao dịch từ 200k
 tcb-everyday,Online nội địa,,,,,Online,,5,10,,,,,,Giao dịch từ 200k
+vpb-super-shopee,"Shopee, ShopeeFood",,,,Shopee;ShopeeFood,,,10,,,400000,,,,
+vpb-super-shopee,"Ăn uống, siêu thị, Grab/Be",,,,Co.op;BigC;Lotte Mart;WinMart;Grab;Be,,,2,,,200000,,,,Siêu thị theo các chuỗi trong thể lệ
+vpb-shopee,"Shopee, ShopeeFood",,,,Shopee;ShopeeFood,,,6,,,250000,,,,
+vpb-shopee,"Ăn uống, siêu thị, Grab/Be",,,,Co.op;Big C;Lotte Mart;WinMart;Grab;Be,,,1,,,150000,,,,
+vpb-srewards,"Shopee, ShopeeFood",,,,Shopee;ShopeeFood,,,12,,,400000,,,,
+vpb-srewards,"Ăn uống, siêu thị, di chuyển",,,,Co.op;Big C;Lotte Mart;WinMart;Grab;Be,,,2,,,200000,,,,
