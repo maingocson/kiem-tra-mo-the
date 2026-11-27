@@ -141,6 +141,19 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - Bước 4 **Chi tiêu tháng này**: mỗi lần quẹt thẻ, chọn thẻ, nhóm, gõ số tiền (`150k`, `1,5tr`, `2tr5`, `1.200.000`) → **Ghi chi tiêu**. Kế hoạch tự tính lại cho phần còn lại của tháng: đã chi bao nhiêu %, còn chi gì ở thẻ nào, tiền hoàn đã có và dự kiến, tiến độ lên mức, nhóm đã chạm trần, nhóm vượt kế hoạch.
 - Khoản đã ghi nằm chung trong lịch sử chi tiêu (bước 2), sang tháng sau dùng "Lấy theo tháng gần nhất" để lập kế hoạch mới.
 
+## Ràng buộc được tính khi lập kế hoạch và theo dõi
+
+- **Số giao dịch tối thiểu** (VD OCB ≥ 7 giao dịch/tháng): chưa đủ thì tiền hoàn của cả kỳ = 0; app hiện tiến độ x/7 và nhắc chia nhỏ khoản chi.
+- **Ngưỡng mức theo tổng chi kỳ này** (StepUp, Shinhan, MSB…): tính mức theo tổng đã quẹt + kế hoạch; dưới ngưỡng đầu chỉ được hoàn cơ bản. App gợi ý "chi để đủ ngưỡng mức" khi đáng.
+- **Mức theo chi tiêu kỳ trước** (VIB Cash Back, Family Link): app tự xếp mức theo tổng chi kỳ trước trong lịch sử; chưa có lịch sử thì dùng mức chọn ở bước 1.
+- **Nhóm phải đăng ký** (VIB, SHB…): chưa tick nhóm đã đăng ký thì tiền đã quẹt chỉ tính hoàn cơ bản; app nhắc nhóm nên đăng ký.
+- **Ưu đãi theo ngày** (ẩm thực cuối tuần Shinhan…): khoản đã ghi tính đúng theo ngày quẹt; kế hoạch tính theo tỷ lệ ngày và ghi rõ "chỉ T7, CN".
+- **Giao dịch tối thiểu của nhóm** (Techcombank Everyday: mỗi giao dịch online từ 200k): khoản nhỏ hơn không được hoàn nhóm.
+- **Điểm tối thiểu mỗi kỳ** (SHB: từ 100k điểm/kỳ mới ghi nhận): dưới mức thì = 0.
+- **Trần nhóm, trần chung, trần cả thẻ, trần năm**: trần năm trừ dần theo tiền hoàn các kỳ trước trong năm.
+- **Kỳ sao kê**: từng thẻ tính theo kỳ riêng (VPBank StepUp 21→20, Super Shopee 26→25; thẻ khác nhập ngày bắt đầu kỳ ở bước 1, thẻ "tháng dương lịch" cố định ngày 1).
+- **Nhiều thẻ (50+)**: danh sách thẻ gọn theo ngân hàng, lọc nhanh; kế hoạch chỉ xét các thẻ hợp từng loại chi tiêu nên vẫn nhanh (46 thẻ, 1.000 giao dịch: ~0,1 giây); thẻ không dùng trong tháng được gom lại; giao dịch tháng này lọc theo thẻ, hiện 10 khoản mới nhất.
+
 ## Hình thẻ
 
 - Ảnh thẻ trong `du-lieu-hoan-tien/hinh-the/<Mã thẻ>.webp`, lấy từ trang chính thức của từng ngân hàng (11/2026), thu nhỏ còn tối đa 400px. Một số ảnh là ảnh quảng cáo có thẻ (MSB, SHB, Techcombank), không phải mặt thẻ phẳng.
