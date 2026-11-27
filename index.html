@@ -231,7 +231,6 @@ details.cbc>summary::-webkit-details-marker{display:none}
 /* Kế hoạch hoàn tiền cho khách */
 .cbseg{grid-template-columns:1fr 1fr}
 .cp select,.cp input{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0;width:100%}
-.me-cb{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
 .cp-add{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cp-add .wide{grid-column:1/-1}
 .cp-card{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--sunk)}
@@ -263,6 +262,8 @@ button.av{cursor:pointer}
 .me-act h2{margin:0 4px 4px;color:var(--accent)}
 .ma-item{display:flex;align-items:center;gap:12px;width:100%;font:inherit;color:var(--ink);background:var(--surface);border:0;border-radius:12px;padding:12px;text-align:left;cursor:pointer}
 .ma-item:active{opacity:.75}
+.panel .ma-item{background:var(--sunk);border:1px solid var(--line)}
+.ma-box{background:var(--surface);border-radius:12px;padding:12px}
 .ma-ic{flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
 .ma-ic svg{width:22px;height:22px}
 .ma-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -580,24 +581,23 @@ button.av{cursor:pointer}
         <div class="mhead"><span>Ngân hàng</span><span>Số thẻ</span><span>HM (tr)</span><span>Đã dùng (tr)</span><span></span></div>
         <div class="stack" id="meCards"></div>
         <button class="add" id="meAddCard" type="button"><b>+</b> Thêm ngân hàng</button>
-        <div class="me-cb">
-          <div class="cbk">Chi tiết thẻ hoàn tiền</div>
-          <p class="note" style="margin:0 0 8px">Chọn đúng dòng thẻ trong danh mục hoàn tiền để theo dõi và lên kế hoạch chi tiêu.</p>
-          <div class="stack" id="meCbCards"></div>
-          <div class="cp-add" style="margin-top:8px">
-            <select id="meCbBank" aria-label="Ngân hàng"></select>
-            <select id="meCbCard" aria-label="Dòng thẻ"></select>
-            <button class="btn2 acc wide" id="meCbAdd" type="button">Thêm thẻ hoàn tiền</button>
-          </div>
-        </div>
+        <button class="ma-item" id="meCheck" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg></span><span class="ma-t"><b>Kiểm tra mở thẻ mới cho tôi</b><small>Ngân hàng nào còn có thể mở thẻ</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
       </div>
     </section>
-    <button class="primary" id="meSave" type="button">Lưu trên máy</button>
     <section class="me-act">
-      <h2>Kiểm tra &amp; Kế hoạch</h2>
-      <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Thẻ hoàn tiền &amp; kế hoạch chi tiêu</b><small>Thẻ đang có, lịch sử chi tiêu, gợi ý quẹt thẻ</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
-      <button class="ma-item" id="meCheck" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg></span><span class="ma-t"><b>Kiểm tra mở thẻ cho tôi</b><small>Ngân hàng nào còn có thể mở thẻ</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+      <h2>Quản lý hoàn tiền chi tiêu</h2>
+      <p class="note" style="margin:0 4px 2px">Nhập các thẻ hoàn tiền bạn đang có, chọn đúng dòng thẻ trong danh mục để theo dõi và lên kế hoạch chi tiêu.</p>
+      <div class="ma-box">
+        <div class="stack" id="meCbCards"></div>
+        <div class="cp-add" style="margin-top:8px">
+          <select id="meCbBank" aria-label="Ngân hàng"></select>
+          <select id="meCbCard" aria-label="Dòng thẻ"></select>
+          <button class="btn2 acc wide" id="meCbAdd" type="button">Thêm thẻ hoàn tiền</button>
+        </div>
+      </div>
+      <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Lịch sử &amp; kế hoạch chi tiêu</b><small>Ghi chi tiêu theo tháng, gợi ý quẹt thẻ nào để đạt mức hoàn</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
     </section>
+    <button class="primary" id="meSave" type="button">Lưu trên máy</button>
     <p class="note" style="margin:0;text-align:center">Thông tin chỉ lưu trên điện thoại này, không gửi đi đâu.</p>
   </div>
 </div>
