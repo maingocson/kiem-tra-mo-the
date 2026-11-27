@@ -293,6 +293,32 @@ body.editing .wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
     <div class="view" id="rulesBody" hidden>
     <div class="row-btns" style="justify-content:flex-end"><button class="ghost" id="lockAgain" type="button">Khoá lại</button></div>
     <section>
+      <h2>Đăng cho mọi người</h2>
+      <div class="panel stack">
+        <p class="note" style="margin:0" id="shInfo">Đang kiểm tra bản chung…</p>
+        <div id="shTokenBox" class="stack" hidden>
+          <label class="f" for="shToken">Mã truy cập GitHub (chỉ lưu trên máy này)<input id="shToken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…"></label>
+          <div class="row-btns"><button class="btn2 acc" id="shTokenSave" type="button">Lưu mã</button></div>
+          <details class="grp"><summary>Cách tạo mã truy cập</summary>
+            <ol class="note" style="margin:0;padding-left:18px">
+              <li>Đăng nhập GitHub, vào <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens</b>, bấm <b>Generate new token</b>.</li>
+              <li><b>Expiration:</b> chọn thời hạn (ví dụ 1 năm).</li>
+              <li><b>Repository access:</b> chọn <b>Only select repositories</b> → chỉ chọn <b>kiem-tra-mo-the-dieu-kien</b>.</li>
+              <li><b>Permissions → Repository permissions → Contents:</b> chọn <b>Read and write</b>. Không bật quyền nào khác.</li>
+              <li>Bấm <b>Generate token</b>, chép mã rồi dán vào ô trên.</li>
+            </ol>
+          </details>
+        </div>
+        <div class="row-btns" id="shActs">
+          <button class="btn2 acc" id="shPublish" type="button" hidden>Đăng cho mọi người</button>
+          <button class="btn2" id="shPull" type="button">Tải bản chung về máy</button>
+          <button class="btn2 danger" id="shTokenDel" type="button" hidden>Xoá mã trên máy</button>
+        </div>
+        <div id="shConfirm" class="confirm" hidden><span id="shMsg"></span>
+          <button class="btn2 danger" id="shYes" type="button">Đăng</button><button class="btn2" id="shNo" type="button">Huỷ</button></div>
+      </div>
+    </section>
+    <section>
       <h2>Sao lưu &amp; phục hồi</h2>
       <div class="panel stack">
         <p class="note" style="margin:0" id="localInfo">Chính sách được lưu ngay trên máy này, mở app không cần mạng vẫn dùng được.</p>
@@ -513,7 +539,7 @@ function showPolicy(){
   setPolicy("on",`${rules.length} ngân hàng · lưu trên máy lúc ${fmtTime(cache.at)}`);
 }
 /* ---------- Lưu trên máy: lịch sử, sao lưu, phục hồi ---------- */
-const SRC={edit:"Sửa trên app",file:"Phục hồi từ file",old:"Khôi phục bản cũ",drive:"Tải từ Drive",admin:"Sửa trên app"};
+const SRC={edit:"Sửa trên app",file:"Phục hồi từ file",old:"Khôi phục bản cũ",drive:"Tải từ Drive",admin:"Sửa trên app",shared:"Bản chung (tự cập nhật)"};
 function versions(){const v=load(K_VER);return Array.isArray(v)?v:[]}
 function addVersion(text,count,source){
   const v=versions().filter(x=>x.text!==text);
@@ -572,6 +598,94 @@ $("#restoreYes").addEventListener("click",()=>{
   else toast("Đã phục hồi chính sách trên máy này");
   if(!$("#results").hidden)runCheck(false);
 });
+
+/* ---------- Bảng điều kiện chung: người quản lý đăng, mọi máy tự tải bản mới nhất ---------- */
+const SH_REPO="maingocson/kiem-tra-mo-the-dieu-kien",SH_FILE="dieu-kien.json";
+const SH_RAW=`https://raw.githubusercontent.com/${SH_REPO}/main/${SH_FILE}`,SH_API=`https://api.github.com/repos/${SH_REPO}/contents/${SH_FILE}`;
+const K_SHARED="kmt.shared.v1",K_TOKEN="kmt.ghToken.v1";
+let shRemote=null,shChecked=0;
+function shToken(){try{return localStorage.getItem(K_TOKEN)||""}catch(e){return""}}
+function shLocal(){return load(K_SHARED)||{}}
+function curText(){return usingSample||!cache||!cache.text?DEFAULT_CSV:cache.text}
+function validShared(d){return d&&typeof d.text==="string"&&d.at&&parseCSV(d.text).map(normRule).some(r=>r.name)}
+async function shFetch(){
+  const r=await fetch(SH_RAW+"?t="+Date.now(),{cache:"no-store"});
+  if(r.status===404)return null;
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const d=await r.json();if(!validShared(d))throw new Error("bad");return d;
+}
+/* tự cập nhật khi có bản chung mới hơn bản đã nhận trên máy này */
+async function shSync(manual){
+  if(!manual&&Date.now()-shChecked<5*60e3)return;
+  shChecked=Date.now();
+  try{
+    const d=await shFetch();shRemote=d||false;
+    if(d&&(manual||d.at>(shLocal().at||""))){
+      if(editing&&dirty){if(manual)toast("Đang sửa điều kiện – bấm Lưu hoặc Huỷ trước");renderShared();return}
+      const same=d.text===curText();
+      if(!same){applyPolicy({text:d.text,list:parseCSV(d.text)},"shared");if(editing){draft=rules.map(toModel);renderRules()}if(!$("#results").hidden)runCheck(false)}
+      save(K_SHARED,{at:d.at});
+      if(!same)toast(`Đã cập nhật điều kiện mới (${d.count||rules.length} ngân hàng, ${fmtTime(d.at)})`);
+      else if(manual)toast("Máy này đã có bản chung mới nhất");
+    }else if(manual)toast(d?"Máy này đã có bản chung mới nhất":"Chưa có bản chung nào được đăng");
+  }catch(e){if(manual)toast("Chưa tải được bản chung – kiểm tra kết nối mạng")}
+  renderShared();
+}
+function renderShared(){
+  const tok=shToken(),d=shRemote;
+  $("#shTokenBox").hidden=!!tok;$("#shPublish").hidden=!tok;$("#shTokenDel").hidden=!tok;
+  let t=d===null?"Đang kiểm tra bản chung…":d===false?"Chưa có bản chung nào được đăng.":`Bản chung mới nhất: ${d.count||"?"} ngân hàng, đăng lúc ${fmtTime(d.at)}.`;
+  if(d)t+=d.text===curText()?" Máy này đang dùng đúng bản chung.":" Máy này đang khác bản chung (có thay đổi chưa đăng).";
+  t+=tok?" Máy này có mã đăng – bấm Đăng cho mọi người sau khi sửa và Lưu.":" Mọi máy tự nhận bản chung mới nhất khi mở app.";
+  $("#shInfo").textContent=t;
+}
+function b64(str){const u=new TextEncoder().encode(str);let b="";for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(b)}
+async function shPublish(){
+  const tok=shToken(),h={Authorization:"Bearer "+tok,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};
+  const text=curText(),at=new Date().toISOString(),count=parseCSV(text).map(normRule).filter(r=>r.name).length;
+  const body=JSON.stringify({at,count,text},null,1)+"\n";
+  for(let attempt=0;attempt<2;attempt++){
+    const g=await fetch(SH_API+"?ref=main&t="+Date.now(),{headers:h,cache:"no-store"});
+    if(g.status===401)throw new Error("Mã truy cập không đúng hoặc đã hết hạn");
+    if(g.status!==200&&g.status!==404)throw new Error(g.status===403?"Mã không có quyền với kho điều kiện":"GitHub báo lỗi "+g.status);
+    const sha=g.status===200?(await g.json()).sha:undefined;
+    const r=await fetch(SH_API,{method:"PUT",headers:h,body:JSON.stringify({message:`Cập nhật điều kiện: ${count} ngân hàng`,content:b64(body),branch:"main",...(sha?{sha}:{})})});
+    if(r.ok){shRemote={at,count,text};save(K_SHARED,{at});return count}
+    if(r.status===409||r.status===422&&!sha)continue;
+    if(r.status===401)throw new Error("Mã truy cập không đúng hoặc đã hết hạn");
+    if(r.status===403||r.status===404)throw new Error("Mã không có quyền ghi vào kho điều kiện (cần Contents: Read and write)");
+    throw new Error("GitHub báo lỗi "+r.status);
+  }
+  throw new Error("Có người vừa đăng cùng lúc – thử lại");
+}
+$("#shTokenSave").addEventListener("click",()=>{
+  const v=$("#shToken").value.trim();
+  if(!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(v)){toast("Mã không đúng dạng (bắt đầu bằng github_pat_)");return}
+  try{localStorage.setItem(K_TOKEN,v)}catch(e){}
+  $("#shToken").value="";renderShared();toast("Đã lưu mã trên máy này");
+});
+$("#shTokenDel").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!b.classList.contains("armed")){b.classList.add("armed");b.textContent="Bấm lần nữa để xoá mã";return}
+  b.classList.remove("armed");b.textContent="Xoá mã trên máy";
+  try{localStorage.removeItem(K_TOKEN)}catch(err){}
+  renderShared();toast("Đã xoá mã. Nhớ thu hồi mã trên GitHub nếu nghi bị lộ.");
+});
+$("#shPull").addEventListener("click",()=>shSync(true));
+$("#shPublish").addEventListener("click",()=>{
+  if(editing&&dirty){toast("Bấm Lưu điều kiện trước khi đăng");return}
+  const n=parseCSV(curText()).map(normRule).filter(r=>r.name).length;
+  $("#shMsg").textContent=`Đăng bảng ${n} ngân hàng đang dùng trên máy này cho mọi người? Máy khác sẽ tự cập nhật khi mở app.`;
+  $("#shConfirm").hidden=false;
+});
+$("#shNo").addEventListener("click",()=>$("#shConfirm").hidden=true);
+$("#shYes").addEventListener("click",async()=>{
+  $("#shConfirm").hidden=true;const b=$("#shPublish"),old=b.textContent;b.disabled=true;b.textContent="Đang đăng…";
+  try{const n=await shPublish();toast(`Đã đăng ${n} ngân hàng cho mọi người`)}
+  catch(e){toast(e.message||"Chưa đăng được – kiểm tra kết nối mạng")}
+  b.disabled=false;b.textContent=old;renderShared();
+});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)shSync(false)});
 
 function applyPolicy(p,source){
   const changed=!cache||cache.text!==p.text;
@@ -636,7 +750,8 @@ $("#saveRules").addEventListener("click",async()=>{
   if(bad){toast(`${bad.name}: các ô giới hạn chỉ nhập số`);return}
   const list=draft.map(toRaw),csv=toCSV(list);
   applyPolicy({text:csv,list},"edit");stopEdit();
-  toast("Đã lưu trên máy. Nên bấm Sao lưu ra file để dự phòng.");
+  renderShared();
+  toast(shToken()?"Đã lưu trên máy. Bấm Đăng cho mọi người để mọi máy nhận bản này.":"Đã lưu trên máy. Nên bấm Sao lưu ra file để dự phòng.");
   if(!$("#results").hidden)runCheck(false);
 });
 
@@ -1236,7 +1351,7 @@ async function exportPdf(btn){
   finally{btn.disabled=false}
 }
 
-renderCust();showPolicy();showLock();showLogo();
+renderCust();showPolicy();showLock();showLogo();renderShared();shSync(false);
 if(cust.example)runCheck(false);
 renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
