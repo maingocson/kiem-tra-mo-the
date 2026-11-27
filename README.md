@@ -133,7 +133,13 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - Thẻ có "Hiệu lực đến" đã qua ngày hôm nay được làm mờ, ghi "hết hạn" và xếp cuối danh sách.
 - Mức tin cậy: **A** có thể lệ đầy đủ · **B** theo trang thẻ · **C** chỉ có câu quảng cáo.
 
-### Kế hoạch cho khách (nút "Kế hoạch cho khách" đầu tab)
+### Hình thẻ
+
+- Ảnh thẻ trong `du-lieu-hoan-tien/hinh-the/<Mã thẻ>.webp`, lấy từ trang chính thức của từng ngân hàng (11/2026), thu nhỏ còn tối đa 400px. Một số ảnh là ảnh quảng cáo có thẻ (MSB, SHB, Techcombank), không phải mặt thẻ phẳng.
+- Danh sách thẻ có ảnh nằm ở `CB_IMG` trong `index.html` (giá trị 2 = thẻ dọc, hiện đủ ảnh). Thẻ chưa có ảnh (OCB – web chặn tải ảnh; VPBank Diamond World, Super Shopee, Shopee Platinum, S Rewards) hiện hình vẽ theo màu ngân hàng.
+- Thêm ảnh: lưu file `<Mã thẻ>.webp` vào thư mục trên rồi thêm mã thẻ vào `CB_IMG`.
+
+## Kế hoạch cho khách (nút "Kế hoạch cho khách" đầu tab)
 
 Gắn với khách đang chọn (lưu cùng hồ sơ khách):
 
