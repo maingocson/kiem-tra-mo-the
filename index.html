@@ -311,6 +311,11 @@ details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-detai
 .cp-own-b .x{align-self:flex-start;font:inherit;font-size:13px;font-weight:700;color:var(--bad);background:none;border:0;padding:4px 0;cursor:pointer}
 .cp-lab{display:flex;flex-direction:column;gap:3px}
 .cp-cfg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cp-cfg label:first-child{grid-column:1/-1}
+.cp-cfg2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.cp-cfg,.cp-cfg2{align-items:end}
+.cp-lab select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+.cfg-seg{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.cfg-seg textarea{font:inherit;width:100%;box-sizing:border-box}
 .pc-c.wait{color:var(--muted);font-weight:600;font-size:12px;text-align:right}
 .cp-need{background:var(--bad-soft,#fde8e8);color:var(--bad);border-radius:8px;padding:6px 8px;font-size:13px}
 .cp-alerts{background:var(--warn-soft);border-radius:10px;padding:8px 10px}
@@ -645,6 +650,22 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
     </section>
   </div>
   <!-- ===== TÔI ===== -->
+  <div class="view" id="v-cbcfg" hidden>
+    <form class="panel stack" id="cfgLock" autocomplete="off">
+      <h2>Chu kỳ &amp; phân khúc thẻ hoàn tiền</h2>
+      <p class="note" style="margin:0">Chỉ quản lý được sửa. Nhập mật khẩu quản lý (như tab Điều kiện).</p>
+      <label class="f" for="cfgPass">Mật khẩu<input id="cfgPass" type="password" inputmode="numeric" autocomplete="off"></label>
+      <div class="row-btns"><button class="btn2 acc" type="submit">Mở khoá</button><span class="note" id="cfgErr" hidden>Sai mật khẩu</span></div>
+    </form>
+    <div class="stack" id="cfgBody" hidden>
+      <div class="panel stack">
+        <div class="row-btns" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Chu kỳ &amp; phân khúc</h2><button class="ghost" id="cfgLockAgain" type="button">Khoá lại</button></div>
+        <p class="note" style="margin:0">Cài cho từng dòng thẻ: tính hoàn theo kỳ sao kê hay tháng dương lịch, ngày sao kê, số ngày miễn lãi, và các <b>phân khúc khách</b> có yêu cầu riêng (VD khách Diamond/Priority chi tối thiểu khác, số giao dịch khác, trần khác). Danh sách thẻ của khách chỉ chọn phân khúc, không sửa được phần này. Lưu ngay trên máy, có trong file sao lưu toàn bộ.</p>
+        <input id="cfgQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ">
+        <div id="cfgList" class="stack"></div>
+      </div>
+    </div>
+  </div>
   <div class="view me" id="v-me" hidden>
     <section class="panel me-head">
       <button class="av s96" id="meAv" type="button" aria-label="Đổi ảnh đại diện"></button>
@@ -720,6 +741,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <hr>
   <div class="dr-sec">Cấu hình</div>
   <button class="dr-item" type="button" data-go="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện mở thẻ</button>
+  <button class="dr-item" type="button" data-go="cbcfg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Chu kỳ &amp; phân khúc thẻ hoàn tiền</button>
   <hr>
   <div class="dr-sec">Sao lưu &amp; phục hồi</div>
   <button class="dr-item" type="button" data-go="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Sao lưu toàn bộ ra file</button>
@@ -1795,7 +1817,8 @@ function cpCalc(c,e,sp,ctx){
   const warn=[];
   if(c.capY!=null&&ctx.yearUsed!=null){const left=Math.max(0,c.capY-ctx.yearUsed);if(cash>left){cash=left;capHit.push("trần năm")}}
   const need={amt:0,txn:0,cash:0};
-  if(below){need.amt=c.tiers[0].from-total;if(total>0)warn.push(`mới chi ${cbMoney(total)}/${cbMoney(c.tiers[0].from)} – chi thêm ${cbMoney(need.amt)} mới được hoàn, chưa đủ thì 0đ`);cash=0}
+  const mS=Math.max(below?c.tiers[0].from:0,c.segMin||0);
+  if(mS&&total<mS){need.amt=mS-total;if(total>0)warn.push(`mới chi ${cbMoney(total)}/${cbMoney(mS)} – chi thêm ${cbMoney(need.amt)} mới được hoàn, chưa đủ thì 0đ`);cash=0}
   if(txs&&c.minTxn&&txs.length<c.minTxn){need.txn=c.minTxn-txs.length;warn.push(`mới ${txs.length}/${c.minTxn} giao dịch – cần thêm ${need.txn} giao dịch mới được hoàn, chưa đủ thì 0đ`);cash=0}
   if(R.minCash&&cash>0&&cash<R.minCash){need.cash=R.minCash-cash;warn.push(`điểm ${cbMoney(cash)} dưới mức ${cbMoney(R.minCash)}/kỳ chưa được ghi nhận – chi thêm cho đủ`);cash=0}
   if(noReg)warn.push("chưa đánh dấu nhóm đã đăng ký – chưa tính hoàn theo nhóm");
@@ -1806,17 +1829,25 @@ let qsLeft={};
 const cpNowPer=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`};
 /* kỳ hoàn tiền của thẻ chứa ngày d: theo tháng dương lịch hoặc theo kỳ sao kê (ngày sau ngày sao kê khách nhập, hoặc theo thể lệ) */
 const cpCalMonth=c=>/^thang/.test(plain(c.cyc||""));
-/* cấu hình từng thẻ của khách: sk = ngày sao kê (1–31, 31 = cuối tháng), basis = "ky" | "thang" (tính hoàn theo kỳ sao kê hay tháng dương lịch), free = số ngày miễn lãi tối đa */
-const cpBasis=(c,e)=>(e&&e.basis)||(cpCalMonth(c)?"thang":"ky");
-const cpSk=(c,e)=>{const v=+(e&&e.sk);if(v>=1&&v<=31)return v;const st=cpCRule(c).cycStart;return st?(st===1?31:st-1):0};
+/* cấu hình chung theo dòng thẻ (chỉ quản lý có mật khẩu sửa, mục Cấu hình → Chu kỳ & phân khúc):
+   basis = "ky" | "thang" (tính hoàn theo kỳ sao kê hay tháng dương lịch), sk = ngày sao kê (1–31, 31 = cuối tháng), free = số ngày miễn lãi tối đa,
+   segs = phân khúc khách [{n tên, min chi tối thiểu/kỳ (đồng), txn số GD tối thiểu, cap trần hoàn/kỳ (đồng), how cách chi}] */
+const K_CBCFG="kmt.cbCfg.v1";let cbCfg=load(K_CBCFG)||{};
+const cpCfg=c=>cbCfg[c.id]||{};
+const cpBasis=c=>cpCfg(c).basis||(cpCalMonth(c)?"thang":"ky");
+const cpSk=c=>{const v=+cpCfg(c).sk;if(v>=1&&v<=31)return v;const st=cpCRule(c).cycStart;return st?(st===1?31:st-1):0};
+/* thẻ theo phân khúc khách: chi tối thiểu của phân khúc thay ngưỡng chi của thẻ; ghi đè số GD tối thiểu, trần hoàn */
+function cpEff(c,e){const S=e&&e.seg!=null?(cpCfg(c).segs||[])[e.seg]:null;if(!S)return c;const o=Object.create(c);o.seg=S;o.segMin=S.min||0;
+  if(S.min&&(c.tiers[0].from||0)>0)o.tiers=c.tiers.map((t,i)=>i===0?{...t,from:S.min}:t);
+  if(S.txn!=null&&S.txn!=="")o.minTxn=+S.txn;if(S.cap)o.capT=c.capT.map(()=>S.cap);return o}
 const cpSkStart=sk=>!sk||sk>=31?1:sk+1;
 const cpCycDay=(c,e)=>cpBasis(c,e)==="thang"?1:cpSkStart(cpSk(c,e));
-const cpFree=e=>{const v=+(e&&e.free);return v>=15&&v<=120?v:45};
+const cpFree=c=>{const v=+cpCfg(c).free;return v>=15&&v<=120?v:45};
 const cpMS=(y,m,sd)=>sd>new Date(y,m+1,0).getDate()?new Date(y,m+1,1):new Date(y,m,sd);
 function cpCycAt(sd,d){let y=d.getFullYear(),m=d.getMonth();if(d<cpMS(y,m,sd))m--;const s=cpMS(y,m,sd),t=cpMS(y,m+1,sd),k=new Date(y,m,1);return{s,t,key:k.getFullYear()*100+k.getMonth()}}
 function cpCycle(c,e,d){return cpCycAt(cpCycDay(c,e),d)}
 /* kỳ sao kê (để biết ngày sao kê, hạn thanh toán): hạn = ngày sao kê + (số ngày miễn lãi − 30) */
-function cpStmt(c,e,d){const y=cpCycAt(cpSkStart(cpSk(c,e)),d),close=new Date(y.t.getTime()-864e5);const due=new Date(close.getFullYear(),close.getMonth(),close.getDate()+Math.max(0,cpFree(e)-30));return{...y,close,due}}
+function cpStmt(c,e,d){const y=cpCycAt(cpSkStart(cpSk(c,e)),d),close=new Date(y.t.getTime()-864e5);const due=new Date(close.getFullYear(),close.getMonth(),close.getDate()+Math.max(0,cpFree(c)-30));return{...y,close,due}}
 const cpTxDate=h=>h.at?new Date(h.at):(()=>{const m=String(h.p||"").match(/^(\d{4})-(\d{2})$/);return m?new Date(+m[1],+m[2]-1,15):new Date()})();
 /* giao dịch thật của từng thẻ: kỳ hiện tại, kỳ trước, tiền hoàn đã nhận trong năm */
 function cpActual(owned,hist,now){now=now||new Date();const out={};
@@ -1859,8 +1890,9 @@ function cpOptimize(owned,needs,fine,fix,ctxs){
   const total=()=>cur.reduce((a,b)=>a+b,0);
   /* dồn chi tiêu để thẻ chạm ngưỡng mức tiếp theo nếu tổng tiền hoàn tăng */
   for(let round=0;round<3;round++){let moved=false;
-    cards.forEach((x,i)=>{if(!cpSpendTier(x.c))return;const r=cpCalc(x.c,x.e,cpMerge(x.fix,x.sp),x.ctx);const nt=r.below?0:r.ti+1;const t=x.c.tiers[nt];if(!t||t.from==null)return;
-      let need=t.from-r.total;if(need<=0||need>tot)return;
+    cards.forEach((x,i)=>{const sm=x.c.segMin||0;if(!cpSpendTier(x.c)&&!sm)return;const r=cpCalc(x.c,x.e,cpMerge(x.fix,x.sp),x.ctx);const nt=r.below?0:r.ti+1;const t=x.c.tiers[nt];
+      const goal=sm&&r.total<sm?sm:(cpSpendTier(x.c)&&t&&t.from!=null?t.from:0);if(!goal)return;
+      let need=goal-r.total;if(need<=0||need>tot)return;
       const snap=cards.map(y=>({...y.sp})),before=total();
       /* lấy trước các khoản mất ít nhất: tỷ lệ ở thẻ đang giữ thấp, tỷ lệ ở thẻ này cao */
       const rI=k=>{let b=x.c.base||0;x.c.groups.forEach(g=>{const cs=cpGroupCats(g);if(cs==="ALL"||cs.has(k)){const v=g.r[Math.min(nt,x.c.nt-1)];if(v!=null&&v<50&&v>b)b=v}});return b};
@@ -1922,9 +1954,9 @@ function cpAutoNeeds(owned,budget){
   if(!(budget>0))for(const k in needs)needs[k]=Math.min(needs[k],CP_AUTO_MAX);
   return Object.fromEntries(Object.entries(needs).map(([k,v])=>[k,String(Math.round(v/1e4)/100)]))}
 function cbOf(p){if(!p.cb)p.cb={cards:[],hist:[],needs:{}};const d=p.cb;d.cards=d.cards||[];d.hist=d.hist||[];d.needs=d.needs||{};
-  d.cards.forEach(x=>{if(x.cyc!=null){if(x.sk==null)x.sk=+x.cyc===1?31:+x.cyc-1;delete x.cyc}});return d}
+  return d}
 function cpData(){return cbOf(cust)}
-function cpOwnedOf(p){const all=cbAll(),d=cbOf(p);return d.cards.map(e=>({c:all.find(c=>c.id===e.id),e})).filter(x=>x.c)}
+function cpOwnedOf(p){const all=cbAll(),d=cbOf(p);return d.cards.map(e=>({c:all.find(c=>c.id===e.id),e})).filter(x=>x.c).map(x=>({c:cpEff(x.c,x.e),e:x.e}))}
 function cpOwned(){return cpOwnedOf(cust)}
 /* danh sách thẻ hoàn tiền đang có (dùng chung cho tab Hoàn tiền và trang Tôi): mỗi thẻ 1 dòng gọn, bấm để mở chi tiết; nhiều thẻ thì chia theo ngân hàng và lọc được */
 const cpOpenSet=new Set();
@@ -1938,17 +1970,15 @@ function cpCardsHtml(p,empty,q){const owned=cpOwnedOf(p),hist=cbOf(p).hist;if(!o
     const tierSel=!cpSpendTier(c)&&c.tiers.length>1?`<label class="note cp-lab">${esc(c.by||"Mức")}${R.prevTier?" – app tự xếp theo lịch sử kỳ trước nếu có":""}<select data-cp-tier="${i}">${c.tiers.map((t,k)=>`<option value="${k}"${(e.tier||0)===k?" selected":""}>${esc(t.n||"Mức "+(k+1))}</option>`).join("")}</select></label>`:"";
     const pg=c.groups.map((g,k)=>[g,k]).filter(([g])=>g.pick);const np=(e.pick||[]).length;
     const picks=pg.length?`<div class="note">Nhóm đã đăng ký ở ngân hàng (${esc(c.pick||"")}) – chưa đăng ký thì chưa được hoàn theo nhóm:</div><div class="cp-picks">${pg.map(([g,k])=>`<label><input type="checkbox" data-cp-pick="${i}" value="${k}"${(e.pick||[]).includes(k)?" checked":""}>${esc(g.g)}</label>`).join("")}</div>`:"";
-    const def=cpCalMonth(c)?"thang":"ky",bs=cpBasis(c,e),sk=cpSk(c,e),now=new Date(),cy=cpCycle(c,e,now),st=cpStmt(c,e,now);
-    const cyc=`<div class="cp-cfg"><label class="note cp-lab">Tính hoàn tiền theo<select data-cp-basis="${i}"><option value="">${def==="thang"?"Tháng dương lịch":"Kỳ sao kê"} (theo thể lệ)</option><option value="ky"${e.basis==="ky"?" selected":""}>Kỳ sao kê</option><option value="thang"${e.basis==="thang"?" selected":""}>Tháng dương lịch</option></select></label>
-      <label class="note cp-lab">Ngày sao kê<input type="number" inputmode="numeric" min="1" max="31" data-cp-sk="${i}" value="${e.sk?esc(e.sk):""}" placeholder="${sk||"vd 20"}"></label>
-      <label class="note cp-lab">Miễn lãi tối đa (ngày)<input type="number" inputmode="numeric" min="15" max="120" list="cpFreeL" data-cp-free="${i}" value="${e.free?esc(e.free):""}" placeholder="45"></label></div>
-      <div class="note">Kỳ hoàn tiền: ${cpDM(cy.s)}–${cpDM(new Date(cy.t.getTime()-864e5))}${bs==="thang"?" (tháng dương lịch)":""} · sao kê ${cpDM(st.close)} · hạn thanh toán ${cpDM(st.due)}${e.free?"":" (tạm tính miễn lãi 45 ngày)"}${!e.sk&&!sk?" · <b>chưa nhập ngày sao kê</b>":""}. 31 = cuối tháng.</div>`;
+    const bs=cpBasis(c),sk=cpSk(c),now=new Date(),cy=cpCycle(c,e,now),st=cpStmt(c,e,now),segs=cpCfg(c).segs||[];
+    const segSel=segs.length?`<label class="note cp-lab">Phân khúc khách<select data-cp-seg="${i}"><option value="">Thông thường</option>${segs.map((S,k)=>`<option value="${k}"${e.seg===k?" selected":""}>${esc(S.n||"Phân khúc "+(k+1))}</option>`).join("")}</select></label>${c.seg&&c.seg.how?`<div class="note">Cách chi: ${esc(c.seg.how)}</div>`:""}`:"";
+    const cyc=segSel+`<div class="note">Kỳ hoàn tiền: ${cpDM(cy.s)}–${cpDM(new Date(cy.t.getTime()-864e5))}${bs==="thang"?" (tháng dương lịch)":" (theo kỳ sao kê)"}${sk?` · sao kê ${cpDM(st.close)} · hạn thanh toán ${cpDM(st.due)} (miễn lãi ${cpFree(c)} ngày)`:" · chưa có ngày sao kê"}. Quản lý cài ở Cấu hình → Chu kỳ &amp; phân khúc.</div>`;
     const rules=[c.minTxn?`cần ≥ ${c.minTxn} giao dịch/${cbPer(c)}`:"",R.minCash?`điểm từ ${cbMoney(R.minCash)}/kỳ mới ghi nhận`:"",c.capY!=null?`trần năm ${cbMoney(c.capY)}`:"",
       c.groups.some(g=>cpGRule(g).days)?"có ưu đãi theo ngày trong tuần":"",c.groups.some(g=>cpGRule(g).minAmt)?"có nhóm tính giao dịch từ "+cbMoney(Math.min(...c.groups.map(g=>cpGRule(g).minAmt).filter(Boolean))):""].filter(Boolean);
     const warn=[c.exp?`Chương trình hết hạn ${esc(c.to)}`:"",c.lv==="C"?"Mức tin cậy C – chưa đủ dữ liệu để tính":""].filter(Boolean).join(" · ");
     const hs=hist.filter(h=>h.card===c.id),per=hs.map(h=>h.p).sort().pop();
     const spent=per?`<div class="note">Tháng ${esc(cpPerTxt(per))} đã chi ${cbMoney(hs.filter(h=>h.p===per).reduce((a,h)=>a+h.amt,0)*TRV)} (${hs.filter(h=>h.p===per).length} giao dịch)</div>`:"";
-    const chips=[tierSel&&c.tiers[e.tier||0]?esc(c.tiers[e.tier||0].n||""):"",pg.length?(np?`${np} nhóm`:`<span class="bad">chưa chọn nhóm</span>`):"",c.exp?`<span class="bad">hết hạn</span>`:"",e.sk?`SK ${e.sk>=31?"cuối th.":e.sk}`:"",e.free?`ML ${e.free}`:""].filter(Boolean).join(" · ");
+    const chips=[tierSel&&c.tiers[e.tier||0]?esc(c.tiers[e.tier||0].n||""):"",pg.length?(np?`${np} nhóm`:`<span class="bad">chưa chọn nhóm</span>`):"",c.exp?`<span class="bad">hết hạn</span>`:"",c.seg?esc(c.seg.n||"phân khúc"):""].filter(Boolean).join(" · ");
     return hd+`<details class="cp-own${many?" g":""}" data-own="${esc(c.id)}"${cpOpenSet.has(c.id)?" open":""}><summary>${cbImg(c,1)}<span class="cp-own-t">${cbBk(c)}<b>${esc(c.name)}</b>${chips?`<small>${chips}</small>`:""}</span></summary>
       <div class="cp-own-b">${tierSel}${picks}${cyc}${rules.length?`<div class="note">Ràng buộc: ${esc(rules.join(" · "))}</div>`:""}${spent}${warn?`<div class="note" style="color:var(--warn)">${warn}</div>`:""}<button class="x" type="button" data-cp-del="${i}">Xoá thẻ này</button></div></details>`}).join("")}
 /* chọn thẻ để thêm: gõ tìm theo tên thẻ/ngân hàng, danh sách chia nhóm theo ngân hàng */
@@ -1966,9 +1996,7 @@ function cpCardsBind(box,getP,saveFn,after){
   $(box).addEventListener("change",e=>{const t=e.target,d=cbOf(getP());
     if(t.dataset.cpTier!=null){d.cards[+t.dataset.cpTier].tier=+t.value;saveFn();after(true)}
     else if(t.dataset.cpPick!=null){const c=d.cards[+t.dataset.cpPick];const v=+t.value;c.pick=(c.pick||[]).filter(x=>x!==v);if(t.checked)c.pick.push(v);saveFn();after(true)}
-    else if(t.dataset.cpBasis!=null){const c=d.cards[+t.dataset.cpBasis];if(t.value)c.basis=t.value;else delete c.basis;saveFn();after(true)}
-    else if(t.dataset.cpSk!=null){const c=d.cards[+t.dataset.cpSk];const v=parseInt(t.value);if(v>=1&&v<=31)c.sk=v;else delete c.sk;saveFn();after(true)}
-    else if(t.dataset.cpFree!=null){const c=d.cards[+t.dataset.cpFree];const v=parseInt(t.value);if(v>=15&&v<=120)c.free=v;else delete c.free;saveFn();after(true)}})}
+    else if(t.dataset.cpSeg!=null){const c=d.cards[+t.dataset.cpSeg];if(t.value==="")delete c.seg;else c.seg=+t.value;saveFn();after(true)}})}
 const cpTr=v=>{const n=cbN(v);return n==null?0:n*TRV};
 const cpPerTxt=p=>{const m=String(p||"").match(/^(\d{4})-(\d{2})$/);return m?`${m[2]}/${m[1]}`:p};
 const cpDM=d=>String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0");
@@ -2036,14 +2064,14 @@ function renderPlanOut(){
   qsLeft={};P.cards.forEach(x=>{for(const k in x.sp)if(x.sp[k]>0)qsLeft[x.c.id+"|"+k]=x.sp[k]});
   const pct=Math.min(100,Math.round(spent/tot*100)),over=Object.keys(spentCat).filter(k=>spentCat[k]>(needs[k]||0)+1);
   /* điều kiện chưa đủ theo số đã quẹt: chưa đủ thì tiền hoàn của thẻ chưa được tính là chắc chắn */
-  const unmet=x=>{const c=x.c,a=A[c.id],f=c.tiers[0].from||0,o={amt:0,txn:0,pts:a.res.need.cash};
-    if(cpSpendTier(c)&&f>0&&a.res.total<f)o.amt=f-a.res.total;if(c.minTxn&&a.n<c.minTxn)o.txn=c.minTxn-a.n;o.any=o.amt>0||o.txn>0||o.pts>0;return o};
+  const unmet=x=>{const c=x.c,a=A[c.id],f=Math.max(cpSpendTier(c)?c.tiers[0].from||0:0,c.segMin||0),o={amt:0,txn:0,pts:a.res.need.cash,f};
+    if(f>0&&a.res.total<f)o.amt=f-a.res.total;if(c.minTxn&&a.n<c.minTxn)o.txn=c.minTxn-a.n;o.any=o.amt>0||o.txn>0||o.pts>0;return o};
   const U={};P.cards.forEach(x=>U[x.c.id]=unmet(x));
-  const needTxt=(x,u)=>[u.amt?`chi thêm ít nhất ${cbMoney(u.amt)} (đã chi ${cbMoney(A[x.c.id].res.total)}/${cbMoney(x.c.tiers[0].from)})`:"",u.txn?`thêm ${u.txn} giao dịch (đã có ${A[x.c.id].n}/${x.c.minTxn})`:"",u.pts?`chi thêm cho điểm đủ ${cbMoney(cpCRule(x.c).minCash)}/kỳ`:""].filter(Boolean).join(" và ");
+  const needTxt=(x,u)=>[u.amt?`chi thêm ít nhất ${cbMoney(u.amt)} (đã chi ${cbMoney(A[x.c.id].res.total)}/${cbMoney(u.f)})`:"",u.txn?`thêm ${u.txn} giao dịch (đã có ${A[x.c.id].n}/${x.c.minTxn})`:"",u.pts?`chi thêm cho điểm đủ ${cbMoney(cpCRule(x.c).minCash)}/kỳ`:""].filter(Boolean).join(" và ");
   const pending=P.cards.reduce((s,x)=>s+(U[x.c.id].any?x.res.cash:0),0),nPend=P.cards.filter(x=>U[x.c.id].any&&x.res.cash>0).length;
   /* cảnh báo ràng buộc cần làm ngay */
   const alerts=[];
-  owned.forEach(({c,e})=>{if(!cpSk(c,e))return;const st=cpStmt(c,e,now),pv=cpStmt(c,e,new Date(st.s.getTime()-864e5));const dl=Math.ceil((pv.due-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
+  owned.forEach(({c,e})=>{if(!cpSk(c))return;const st=cpStmt(c,e,now),pv=cpStmt(c,e,new Date(st.s.getTime()-864e5));const dl=Math.ceil((pv.due-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
     if(dl>=0&&dl<=7&&d.hist.some(h=>h.card===c.id&&(t=>t>=pv.s&&t<pv.t)(cpTxDate(h))))alerts.push(`<b>${esc(c.bank+" "+c.name)}</b>: hạn thanh toán sao kê ${cpDM(pv.close)} là <b>${cpDM(pv.due)}</b> (${dl?`còn ${dl} ngày`:"hôm nay"}) – thanh toán đủ để không mất lãi.`)});
   P.cards.forEach(x=>{const c=x.c,a=A[c.id],plan=Object.values(x.sp).reduce((s,v)=>s+v,0),nm=esc(c.bank+" "+c.name),u=U[c.id];
     if(u.any&&(plan>0||a.n>0))alerts.push(plan>0?`<b>${nm}</b>: chưa đủ điều kiện – cần ${needTxt(x,u)} mới được hoàn${u.txn?" (chia nhỏ khoản chi)":""}. Chưa đủ thì cả kỳ 0đ${x.res.cash?`, nên ${cbMoney(x.res.cash)} dự kiến của thẻ này chưa chắc`:""}.`
@@ -2073,12 +2101,12 @@ function renderPlanOut(){
     let tierProg="";if(cpSpendTier(c)){const nt=r.below?0:r.ti+1,t=c.tiers[nt];if(t&&t.from){const p=Math.min(100,Math.round(done/t.from*100));tierProg=`<div class="cp-done">Lên mức “${esc(t.n||"tiếp theo")}”: cần chi ${cbMoney(t.from)}/${cbPer(c)} · đã chi ${cbMoney(done)}</div><div class="cp-prog"><i style="width:${p}%"></i></div>`}}
     const txnProg=c.minTxn?`<div class="cp-done">Số giao dịch trong kỳ: ${a.n}/${c.minTxn}</div><div class="cp-prog${a.n>=c.minTxn?"":" over"}"><i style="width:${Math.min(100,Math.round(a.n/c.minTxn*100))}%"></i></div>`:"";
     const capNow=done?a.res.capHit:[];const u=U[c.id],bad=a.res.warn.length||(u.any&&(plan>0||a.n>0));
-    const st=cpStmt(c,x.e,now),sk=cpSk(c,x.e);
+    const st=cpStmt(c,x.e,now),sk=cpSk(c),seg=c.seg?`<div class="note">Phân khúc <b>${esc(c.seg.n||"")}</b>${c.segMin?` · chi tối thiểu ${cbMoney(c.segMin)}/${cbPer(c)}`:""}${c.seg.how?` · ${esc(c.seg.how)}`:""}</div>`:"";
     const cyc=`Kỳ hoàn tiền ${cpDM(a.cur.s)}–${cpDM(new Date(a.cur.t.getTime()-864e5))}${cpBasis(c,x.e)==="thang"?" (tháng dương lịch)":""}`;
-    const stTxt=sk?`<div class="note">Sao kê ${cpDM(st.close)} · hạn thanh toán ${cpDM(st.due)} · quẹt hôm nay được miễn lãi ${Math.round((st.due-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5)} ngày${x.e.free?"":" (tạm tính miễn lãi 45 ngày)"}</div>`:`<div class="note">Chưa nhập ngày sao kê – nhập ở bước 1 để app tính hạn thanh toán.</div>`;
+    const stTxt=sk?`<div class="note">Sao kê ${cpDM(st.close)} · hạn thanh toán ${cpDM(st.due)} · quẹt hôm nay được miễn lãi ${Math.round((st.due-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5)} ngày${cpCfg(c).free?"":" (tạm tính miễn lãi 45 ngày)"}</div>`:`<div class="note">Dòng thẻ này chưa có ngày sao kê – quản lý cài ở Cấu hình → Chu kỳ &amp; phân khúc.</div>`;
     const needBox=u.any&&(plan>0||a.n>0)?`<div class="cp-need">Chưa đủ điều kiện nên chưa được hoàn: cần ${esc(needTxt(x,u))}. Chưa đủ thì cả kỳ 0đ.${plan>0?" Kế hoạch dưới đây đã tính phần chi thêm.":" Kế hoạch không dồn thêm vì thẻ khác lợi hơn."}</div>`:"";
     return`<details class="pc"${cpOpenSet.has("pc:"+c.id)?" open":""} data-pc="${esc(c.id)}"><summary>${cbImg(c,1)}<span class="pc-t">${cbBk(c)}<b>${esc(c.name)}</b><small>${done?`đã quẹt ${cbMoney(done)} · `:""}${plan>0?`nên quẹt thêm ${cbMoney(plan)}`:"không cần quẹt thêm"}${bad?` · <span class="bad">cần lưu ý</span>`:""}</small></span>${u.any&&r.cash?`<b class="pc-c wait">chờ ĐK<br>+${cbMoney(r.cash)}</b>`:`<b class="pc-c">+${cbMoney(r.cash)}</b>`}</summary>
-      <div class="pc-b"><div class="note">${esc(cyc)}${tierTxt?` · ${esc(tierTxt)}`:""}${done?` · đã được hoàn ${cbMoney(a.res.cash)}`:""}</div>${stTxt}${needBox}
+      <div class="pc-b"><div class="note">${esc(cyc)}${tierTxt?` · ${esc(tierTxt)}`:""}${done?` · đã được hoàn ${cbMoney(a.res.cash)}`:""}</div>${seg}${stTxt}${needBox}
       ${ls.length?`<table class="ctbl"><tbody>${ls.map(k=>{const l=r.lines.find(l=>l.k===k);return`<tr class="cp-row" data-q-card="${esc(c.id)}" data-q-cat="${k}" data-q-left="${x.sp[k]}" title="Bấm để ghi chi tiêu"><td>${esc(CP_NAME[k])}<div class="note">${l&&l.g?esc(l.g.g):"Hoàn cơ bản"}</div></td><td>${cbMoney(x.sp[k])}</td><td>${l?cbPct(Math.round(l.r*100)/100):""}</td></tr>`}).join("")}</tbody></table>`:""}
       ${tierProg}${txnProg}${a.res.warn.filter(w=>!/0đ|chưa được ghi nhận/.test(w)||!needBox).length?`<div class="note" style="color:var(--bad)">${esc(a.res.warn.filter(w=>!/0đ|chưa được ghi nhận/.test(w)||!needBox).join(" · "))}</div>`:""}
       ${capNow.length?`<div class="note" style="color:var(--warn)">Đã chạm trần (theo số đã chi): ${esc([...new Set(capNow)].join(", "))} – chi thêm nhóm này ở thẻ khác.</div>`:r.capHit.length?`<div class="note" style="color:var(--warn)">Sẽ chạm trần: ${esc([...new Set(r.capHit)].join(", "))}</div>`:""}
@@ -2093,7 +2121,7 @@ function renderPlanOut(){
     if(gain>=20000)ups.push({c,need,gain,name:t.n||"mức "+(nt+1)})});
   const upHtml=ups.length?`<div class="cbk">Chi thêm để lên mức</div><ul class="cbl">${ups.sort((a,b)=>b.gain-a.gain).slice(0,5).map(u=>`<li><b>${esc(u.c.bank+" "+u.c.name)}</b>: chi thêm ${cbMoney(u.need)} để lên ${esc(u.name)} → tiền hoàn tăng thêm khoảng ${cbMoney(u.gain)}/${cbPer(u.c)}. Nếu được, dồn các khoản đang quẹt thẻ khác sang thẻ này.</li>`).join("")}</ul>`:"";
   O.innerHTML=`<div class="cbk">Kế hoạch chi tiêu tháng ${esc(cpPerTxt(per))}</div>${big}${nextHtml}<div class="cbk">Theo từng thẻ (${owned.length})</div>${owned.length>8?`<input id="cpPcQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ trong kế hoạch">`:""}${planHtml}${upHtml}<div id="cpSug"><p class="note" style="margin:0">Đang tính gợi ý mở thẻ mới…</p></div>
-    <p class="note" style="margin:0">Ước tính theo dữ liệu tab Hoàn tiền. Kỳ hoàn tiền từng thẻ theo cấu hình ở bước 1: tính theo kỳ sao kê hoặc tháng dương lịch, ngày sao kê, số ngày miễn lãi. Thẻ chưa đủ số giao dịch, chi tiêu tối thiểu hoặc điểm tối thiểu thì chưa được tính tiền hoàn. Kế hoạch giả định chi đều các ngày; tiền đã hoàn tính theo đúng ngày, số tiền và số giao dịch đã ghi. Phần vượt trần không được hoàn; không tính ưu đãi đối tác riêng. Luôn đối chiếu thể lệ trước khi tư vấn.</p>`;
+    <p class="note" style="margin:0">Ước tính theo dữ liệu tab Hoàn tiền. Kỳ hoàn tiền, ngày sao kê, số ngày miễn lãi và phân khúc theo cấu hình của quản lý (Cấu hình → Chu kỳ &amp; phân khúc). Thẻ chưa đủ số giao dịch, chi tiêu tối thiểu hoặc điểm tối thiểu thì chưa được tính tiền hoàn. Kế hoạch giả định chi đều các ngày; tiền đã hoàn tính theo đúng ngày, số tiền và số giao dịch đã ghi. Phần vượt trần không được hoàn; không tính ưu đãi đối tác riêng. Luôn đối chiếu thể lệ trước khi tư vấn.</p>`;
   /* gợi ý mở thẻ mới: tính sau để màn hình hiện ngay */
   clearTimeout(renderPlanOut.sg);renderPlanOut.sg=setTimeout(()=>{const box=$("#cpSug");if(!box)return;
     const ev=evaluate(cust),elig={};ev.list.forEach(x=>{elig[canon(x.rule.name)]=x.status});
@@ -2197,7 +2225,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")drClose()});
 {let x0=null;const d=$("#drawer");d.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
  d.addEventListener("touchmove",e=>{if(x0!=null&&e.touches[0].clientX-x0<-60){x0=null;drClose()}},{passive:true})}
 $("#drawer").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(!b)return;const g=b.dataset.go;drClose();
-  if(g==="me")showTab("me");else if(g==="custs")showTab("custs");else if(g==="rules")showTab("rules");
+  if(g==="me")showTab("me");else if(g==="custs")showTab("custs");else if(g==="rules")showTab("rules");else if(g==="cbcfg")showTab("cbcfg");
   else if(g==="upd"){showTab("check");$("#pFile").click()}
   else if(g==="bk")bkExport();else if(g==="rs")$("#bkFile").click();
   else if(g==="back"){useMe();showTab("check")}else if(g==="new"){showTab("check");$("#newConfirm").hidden=false}});
@@ -2461,13 +2489,60 @@ $("#lockAgain").addEventListener("click",()=>{
   unlocked=false;try{sessionStorage.removeItem("kmt.unlock")}catch(err){}
   showLock();showAdmin();
 });
+
+/* ---------- Cấu hình chu kỳ & phân khúc thẻ hoàn tiền (chỉ quản lý) ---------- */
+const cfgOpen=new Set();
+function cfgSave(){save(K_CBCFG,cbCfg)}
+function cfgShow(){$("#cfgLock").hidden=unlocked;$("#cfgBody").hidden=!unlocked;if(unlocked)cfgRender();else setTimeout(()=>$("#cfgPass").focus(),50)}
+const trIn=v=>v?String(Math.round(v/1e4)/100).replace(".",","):"";
+function cfgRender(){const q=plain($("#cfgQ").value||"");const list=cbAll().filter(c=>!q||plain(c.bank+" "+c.name).includes(q));let prev=null;
+  $("#cfgList").innerHTML=list.length?list.map(c=>{const g=cpCfg(c),segs=g.segs||[],def=cpCalMonth(c)?"thang":"ky",sk=cpSk(c);
+    const hd=c.bank!==prev?`<div class="cp-bankh" style="--c1:${cbCol(c.bank)[1]}"><i></i>${esc(c.bank)}</div>`:"";prev=c.bank;
+    const chips=[cpBasis(c)==="thang"?"Tháng dương lịch":"Kỳ sao kê",sk?`SK ${sk>=31?"cuối tháng":sk}`:`<span class="bad">chưa có ngày sao kê</span>`,`ML ${cpFree(c)}`,segs.length?`${segs.length} phân khúc`:""].filter(Boolean).join(" · ");
+    const segHtml=segs.map((S,k)=>`<div class="cfg-seg" data-k="${k}"><label class="note cp-lab">Tên phân khúc<input type="text" data-f="n" value="${esc(S.n||"")}" placeholder="VD Diamond, Priority"></label>
+      <div class="cp-cfg2"><label class="note cp-lab">Chi tối thiểu (tr)<input type="text" inputmode="decimal" data-f="min" value="${trIn(S.min)}" placeholder="VD 10"></label>
+      <label class="note cp-lab">Số GD tối thiểu<input type="number" inputmode="numeric" min="0" data-f="txn" value="${S.txn!=null&&S.txn!==""?esc(S.txn):""}" placeholder="${c.minTxn||"không"}"></label>
+      <label class="note cp-lab">Trần hoàn (tr)<input type="text" inputmode="decimal" data-f="cap" value="${trIn(S.cap)}" placeholder="như thẻ"></label></div>
+      <label class="note cp-lab">Cách chi để được hoàn<textarea rows="2" data-f="how" placeholder="VD giữ số dư 2 tỷ, chi qua ví…">${esc(S.how||"")}</textarea></label>
+      <button class="x" type="button" data-seg-del="${k}">Xoá phân khúc</button></div>`).join("");
+    return hd+`<details class="cp-own g" data-cfg="${esc(c.id)}"${cfgOpen.has(c.id)?" open":""}><summary>${cbImg(c,1)}<span class="cp-own-t"><b>${esc(c.name)}</b><small>${chips}</small></span></summary>
+      <div class="cp-own-b"><div class="cp-cfg"><label class="note cp-lab">Tính hoàn tiền theo<select data-f="basis"><option value="">${def==="thang"?"Tháng dương lịch":"Kỳ sao kê"} (theo thể lệ)</option><option value="ky"${g.basis==="ky"?" selected":""}>Kỳ sao kê</option><option value="thang"${g.basis==="thang"?" selected":""}>Tháng dương lịch</option></select></label>
+      <label class="note cp-lab">Ngày sao kê<input type="number" inputmode="numeric" min="1" max="31" data-f="sk" value="${g.sk?esc(g.sk):""}" placeholder="${sk||"VD 20"}"></label>
+      <label class="note cp-lab">Miễn lãi (ngày)<input type="number" inputmode="numeric" min="15" max="120" list="cpFreeL" data-f="free" value="${g.free?esc(g.free):""}" placeholder="45"></label></div>
+      <div class="note">Thể lệ: ${esc(c.cyc||"chưa ghi chu kỳ")}${c.minTxn?` · ${c.minTxn} giao dịch/${cbPer(c)}`:""}${c.tiers[0].from?` · chi từ ${cbMoney(c.tiers[0].from)}`:""}. Ngày sao kê 31 = cuối tháng. Hạn thanh toán = ngày sao kê + (số ngày miễn lãi − 30). Chi tối thiểu, số GD, trần của phân khúc thay cho điều kiện thông thường của thẻ (tính theo mỗi kỳ).</div>
+      <div class="cbk" style="margin-top:4px">Phân khúc khách (${segs.length})</div>${segs.length?"":`<p class="note" style="margin:0">Chưa có – khách đều tính theo điều kiện thông thường của thẻ.</p>`}${segHtml}
+      <button class="btn2" type="button" data-seg-add="1">+ Thêm phân khúc</button></div></details>`}).join(""):`<p class="note" style="margin:0">Không có thẻ khớp.</p>`}
+$("#cfgLock").addEventListener("submit",async e=>{e.preventDefault();const ok=(await hashPass($("#cfgPass").value.trim()))===PASS_HASH;$("#cfgPass").value="";$("#cfgErr").hidden=ok;if(!ok)return;
+  unlocked=true;try{sessionStorage.setItem("kmt.unlock","1")}catch(err){}cfgShow();showLock();showAdmin()});
+$("#cfgLockAgain").addEventListener("click",()=>{unlocked=false;try{sessionStorage.removeItem("kmt.unlock")}catch(err){}cfgShow();showLock();showAdmin()});
+$("#cfgQ").addEventListener("input",cfgRender);
+$("#cfgList").addEventListener("toggle",e=>{const d=e.target;if(d.dataset&&d.dataset.cfg){d.open?cfgOpen.add(d.dataset.cfg):cfgOpen.delete(d.dataset.cfg)}},true);
+const cfgOf=el=>{const d=el.closest("[data-cfg]");return d?(cbCfg[d.dataset.cfg]=cbCfg[d.dataset.cfg]||{}):null};
+const cfgClean=()=>{for(const id in cbCfg){const g=cbCfg[id];if(g.segs&&!g.segs.length)delete g.segs;if(!Object.keys(g).length)delete cbCfg[id]}};
+$("#cfgList").addEventListener("click",e=>{const add=e.target.closest("[data-seg-add]"),del=e.target.closest("[data-seg-del]");if(!add&&!del)return;if(!unlocked)return;const g=cfgOf(e.target);
+  if(add){(g.segs=g.segs||[]).push({n:""});cfgSave();cfgRender();const ins=document.querySelectorAll(`[data-cfg="${CSS.escape(e.target.closest("[data-cfg]")?.dataset.cfg||"")}"] .cfg-seg input[data-f=n]`);if(ins.length)ins[ins.length-1].focus();return}
+  if(del.dataset.sure!=="1"){del.dataset.sure="1";del.textContent="Bấm lần nữa để xoá";setTimeout(()=>{del.dataset.sure="";del.textContent="Xoá phân khúc"},3000);return}
+  g.segs.splice(+del.dataset.segDel,1);cfgClean();cfgSave();cfgRender();toast("Đã xoá phân khúc – khách đang chọn phân khúc này sẽ về Thông thường")});
+$("#cfgList").addEventListener("change",e=>{const t=e.target,f=t.dataset.f;if(!f||!unlocked)return;const g=cfgOf(t);if(!g)return;const sg=t.closest(".cfg-seg");
+  if(sg){const S=g.segs[+sg.dataset.k];if(!S)return;
+    if(f==="n"||f==="how")S[f]=t.value.trim();
+    else if(f==="txn"){const v=parseInt(t.value);if(v>=0)S.txn=v;else delete S.txn}
+    else{const v=cpAmt(t.value);if(v>0)S[f]=Math.round(v*TRV);else delete S[f];t.value=trIn(S[f])}}
+  else if(f==="basis"){if(t.value)g.basis=t.value;else delete g.basis}
+  else if(f==="sk"){const v=parseInt(t.value);if(v>=1&&v<=31)g.sk=v;else{delete g.sk;t.value=""}}
+  else if(f==="free"){const v=parseInt(t.value);if(v>=15&&v<=120)g.free=v;else{delete g.free;t.value=""}}
+  cfgClean();cfgSave();
+  const d=t.closest("[data-cfg]"),c=cbAll().find(c=>c.id===d.dataset.cfg);if(c&&!sg){const sk=cpSk(c);d.querySelector("summary small").innerHTML=[cpBasis(c)==="thang"?"Tháng dương lịch":"Kỳ sao kê",sk?`SK ${sk>=31?"cuối tháng":sk}`:`<span class="bad">chưa có ngày sao kê</span>`,`ML ${cpFree(c)}`,(cpCfg(c).segs||[]).length?`${cpCfg(c).segs.length} phân khúc`:""].filter(Boolean).join(" · ")}
+  else if(c&&sg&&f==="n"){/* tên phân khúc */}
+  toast("Đã lưu")});
 function showTab(t){
-  ["check","custs","rules","cb","me"].forEach(v=>$("#v-"+v).hidden=v!==t);
-  $("#tbTitle").textContent={check:"Mở thẻ",cb:"Hoàn tiền",me:"Tôi",custs:"Khách hàng",rules:"Điều kiện"}[t]||"";
+  ["check","custs","rules","cb","me","cbcfg"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  $("#tbTitle").textContent={check:"Mở thẻ",cb:"Hoàn tiền",me:"Tôi",custs:"Khách hàng",rules:"Điều kiện",cbcfg:"Chu kỳ & phân khúc"}[t]||"";
   $("#policyBar").hidden=t!=="check";
   if(t==="me")renderMe();
   if(t==="check")renderCust();
   if(t==="custs")renderCustList();
+  if(t==="cbcfg")cfgShow();
   if(t==="cb"){cbShowLock();if(cbOk){renderCb();if(!$("#cpView").hidden)renderPlan()}}
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   window.scrollTo(0,0);
