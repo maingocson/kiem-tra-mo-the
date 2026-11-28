@@ -144,14 +144,18 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 ## Ràng buộc được tính khi lập kế hoạch và theo dõi
 
 - **Số giao dịch tối thiểu** (VD OCB ≥ 7 giao dịch/tháng): chưa đủ thì tiền hoàn của cả kỳ = 0; app hiện tiến độ x/7 và nhắc chia nhỏ khoản chi.
-- **Ngưỡng mức theo tổng chi kỳ này** (StepUp, Shinhan, MSB…): tính mức theo tổng đã quẹt + kế hoạch; dưới ngưỡng đầu chỉ được hoàn cơ bản. App gợi ý "chi để đủ ngưỡng mức" khi đáng.
+- **Ngưỡng mức theo tổng chi kỳ này** (StepUp, Shinhan, MSB…): tính mức theo tổng đã quẹt + kế hoạch; dưới ngưỡng đầu (VD Shinhan 10tr, MSB Online 3tr) thì tiền hoàn = 0. App báo "cần chi thêm X", và tự dồn chi tiêu sang thẻ đó nếu tổng tiền hoàn tăng.
 - **Mức theo chi tiêu kỳ trước** (VIB Cash Back, Family Link): app tự xếp mức theo tổng chi kỳ trước trong lịch sử; chưa có lịch sử thì dùng mức chọn ở bước 1.
 - **Nhóm phải đăng ký** (VIB, SHB…): chưa tick nhóm đã đăng ký thì tiền đã quẹt chỉ tính hoàn cơ bản; app nhắc nhóm nên đăng ký.
 - **Ưu đãi theo ngày** (ẩm thực cuối tuần Shinhan…): khoản đã ghi tính đúng theo ngày quẹt; kế hoạch tính theo tỷ lệ ngày và ghi rõ "chỉ T7, CN".
 - **Giao dịch tối thiểu của nhóm** (Techcombank Everyday: mỗi giao dịch online từ 200k): khoản nhỏ hơn không được hoàn nhóm.
 - **Điểm tối thiểu mỗi kỳ** (SHB: từ 100k điểm/kỳ mới ghi nhận): dưới mức thì = 0.
 - **Trần nhóm, trần chung, trần cả thẻ, trần năm**: trần năm trừ dần theo tiền hoàn các kỳ trước trong năm.
-- **Kỳ sao kê**: từng thẻ tính theo kỳ riêng (VPBank StepUp 21→20, Super Shopee 26→25; thẻ khác nhập ngày bắt đầu kỳ ở bước 1, thẻ "tháng dương lịch" cố định ngày 1).
+- **Chưa đủ điều kiện thì chưa tính hoàn**: thẻ thiếu số giao dịch, thiếu chi tiêu tối thiểu hoặc điểm chưa đủ thì "Đã được hoàn" = 0, thẻ hiện "chờ ĐK", và ô "Trong đó chờ đủ điều kiện" tách riêng phần tiền hoàn chưa chắc. Cảnh báo ghi rõ cần chi thêm bao nhiêu, thêm mấy giao dịch.
+- **Cấu hình từng thẻ** (bước 1, bấm vào thẻ):
+  - *Tính hoàn tiền theo*: kỳ sao kê hoặc tháng dương lịch (mặc định theo thể lệ).
+  - *Ngày sao kê* (1–31, 31 = cuối tháng): kỳ hoàn tiền theo sao kê bắt đầu từ ngày hôm sau. Ngày 29–31 tự dồn về cuối tháng ở tháng ngắn.
+  - *Miễn lãi tối đa* (45, 50, 55, 60 ngày…, mặc định 45): hạn thanh toán = ngày sao kê + (số ngày miễn lãi − 30). App hiện ngày sao kê, hạn thanh toán, số ngày miễn lãi nếu quẹt hôm nay, và nhắc khi còn ≤ 7 ngày tới hạn thanh toán của kỳ có giao dịch.
 - **Nhiều thẻ (50+)**: danh sách thẻ gọn theo ngân hàng, lọc nhanh; kế hoạch chỉ xét các thẻ hợp từng loại chi tiêu nên vẫn nhanh (46 thẻ, 1.000 giao dịch: ~0,1 giây); thẻ không dùng trong tháng được gom lại; giao dịch tháng này lọc theo thẻ, hiện 10 khoản mới nhất.
 
 ## Hình thẻ
