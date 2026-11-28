@@ -476,7 +476,14 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 .tk-in{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}.tk-in input{flex:1;min-width:0;padding:7px 9px;font-size:14px}
 .lv{display:inline-block;font-size:11px;font-weight:800;border-radius:99px;padding:1px 7px;margin-right:4px}
 .lv.ok{background:var(--ok-soft);color:var(--ok)}.lv.warn{background:var(--warn-soft);color:var(--warn)}.lv.bad{background:var(--bad-soft);color:var(--bad)}.lv.ch{background:var(--sunk);color:var(--muted)}
-.pl-chips button{font-size:12px}
+.pl-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.pl-row{display:flex;gap:10px;align-items:center;width:100%;font:inherit;color:var(--ink);text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 12px;cursor:pointer}
+.pl-row:first-child{border-top:0}.pl-row.on{box-shadow:inset 3px 0 0 var(--accent);background:var(--sunk)}
+.pl-row.active{background:var(--accent-soft)}.pl-row.active.on{background:var(--accent-soft)}
+.pl-row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.pl-row .t b{font-size:15px}.pl-row .t small{font-size:13px;color:var(--muted);line-height:1.4}.pl-row .t small b{color:var(--ink)}
+.pl-row .chip{flex:none}
+.pl-sep{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:8px 12px 4px;border-top:1px solid var(--line);background:var(--sunk)}
+.pl-list .grp>summary{padding:8px 12px;font-size:13px;color:var(--accent);font-weight:600}
 .pl-i{display:flex;justify-content:space-between;gap:8px}
 .pl-new{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--accent);border-radius:12px;padding:10px}
 .pl-sug{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -2104,7 +2111,8 @@ const cpCondTxt=u=>[u.amt?`chi thêm ${cbMoney(u.amt)}`:"",u.txn?`thêm ${u.txn}
 /* ---- Kế hoạch chi tiêu: mỗi khách nhiều kế hoạch, nối liền nhau theo ngày ---- */
 const newPlanId=()=>"k"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 let cpSelId=null,cpNewOpen=false,cpNewTo=null,cpNewFrom=null,cpEditEnd=false;
-const cpStTxt={draft:["Nháp","ch"],active:["Đang áp dụng","ok"],done:["Đã kết thúc","acc"]};
+const cpStTxt={draft:["Nháp","ch"],active:["Đang hoạt động","ok"],next:["Sắp tới","warn"],done:["Đã kết thúc","acc"]};
+const cpStOf=P=>P.status==="active"&&P.from>dKey(dToday())?"next":P.status;
 function cpPlanTick(d){const t=dKey(dToday());d.plans.forEach(P=>{if(P.status==="active"&&P.to<t)P.status="done"})}
 const cpActivePlan=d=>{const t=dKey(dToday());return d.plans.find(P=>P.status==="active"&&P.from<=t&&P.to>=t)||null};
 function cpSel(d){let P=cpSelId&&d.plans.find(x=>x.id===cpSelId);if(!P){P=cpActivePlan(d)||d.plans.slice().sort((a,b)=>b.from.localeCompare(a.from))[0]||null;cpSelId=P&&P.id}return P}
@@ -2127,7 +2135,8 @@ function cpShiftNext(d,oldTo,newTo){const of=dKey(dAdd(dParse(oldTo),1)),nf=dKey
   d.plans.forEach(P=>{if(P.from===of&&(P.status==="draft"||P.status==="active")){P.from=nf;const L=dDiff(dParse(P.from),dParse(P.to))+1;if(L<CP_PLAN_MIN||L>CP_PLAN_MAX)P.to=dKey(dAdd(dParse(nf),29))}})}
 function cpPlanCheck(d,P,from,to,status){const t0=dToday(),L=dDiff(from,to)+1;
   if(L<CP_PLAN_MIN)return`Kế hoạch tối thiểu ${CP_PLAN_MIN} ngày`;if(L>CP_PLAN_MAX)return`Kế hoạch tối đa ${CP_PLAN_MAX} ngày`;if(to<t0)return"Ngày kết thúc phải từ hôm nay trở đi";
-  if(status==="active"){const f=dKey(from),t=dKey(to);const o=d.plans.find(x=>x!==P&&(x.status==="active"||x.status==="done")&&!(x.to<f||x.from>t));if(o)return`Trùng ngày với kế hoạch ${cpPlanTitle(o)}`}
+  if(status==="active"){const f=dKey(from),t=dKey(to);const o=d.plans.find(x=>x!==P&&(x.status==="active"||x.status==="done")&&!(x.to<f||x.from>t));if(o)return`Trùng ngày với kế hoạch ${cpPlanTitle(o)}`;
+    const nx=d.plans.find(x=>x!==P&&cpStOf(x)==="next");if(f>dKey(t0)&&nx)return`Đã có kế hoạch sắp tới ${cpPlanTitle(nx)} – sửa hoặc đưa nó về nháp trước`}
   return""}
 /* ---- Thẻ & kỳ: mỗi thẻ hiện 2 đồng hồ (kỳ tính hoàn, kỳ sao kê), đã thanh toán, đối chiếu ---- */
 function cpTKHtml(owned,A,planned){const d=cpData(),t0=dToday();if(!owned.length)return"";d.paid=d.paid||{};d.stmt=d.stmt||{};d.recv=d.recv||{};
@@ -2149,13 +2158,26 @@ function cpTKHtml(owned,A,planned){const d=cpData(),t0=dToday();if(!owned.length
     return`<details class="tk"${cpOpenSet.has("tk:"+c.id)?" open":""} data-tk="${esc(c.id)}"><summary>${cbImg(c,1)}<span class="tk-t"><b>${esc(c.bank+" "+c.name)}</b><small><span class="chip ${cpBasis(c)==="thang"?"acc":"ch"}">${cpBasisTxt(c)}</span>${cpBasisOk(c)?"":` <span class="chip warn">chưa xác nhận</span>`}</small><small>Kỳ tính hoàn ${cpDM(a.cur.s)}–${cpDM(end)} · còn ${left+1} ngày</small><small>${cond}</small></span>${u.f?cpRing(a.res.total,u.f,`${cpTrS(a.res.total)}/${cpTrS(u.f)}`,40):c.minTxn?cpRing(a.n,c.minTxn,`${a.n}/${c.minTxn}`,40):""}</summary>
       <div class="tk-b"><div class="note">Đã chi kỳ này ${cbMoney(a.res.total)} · ${a.n} giao dịch · hoàn tạm ${cbMoney(a.res.cash)}${c.capT[a.res.ti]!=null?` / trần ${cbMoney(c.capT[a.res.ti])}`:""}${cpBasisOk(c)?"":" · kiểu tính hoàn đang đoán theo thể lệ, quản lý cần xác nhận ở Danh mục thẻ hoàn"}</div>${stm}${rec}</div></details>`});
   return`<div class="sec-head"><span class="cbk" style="margin:0">Thẻ &amp; kỳ</span><span class="note">${owned.length} thẻ</span></div><p class="note" style="margin:0">Mỗi thẻ có 2 đồng hồ: <b>kỳ tính hoàn</b> (điều kiện, trần, mức) và <b>kỳ sao kê</b> (số tiền phải trả, hạn thanh toán). Bấm thẻ để đánh dấu đã thanh toán và đối chiếu.</p>${rows.join("")}`}
+/* tiền hoàn tính theo giao dịch thật của các kỳ kết thúc trong kế hoạch (đã qua), và tiền ngân hàng đã trả đã nhập */
+function cpPlanReal(P,owned,d){const t0=dToday(),f=dParse(P.from),to=dParse(P.to);let cash=0,rcv=0,nR=0,n=0;d.recv=d.recv||{};
+  owned.forEach(({c,e})=>cpPeriods(c,e,f,dMin(to,t0)).forEach(p=>{const end=dAdd(p.t,-1);if(end>=t0||end>to||end<f)return;const st=cpPerState(c,e,d.hist,p,null);cash+=st.res.cash;n++;const rv=d.recv[c.id+"|"+dKey(p.s)];if(rv!=null){rcv+=rv;nR++}}));
+  return{cash,rcv,nR,n}}
+function cpPlanRow(P,d,owned,sel){const t0=dToday(),st=cpStOf(P),S=cpStTxt[st],f=dParse(P.from),to=dParse(P.to),L=dDiff(f,to)+1,ps=cust.planSum&&cust.planSum.plan===P.id?cust.planSum:null;let sub="";
+  if(st==="active")sub=`còn ${dDiff(t0,to)+1}/${L} ngày${ps&&ps.tot?` · dự kiến hoàn <b>${cbMoney(ps.cash)}</b> · đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)}${ps.todo?` · việc ${ps.done||0}/${ps.todo}`:""}`:""}`;
+  else if(st==="next")sub=`${L} ngày · bắt đầu sau ${dDiff(t0,f)} ngày, tự chuyển sang đang hoạt động`;
+  else if(st==="draft")sub=`${L} ngày · phương án chưa chốt`;
+  else{const r=cpPlanReal(P,owned,d);sub=`${L} ngày${P.snap?` · dự kiến ${cbMoney(P.snap.cash)}`:""} · app tính <b>${cbMoney(r.cash)}</b>${r.nR?` · NH trả ${cbMoney(r.rcv)}`:""}`}
+  return`<button type="button" class="pl-row${sel?" on":""} ${st}" data-pl-sel="${esc(P.id)}"><span class="t"><b>${cpPlanTitle(P)}</b><small>${sub}</small></span><span class="chip ${S[1]}">${S[0]}</span></button>`}
 /* ---- thanh kế hoạch: chọn kế hoạch, tạo mới (đề xuất ngày), áp dụng, sửa ngày kết thúc ---- */
 function cpPBHtml(d,owned){const t0=dToday(),P=cpSel(d),list=d.plans.slice().sort((a,b)=>a.from.localeCompare(b.from));
-  const chips=list.length?`<div class="cs-filter pl-chips">${list.map(x=>`<button type="button" data-pl-sel="${esc(x.id)}" aria-pressed="${P&&x.id===P.id}">${cpPlanTitle(x)} · ${cpStTxt[x.status][0]}</button>`).join("")}</div>`:"";
+  const ord={active:0,next:1,draft:2,done:3},grp=list.slice().sort((a,b)=>ord[cpStOf(a)]-ord[cpStOf(b)]||(cpStOf(a)==="done"?b.from.localeCompare(a.from):a.from.localeCompare(b.from)));
+  const doneL=grp.filter(x=>cpStOf(x)==="done"),liveL=grp.filter(x=>cpStOf(x)!=="done"),hasAct=list.some(x=>cpStOf(x)==="active");
+  const row=x=>cpPlanRow(x,d,owned,P&&x.id===P.id);
+  const chips=list.length?`${hasAct?"":`<div class="cu-link"><span><b>Chưa có kế hoạch đang hoạt động.</b> Tạo kế hoạch để app phân bổ chi tiêu và nhắc việc.</span></div>`}<div class="pl-list">${liveL.map(row).join("")}${doneL.length?`<div class="pl-sep">Đã kết thúc (${doneL.length})</div>${doneL.slice(0,5).map(row).join("")}${doneL.length>5?`<details class="grp"><summary>Xem thêm ${doneL.length-5} kế hoạch</summary>${doneL.slice(5).map(row).join("")}</details>`:""}`:""}</div>`:"";
   let info="";
-  if(P){const f=dParse(P.from),to=dParse(P.to),L=dDiff(f,to)+1,dl=dDiff(t0,to)+1,st=cpStTxt[P.status];
-    info=`<div class="pl-i"><div><b>Kế hoạch ${cpPlanTitle(P)}</b> <span class="chip ${st[1]}">${st[0]}</span><br><span class="note">${L} ngày${P.status==="active"?(f>t0?` · bắt đầu sau ${dDiff(t0,f)} ngày`:` · còn ${dl} ngày`):""}</span></div></div>
-      ${P.status==="active"&&!cpEditEnd?`<div class="row-btns"><button class="btn2" type="button" data-pl-act="edit">Đổi ngày kết thúc</button>${f<=t0?`<button class="btn2" type="button" data-pl-act="endnow">Kết thúc hôm nay</button>`:`<button class="btn2" type="button" data-pl-act="unapply">Về nháp</button>`}</div>`:""}
+  if(P){const f=dParse(P.from),to=dParse(P.to),L=dDiff(f,to)+1,dl=dDiff(t0,to)+1,st=cpStTxt[cpStOf(P)];
+    info=`<div class="pl-i"><div><span class="note">Đang xem:</span> <b>${cpPlanTitle(P)}</b> <span class="chip ${st[1]}">${st[0]}</span><br><span class="note">${L} ngày${P.status==="active"?(f>t0?` · bắt đầu sau ${dDiff(t0,f)} ngày`:` · còn ${dl} ngày`):""}</span></div></div>
+      ${P.status==="active"&&!cpEditEnd?`<div class="row-btns"><button class="btn2" type="button" data-pl-act="edit">Đổi ngày kết thúc</button>${f<=t0?`<button class="btn2" type="button" data-pl-act="endnow">Kết thúc hôm nay</button>`:`<button class="btn2" type="button" data-pl-act="unapply">Đưa về nháp</button>`}</div>`:""}
       ${P.status==="active"&&cpEditEnd?`<div class="cp-add"><input type="date" id="cpPlEnd" value="${P.to}" min="${dKey(dMax(t0,dAdd(f,CP_PLAN_MIN-1)))}" max="${dKey(dAdd(f,CP_PLAN_MAX-1))}"><button class="btn2 acc" type="button" data-pl-act="saveend">Lưu</button><button class="btn2" type="button" data-pl-act="canceledit">Huỷ</button></div><p class="note" style="margin:0">Kế hoạch kế tiếp (nếu có) tự dời ngày bắt đầu để nối liền.</p>`:""}
       ${P.status==="draft"?`<div class="row-btns"><button class="btn2 acc" type="button" data-pl-act="apply">Áp dụng kế hoạch này</button><button class="btn2 danger" type="button" data-pl-act="del">Xoá nháp</button></div>`:""}`}
   let form="";
@@ -2180,7 +2202,7 @@ function cpPlanCreate(status){const d=cpData(),owned=cpOwned(),t0=dToday(),slot=
   const P={id:newPlanId(),from:dKey(from),to:dKey(to),status,needs:prev?clone(prev.needs||{}):{},budget:prev?prev.budget:undefined,needsSrc:prev?prev.needsSrc:"auto",known:[],pins:prev?clone(prev.pins||{}):{},created:new Date().toISOString()};
   if(!prev||!Object.keys(P.needs).length)P.needsSrc="auto";
   if(status==="active")d.plans=d.plans.filter(x=>!(x.status==="draft"&&x.from===P.from));
-  d.plans.push(P);cpSelId=P.id;cpNewOpen=false;cpNewTo=null;cpNewFrom=null;cpSave();renderPlan();toast(status==="active"?"Đã tạo và áp dụng kế hoạch":"Đã lưu nháp kế hoạch")}
+  d.plans.push(P);cpSelId=P.id;cpNewOpen=false;cpNewTo=null;cpNewFrom=null;cpSave();renderPlan();toast(status!=="active"?"Đã lưu nháp kế hoạch":P.from>dKey(t0)?`Đã lên lịch – tự hoạt động từ ${dDMY(dParse(P.from))}`:"Đã tạo, kế hoạch đang hoạt động")}
 function cpPlanAct(a){const d=cpData(),P=cpSel(d),t0=dToday();
   if(a==="new"){cpNewOpen=true;cpNewTo=null;renderPlan();return}
   if(!P)return;
@@ -2430,6 +2452,8 @@ function renderPlan(){
     $("#cpPins").innerHTML=CP_CATS.map(([k,n])=>`<label>${esc(n)}<select data-pin="${k}"><option value="">Tự động</option>${op}</select></label>`).join("");
     $("#cpPins").querySelectorAll("[data-pin]").forEach(sel=>{sel.value=pins[sel.dataset.pin]||""});$("#cpPinS").textContent=Object.keys(pins).length?`${Object.keys(pins).length} loại đã ghim`:""}
   renderPlanOut();
+  /* vẽ lại danh sách kế hoạch để dòng đang hoạt động có số liệu vừa tính */
+  if(owned.length&&!cpNewOpen&&!cpEditEnd)$("#cpPB").innerHTML=cpPBHtml(d,owned);
 }
 function renderPlanOut(){
   const d=cpData(),owned=cpOwned(),all=cbAll(),O=$("#cpOut"),now=new Date(),t0=dToday(),PL=cpSel(d);
@@ -2459,7 +2483,7 @@ function renderPlanOut(){
       L[k]=flex[k]*share+known.filter(x=>x.cat===k&&(dt=>dt>=a0&&dt<b0)(dParse(x.d))).reduce((s,x)=>s+cpTr(x.amt),0)}
     lims[vc.id]=L})});
   const leftTot=Object.values(left).reduce((a,b)=>a+b,0);
-  if(!tot){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;$("#cpSugBox").hidden=true;setPlanSum({plan:PL.id,from:PL.from,to:PL.to,cards:owned.length,cash:realized,spent,tot:0,cashNow:realized});
+  if(!tot){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;$("#cpSugBox").hidden=true;if(cpActivePlan(d)===PL)setPlanSum({plan:PL.id,from:PL.from,to:PL.to,cards:owned.length,cash:realized,spent,tot:0,cashNow:realized});
     O.innerHTML=`<div class="cbk">Kế hoạch ${cpPlanTitle(PL)}</div>${spent?`<p style="margin:0">Đã chi <b>${cbMoney(spent)}</b> trong kế hoạch.</p>`:""}<p class="note" style="margin:0">Nhập nhu cầu chi tiêu ở bước 2 hoặc bấm "Tự tính theo thẻ".</p>${cpTLHtml(owned,from,to)}`;return}
   const P=cpOptimize(V,left,true,fix,vctx,lims);
   qsLeft={};P.cards.forEach(x=>{if(x.c.isNext)return;for(const k in x.sp)if(x.sp[k]>0)qsLeft[x.c.baseId+"|"+k]=(qsLeft[x.c.baseId+"|"+k]||0)+x.sp[k]});
@@ -2491,7 +2515,7 @@ function renderPlanOut(){
     else if(cpCRule(c).pickReg&&x.e.pick&&x.e.pick.length&&(plan>0||a.n>0))alerts.push({ic:"ok",done:1,t:`Đã đăng ký nhóm hoàn tiền <b>${nm}</b>`,s:esc(x.e.pick.map(i=>c.groups[i]&&c.groups[i].g).filter(Boolean).join(", "))});
     if(c.capY!=null&&a.ctx.yearUsed!=null&&a.ctx.yearUsed>=c.capY*0.9)alerts.push({ic:"warn",t:`<b>${nm}</b> sắp chạm trần năm`,s:`đã nhận ${cbMoney(a.ctx.yearUsed)} / ${cbMoney(c.capY)}`})});
   alerts.sort((a,b)=>(a.done?1:0)-(b.done?1:0));const nDone=alerts.filter(a=>a.done).length;
-  setPlanSum({plan:PL.id,from:PL.from,to:PL.to,cards:owned.length,cash:planCash,spent,tot,cashNow,todo:alerts.length,done:nDone});
+  if(cpActivePlan(d)===PL)setPlanSum({plan:PL.id,from:PL.from,to:PL.to,cards:owned.length,cash:planCash,spent,tot,cashNow,todo:alerts.length,done:nDone});
   const tdRow=a=>`<div class="td${a.done?" done":""}"><span class="ic">${IC[a.ic]}</span><span class="t">${a.t}<br><span class="note">${a.s}</span></span>${a.ring||""}</div>`;
   const todo=alerts.length?`<div class="cp-todo"><div class="cp-todo-h"><span class="cbk" style="margin:0">Việc cần làm</span><span>${nDone}/${alerts.length} hoàn tất</span></div><div class="cp-todo-p" title="${nDone}/${alerts.length} việc hoàn tất"><i style="width:${Math.round(nDone/alerts.length*100)}%"></i></div>${alerts.slice(0,4).map(tdRow).join("")}${alerts.length>4?`<details class="grp"><summary>Xem thêm ${alerts.length-4} việc</summary>${alerts.slice(4).map(tdRow).join("")}</details>`:""}</div>`:"";
   const big=`<div class="cp-hero"><em>Nếu chi đúng kế hoạch ${cpPlanTitle(PL)}, dự kiến hoàn</em><strong>${cpVnd(planCash)}<small>₫</small></strong></div>
@@ -2657,7 +2681,7 @@ $("#cpMake").addEventListener("click",()=>cpMake(false));
 $("#cpAuto").addEventListener("click",()=>{const d=cpData();if(!cpOwned().length){toast("Thêm thẻ đang có ở bước 1 trước");return}d.needsSrc="auto";cpSave();renderPlan();toast("Đã tự tính nhu cầu theo thẻ đang có")});
 $("#cpBudget").addEventListener("input",e=>{const d=cpData();const v=e.target.value.trim();d.budget=v||undefined;if(d.needsSrc!=="auto"&&cpOwned().length)d.needsSrc="auto";cpSave();clearTimeout(renderPlan.t);renderPlan.t=setTimeout(renderPlan,400)});
 
-$("#cpPB").addEventListener("click",e=>{const s=e.target.closest("[data-pl-sel]");if(s){cpSelId=s.dataset.plSel;cpNewOpen=false;cpEditEnd=false;renderPlan();return}
+$("#cpPB").addEventListener("click",e=>{const s=e.target.closest("[data-pl-sel]");if(s){cpSelId=s.dataset.plSel;cpNewOpen=false;cpEditEnd=false;renderPlan();setTimeout(()=>{const o=$("#cpOut");if(o)window.scrollTo({top:o.getBoundingClientRect().top+scrollY-70,behavior:"smooth"})},60);return}
   const t=e.target.closest("[data-pl-to]");if(t){cpNewTo=t.dataset.plTo;const f=$("#cpPlFrom");if(f)cpNewFrom=f.value;renderPlan();return}
   const n=e.target.closest("[data-pl-new]");if(n){if(n.dataset.plNew==="x"){cpNewOpen=false;renderPlan()}else cpPlanCreate(n.dataset.plNew);return}
   const a=e.target.closest("[data-pl-act]");if(a)cpPlanAct(a.dataset.plAct)});
@@ -3386,8 +3410,8 @@ function renderCustPage(){const c=cust,isMe=!!c.isMe,st=CS_ST[custSt(c)];
   let sm=null;try{sm=summaryOf(c)}catch(e){}const s1=stats(c);
   $("#cuCheckS").innerHTML=[custHasCredit(c)?`${fmt(s1.cards)} thẻ ở ${s1.bankCount} ngân hàng · dùng ${Math.round(s1.util)}% hạn mức`:"Chưa nhập thẻ tín dụng hoặc CIC",c.cic&&c.cic.at?`CIC ngày ${esc(String(c.cic.at))}`:"",
     sm?(sm.ok.length?`<b>Mở được ${sm.ok.length} ngân hàng</b>: ${esc(sm.ok.slice(0,4).join(", "))}${sm.ok.length>4?"…":""}`:sm.warn.length?`<b>Cần giảm dư nợ</b>: ${esc(sm.warn.slice(0,3).join(", "))}`:"Chưa có ngân hàng phù hợp"):""].filter(Boolean).join("<br>");
-  const d=cbOf(c),n=d.cards.length,{ap,ps}=psCur(c),dues=custDues(c),nPl=d.plans.filter(x=>x.status!=="draft").length;
-  $("#cuPlanS").innerHTML=(n?[`${n} thẻ hoàn tiền · ${nPl} kế hoạch`,ap?`Kế hoạch ${cpDM(dParse(ap.from))}–${cpDM(dParse(ap.to))} (còn ${dDiff(dToday(),dParse(ap.to))+1} ngày)${ps&&ps.tot?`: <b>dự kiến hoàn ${cbMoney(ps.cash)}</b> · đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)}`:""}`:`<b style="color:var(--warn)">Chưa có kế hoạch đang áp dụng</b>`,
+  const d=cbOf(c),n=d.cards.length,{ap,ps}=psCur(c),dues=custDues(c),nPl=d.plans.filter(x=>x.status!=="draft").length,nNext=d.plans.some(x=>cpStOf(x)==="next");
+  $("#cuPlanS").innerHTML=(n?[`${n} thẻ hoàn tiền · ${nPl} kế hoạch${nNext?" (có kế hoạch sắp tới)":""}`,ap?`Kế hoạch ${cpDM(dParse(ap.from))}–${cpDM(dParse(ap.to))} (còn ${dDiff(dToday(),dParse(ap.to))+1} ngày)${ps&&ps.tot?`: <b>dự kiến hoàn ${cbMoney(ps.cash)}</b> · đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)}`:""}`:`<b style="color:var(--warn)">Chưa có kế hoạch đang áp dụng</b>`,
     ps&&ps.todo?`Việc cần làm: ${ps.done||0}/${ps.todo} hoàn tất`:"",dues.length?`<b style="color:var(--${dues[0].type==="over"?"bad":"warn"})">${dues[0].type==="over"?"Quá hạn thanh toán":"Hạn thanh toán"} ${cpDM(dues[0].due)}</b> · ${esc(dues[0].c.bank+" "+dues[0].c.name)}`:""]
     :["Chưa có thẻ hoàn tiền – bấm để thêm thẻ và lập kế hoạch"]).concat(cbOk?[]:["Cần mật khẩu Hoàn tiền"]).filter(Boolean).join("<br>");
   /* thẻ tín dụng khách đang có (CIC / hồ sơ) mà chưa có trong kế hoạch hoàn tiền */
