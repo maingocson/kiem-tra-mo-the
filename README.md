@@ -181,7 +181,7 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - **Điểm tối thiểu mỗi kỳ** (SHB: từ 100k điểm/kỳ mới ghi nhận): dưới mức thì = 0.
 - **Trần nhóm, trần chung, trần cả thẻ, trần năm**: trần năm trừ dần theo tiền hoàn các kỳ trước trong năm.
 - **Chưa đủ điều kiện thì chưa tính hoàn**: thẻ thiếu số giao dịch, thiếu chi tiêu tối thiểu hoặc điểm chưa đủ thì "Đã được hoàn" = 0, thẻ hiện "chờ ĐK", và ô "Trong đó chờ đủ điều kiện" tách riêng phần tiền hoàn chưa chắc. Cảnh báo ghi rõ cần chi thêm bao nhiêu, thêm mấy giao dịch.
-- **Danh mục thẻ hoàn** (menu trái → Cấu hình → *Danh mục thẻ hoàn*, cần mật khẩu quản lý như tab Điều kiện). Bấm vào từng thẻ để sửa:
+- **Danh mục thẻ hoàn** (menu trái → Cấu hình → *Danh mục thẻ hoàn*, cần mật khẩu quản lý như tab Điều kiện). Bố cục giống trang **Tra cứu**: ô tìm (tên thẻ, nhóm chi tiêu, mã MCC), lọc ngân hàng, lọc mức tin cậy, ẩn thẻ ngừng phát hành, lọc **thẻ chưa xác nhận kiểu tính hoàn**; thẻ nhóm theo ngân hàng, khung thẻ như Tra cứu, dưới mỗi thẻ là nhãn kiểu tính hoàn / miễn lãi / phân khúc và nút **✎ Sửa** (bấm **Xong** để đóng). Mọi sửa đổi nằm ở bản nháp, thẻ hiển thị theo bản nháp; thanh dưới báo **"N thay đổi chưa lưu"** với nút **Lưu** (áp dụng cho khách) và **Huỷ** (bấm 2 lần, bỏ thay đổi). Rời trang khi chưa lưu thì app hỏi lại. Khi sửa:
   - *Tính hoàn tiền theo*: kỳ sao kê hoặc tháng dương lịch (mặc định theo thể lệ).
   - *Miễn lãi* (45, 50, 55, 60 ngày…, mặc định 45): hạn thanh toán = ngày sao kê của khách + (số ngày miễn lãi − 30). App nhắc khi còn ≤ 7 ngày tới hạn của kỳ có giao dịch.
   - *Phân khúc khách* (VD Premier, Diamond): tên, chi tối thiểu/kỳ, số giao dịch tối thiểu, trần hoàn/kỳ, cách chi để được hoàn. Các số này **thay** điều kiện thông thường của thẻ cho khách thuộc phân khúc đó.
@@ -190,7 +190,7 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
   - Lưu ở khoá `kmt.cbCfg.v1`, có trong file sao lưu toàn bộ.
   - **Điều kiện thẻ**: mọi cột của bảng Thẻ (mức, ngưỡng mức, trần thẻ, trần năm, hoàn cơ bản, số GD tối thiểu, số nhóm được chọn, hiệu lực, ghi chú…). Số tiền ghi bằng đồng, tỷ lệ ghi %.
   - **Nhóm hoàn tiền** và **Trần chung**: sửa, thêm, xoá từng dòng. Có thể thêm thẻ mới hoặc xoá thẻ khỏi danh mục.
-  - Sửa xong lưu ngay; nếu dữ liệu sau khi sửa không đọc được thì app không lưu.
+  - Nếu dữ liệu sau khi sửa không đọc được thì app không nhận thay đổi đó. Phục hồi từ file và Về dữ liệu gốc có bước xác nhận riêng và ghi ngay.
   - **Sao lưu ra Excel** (.xlsx, các trang Thẻ, Nhóm, Trần chung, Loại trừ, Chu kỳ & phân khúc – đúng cột như dữ liệu app) hoặc **Sao lưu CSV** (mỗi trang một file). **Phục hồi từ file**: chọn file Excel hoặc nhiều file CSV, app báo đọc được gì rồi mới thay. File Excel đã mở và lưu lại bằng Excel/Numbers cần iPhone đời mới (iOS 16.4 trở lên) để đọc; máy cũ thì dùng CSV. **Về dữ liệu gốc** bỏ các sửa đổi (giữ chu kỳ & phân khúc).
 - **Nhiều thẻ (50+)**: danh sách thẻ gọn theo ngân hàng, lọc nhanh; kế hoạch chỉ xét các thẻ hợp từng loại chi tiêu nên vẫn nhanh (46 thẻ, 1.000 giao dịch: ~0,1 giây); thẻ không dùng trong tháng được gom lại; giao dịch tháng này lọc theo thẻ, hiện 10 khoản mới nhất.
 

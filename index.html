@@ -374,6 +374,14 @@ details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-detai
 .cfg-lvn span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cfg-sum{background:var(--accent-soft);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.5;color:var(--ink)}
 .cfg-sum .w{color:var(--warn);font-weight:700}
+.cfg-save{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:19;display:flex;align-items:center;gap:8px;padding:10px max(16px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.06)}
+.cfg-save span{flex:1;min-width:0;font-size:14px;color:var(--muted)}.cfg-save.dirty span{color:var(--warn);font-weight:700}
+.cfg-save .btn2{padding:9px 18px}.cfg-save .btn2:disabled{opacity:.45}
+#v-cbcfg:not([hidden]){padding-bottom:64px}
+.cfg-card{display:flex;flex-direction:column;gap:6px}
+.cfg-card.ed>details.cb{border-color:var(--accent)}
+.cfg-bar1{display:flex;align-items:center;gap:8px;padding:0 4px}.cfg-bar1 .note{flex:1;min-width:0}
+.cfg-ed{border:1px solid var(--accent);border-radius:14px;padding:10px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
 .cfg-rs{background:var(--warn-soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .pc-c.wait{color:var(--warn);font-weight:700;font-size:12px;text-align:right}
 .cp-need{background:var(--bad-soft,#fde8e8);color:var(--bad);border-radius:8px;padding:6px 8px;font-size:13px}
@@ -850,6 +858,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   </div>
   <!-- ===== TÔI ===== -->
   <div class="view" id="v-cbcfg" hidden>
+    <div class="cfg-save" id="cfgBar" hidden><span id="cfgBarT">Không có thay đổi</span><button class="ghost" id="cfgCancel" type="button">Huỷ</button><button class="btn2 acc" id="cfgSaveBtn" type="button">Lưu</button></div>
     <form class="panel stack" id="cfgLock" autocomplete="off">
       <h2>Danh mục thẻ hoàn</h2>
       <p class="note" style="margin:0">Chỉ quản lý được sửa. Nhập mật khẩu quản lý (như tab Điều kiện).</p>
@@ -874,7 +883,14 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
         <details class="grp" id="cfgNewBox"><summary>+ Thêm thẻ mới vào danh mục</summary>
           <div class="cp-cfg2" style="margin-top:8px"><label class="note cp-lab">Mã thẻ<input id="cfgNewId" type="text" placeholder="vd tcb-abc" autocapitalize="off"></label><label class="note cp-lab">Ngân hàng<input id="cfgNewBank" type="text"></label><label class="note cp-lab">Tên thẻ<input id="cfgNewName" type="text"></label></div>
           <button class="btn2 acc" id="cfgNewAdd" type="button" style="margin-top:8px">Thêm thẻ</button></details>
-        <input id="cfgQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ">
+        <div class="cb-tools">
+          <input id="cfgQ" type="text" enterkeyhint="search" placeholder="Tìm thẻ, nhóm chi tiêu hoặc mã MCC (vd 5411)" aria-label="Tìm thẻ trong danh mục" autocomplete="off">
+          <div class="cb-filter" id="cfgBanks" role="group" aria-label="Lọc theo ngân hàng"></div>
+          <div class="cb-filter" id="cfgLvs" role="group" aria-label="Lọc theo mức tin cậy"></div>
+          <label class="cb-opt"><input type="checkbox" id="cfgHide"> Ẩn thẻ đã ngừng phát hành</label>
+          <label class="cb-opt"><input type="checkbox" id="cfgUnc"> Chỉ thẻ chưa xác nhận kiểu tính hoàn</label>
+        </div>
+        <p class="note" style="margin:0" id="cfgCount"></p>
         <div id="cfgList" class="stack"></div>
       </div>
     </div>
@@ -3000,8 +3016,16 @@ $("#lockAgain").addEventListener("click",()=>{
 
 /* ---------- Danh mục thẻ hoàn (chỉ quản lý): chu kỳ, miễn lãi, phân khúc, điều kiện thẻ/nhóm/trần chung; sao lưu & phục hồi Excel/CSV ---------- */
 const cfgOpen=new Set();
-function cfgSave(){save(K_CBCFG,cbCfg)}
-function cfgShow(){$("#cfgLock").hidden=unlocked;$("#cfgBody").hidden=!unlocked;if(unlocked){cfgT=null;cfgRender()}else setTimeout(()=>$("#cfgPass").focus(),50)}
+/* sửa trên bản nháp; bấm Lưu mới ghi và áp dụng cho khách */
+let cfgDD=null,cfgNext=null,cfgBuilt=null,cfgNChg=0;const cfgEdit=new Set();
+const cfgD=()=>cfgDD||(cfgDD=clone(cbCfg));
+function cfgSave(){cfgNChg++;cfgBarSync()}
+function cfgBarSync(){const b=$("#cfgBar");if(!b)return;b.hidden=!unlocked||curView!=="cbcfg";b.classList.toggle("dirty",cfgNChg>0);$("#cfgBarT").textContent=cfgNChg?`${cfgNChg} thay đổi chưa lưu`:"Không có thay đổi";$("#cfgSaveBtn").disabled=!cfgNChg;$("#cfgCancel").disabled=!cfgNChg}
+function cfgDiscard(){cfgT=null;cfgDD=null;cfgNext=null;cfgBuilt=null;cfgNChg=0;cfgEdit.clear()}
+function cfgSaveAll(){if(!cfgNChg)return;if(cfgNext){cbStore=cfgNext;save(K_CB,cbStore);CB=null}cbCfg=clone(cfgD());save(K_CBCFG,cbCfg);cfgNext=null;cfgNChg=0;cfgBuilt=null;try{cpAlC.clear()}catch(e){}cfgBarSync();cfgInfo();toast("Đã lưu danh mục thẻ hoàn – khách đang dùng thẻ tính theo điều kiện mới")}
+/* thẻ dựng từ bản nháp (để xem đúng như trang Tra cứu) */
+function cfgCardsB(){if(!cfgBuilt){const T=cfgTables(),src={at:""};CFG_TB.forEach(([k])=>src[k]=gridCsv(T[k]));try{cfgBuilt=cbBuild(src)}catch(e){cfgBuilt=cbAll()}}return cfgBuilt}
+function cfgShow(){$("#cfgLock").hidden=unlocked;$("#cfgBody").hidden=!unlocked;if(unlocked){if(!cfgNChg)cfgDiscard();cfgRender()}else setTimeout(()=>$("#cfgPass").focus(),50);cfgBarSync()}
 const trIn=v=>v?String(Math.round(v/1e4)/100).replace(".",","):"";
 /* bảng dữ liệu dạng lưới {h:[cột], rows:[[ô]]} để sửa và ghi lại CSV đúng cấu trúc */
 function csvGrid(text){text=String(text||"").replace(/^﻿/,"");if(!text.trim())return{h:[],rows:[]};
@@ -3018,8 +3042,8 @@ const CFG_TB=[["the","Thẻ"],["nhom","Nhóm"],["tc","Trần chung"],["lt","Lo�
 let cfgT=null;
 function cfgTables(){if(!cfgT){const src=cbSrc();cfgT={};CFG_TB.forEach(([k])=>cfgT[k]=csvGrid(src[k]||(CB_DEF[k]||"")))}return cfgT}
 function cfgCommit(){const T=cfgTables(),next={at:new Date().toISOString()};CFG_TB.forEach(([k])=>next[k]=gridCsv(T[k]));
-  let n=0;try{n=cbBuild(next).length}catch(e){}if(!n){toast("Dữ liệu sau khi sửa không đọc được – chưa lưu");cfgT=null;return false}
-  cbStore=next;save(K_CB,next);CB=null;cfgInfo();return true}
+  let n=0;try{n=cbBuild(next).length}catch(e){}if(!n){toast("Dữ liệu sau khi sửa không đọc được – chưa nhận thay đổi này");return false}
+  cfgNext=next;cfgBuilt=null;cfgSave();return true}
 /* trang "Chu kỳ & phân khúc" trong file: mỗi phân khúc một dòng; thẻ chỉ có chu kỳ/miễn lãi thì một dòng trống phân khúc */
 const CFG_SEG_H=["Mã thẻ","Tính hoàn theo","Miễn lãi (ngày)","Phân khúc","Chi tối thiểu/kỳ","Số GD tối thiểu","Trần hoàn/kỳ","Cách chi"];
 function cfgSegGrid(){const rows=[];Object.keys(cbCfg).sort().forEach(id=>{const g=cbCfg[id],b=g.basis==="thang"?"Tháng dương lịch":g.basis==="ky"?"Kỳ sao kê":"",fr=g.free||"";
@@ -3030,18 +3054,29 @@ function cfgSegFrom(grid){const ix=n=>grid.h.findIndex(h=>plain(h)===plain(n)),o
     if(n){const S={n},m=cbN(r[ix("Chi tối thiểu/kỳ")]),t=parseInt(r[ix("Số GD tối thiểu")]),c=cbN(r[ix("Trần hoàn/kỳ")]),h=(r[ix("Cách chi")]||"").trim();
       if(m>0)S.min=m<1000?m*TRV:m;if(t>=0)S.txn=t;if(c>0)S.cap=c<1000?c*TRV:c;if(h)S.how=h;(g.segs=g.segs||[]).push(S)}
     if(!Object.keys(g).length)delete out[id]});return out}
-function cfgInfo(){const T=cfgTables();$("#cfgInfo").innerHTML=`${T.the.rows.length} thẻ · ${T.nhom.rows.length} nhóm hoàn tiền · ${cbStore&&cbStore.the?`đã sửa trên máy ${esc(String(cbStore.at||"").slice(0,10))}`:"dữ liệu gốc của app"}. Bấm vào thẻ để sửa chu kỳ, miễn lãi, phân khúc và mọi điều kiện (mức, trần, tỷ lệ từng nhóm…). Sửa xong lưu ngay; khách đang dùng thẻ sẽ tính theo điều kiện mới.`}
+function cfgInfo(){const T=cfgTables();$("#cfgInfo").innerHTML=`${T.the.rows.length} thẻ · ${T.nhom.rows.length} nhóm hoàn tiền · ${cbStore&&cbStore.the?`đã sửa trên máy ${esc(String(cbStore.at||"").slice(0,10))}`:"dữ liệu gốc của app"}. Xem thẻ giống trang Tra cứu; bấm <b>✎ Sửa</b> ở thẻ để sửa chu kỳ, miễn lãi, phân khúc và mọi điều kiện. Sửa xong bấm <b>Lưu</b> ở thanh dưới – chưa Lưu thì khách chưa tính theo điều kiện mới.`}
 const CFG_LONG=new Set(["Ưu đãi mở mới","Cách nhận","Loại trừ riêng","Ghi chú","Nguồn","Đơn vị bán","MCC","MCC loại trừ"]);
 const cfgField=(t,r,k,h,v)=>CFG_LONG.has(h)?`<label class="note cp-lab cfg-w">${esc(h)}<textarea rows="2" data-t="${t}" data-r="${r}" data-k="${k}">${esc(v)}</textarea></label>`
   :`<label class="note cp-lab">${esc(h)}<input type="text" data-t="${t}" data-r="${r}" data-k="${k}" value="${esc(v)}"></label>`;
-function cfgChips(c){const segs=cpCfg(c).segs||[];return[cpBasis(c)==="thang"?"Tháng dương lịch":"Kỳ sao kê",`miễn lãi ${cpFree(c)} ngày`,segs.length?`${segs.length} phân khúc`:""].filter(Boolean).join(" · ")}
-function cfgRender(){cfgInfo();const T=cfgTables(),q=plain($("#cfgQ").value||""),all=cbAll();
-  const bk=T.the.h.indexOf("Ngân hàng"),nm=T.the.h.indexOf("Tên thẻ");let prev=null;
-  const list=T.the.rows.filter(r=>r[0]).map(r=>({id:r[0],r,c:all.find(c=>c.id===r[0])||null})).filter(x=>!q||plain(x.r.join(" ")).includes(q));
-  list.sort((a,b)=>String(a.r[bk]).localeCompare(String(b.r[bk])));
-  $("#cfgList").innerHTML=list.length?list.map(x=>{const bank=x.r[bk]||"";const hd=bank!==prev?`<div class="cp-bankh" style="--c1:${cbCol(bank)[1]}"><i></i>${esc(bank)}</div>`:"";prev=bank;
-    return hd+`<details class="cp-own g" data-cfg="${esc(x.id)}"${cfgOpen.has(x.id)?" open":""}><summary>${x.c?cbImg(x.c,1):""}<span class="cp-own-t"><b>${esc(x.r[nm]||x.id)}</b><small>${x.c?cfgChips(x.c):`<span class="bad">thiếu dữ liệu</span>`}</small></span></summary><div class="cp-own-b" data-body>${cfgOpen.has(x.id)?cfgBodyHtml(x.id):""}</div></details>`}).join("")
-    :`<p class="note" style="margin:0">Không có thẻ khớp.</p>`}
+function cfgChips(c){const g=cfgD()[c.id]||{},segs=g.segs||[],b=g.basis||(cpCalMonth(c)?"thang":"ky"),fr=+g.free>=15?+g.free:45;
+  return[`<span class="chip ${b==="thang"?"acc":"ch"}">${b==="thang"?"Theo tháng":"Theo kỳ sao kê"}</span>`,g.basis?"":`<span class="chip warn">chưa xác nhận</span>`,`miễn lãi ${fr} ngày${g.free?"":" (tạm)"}`,segs.length?`${segs.length} phân khúc`:""].filter(Boolean).join(" ")}
+let cfgBank="",cfgLv="";
+function cfgRender(){cfgInfo();cfgBarSync();const T=cfgTables(),cards=cfgCardsB(),q=($("#cfgQ").value||"").trim(),D=cfgD(),bk=T.the.h.indexOf("Ngân hàng"),nm=T.the.h.indexOf("Tên thẻ");
+  const rows=T.the.rows.filter(r=>r[0]).map(r=>({id:r[0],r,c:cards.find(x=>x.id===r[0])||null,bank:String(r[bk]||"")}));
+  const banks=[...new Set(rows.map(x=>x.bank))],hide=$("#cfgHide").checked,unc=$("#cfgUnc").checked;
+  $("#cfgBanks").innerHTML=["",...banks].map(b=>`<button type="button" data-cb="${esc(b)}" aria-pressed="${b===cfgBank}">${esc(b||"Tất cả")}</button>`).join("");
+  const lvN=l=>rows.filter(x=>x.c&&x.c.lv===l&&(!cfgBank||x.bank===cfgBank)).length;
+  $("#cfgLvs").innerHTML=[["","Mọi mức tin cậy"],["A","A · có thể lệ"],["B","B · trang thẻ"],["C","C · quảng cáo"]].map(([v,t])=>`<button type="button" data-clv="${v}" aria-pressed="${v===cfgLv}">${t}${v?` (${lvN(v)})`:""}</button>`).join("");
+  const list=rows.filter(x=>(!cfgBank||x.bank===cfgBank)&&(!cfgLv||(x.c&&x.c.lv===cfgLv))&&(!hide||!(x.c&&x.c.stop))&&(!unc||!(D[x.id]&&D[x.id].basis)))
+    .map(x=>({...x,h:x.c?cbHit(x.c,q):{ok:!q||plain(x.r.join(" ")).includes(plain(q)),g:new Set()}})).filter(x=>x.h.ok||cfgEdit.has(x.id));
+  list.sort((a,b)=>banks.indexOf(a.bank)-banks.indexOf(b.bank)||String(a.r[nm]).localeCompare(String(b.r[nm])));
+  const nUnc=rows.filter(x=>!(D[x.id]&&D[x.id].basis)).length;
+  $("#cfgCount").textContent=`${list.length} thẻ${q?` khớp “${q}”`:""} · ${nUnc} thẻ chưa xác nhận kiểu tính hoàn`;
+  const cnt={};list.forEach(x=>cnt[x.bank]=(cnt[x.bank]||0)+1);let prev=null;
+  $("#cfgList").innerHTML=list.length?list.map(x=>{const hd=x.bank!==prev?`<div class="cb-bank" style="--c1:${cbCol(x.bank)[1]}"><i></i>${esc(x.bank)} <small>${cnt[x.bank]} thẻ</small></div>`:"";prev=x.bank;const ed=cfgEdit.has(x.id);
+    return hd+`<div class="cfg-card${ed?" ed":""}" data-cfg="${esc(x.id)}">${x.c?cbCard(x.c,x.h.g):`<div class="panel"><b>${esc(x.r[nm]||x.id)}</b> <span class="bad">thiếu dữ liệu – bấm Sửa để điền</span></div>`}
+      <div class="cfg-bar1"><span class="note" data-chips>${x.c?cfgChips(x.c):""}</span><button class="btn2${ed?" acc":""}" type="button" data-cfg-edit="1">${ed?"Xong":"✎ Sửa"}</button></div>${ed?`<div class="cfg-ed" data-body>${cfgBodyHtml(x.id)}</div>`:""}</div>`}).join("")
+    :`<div class="panel note">Không có thẻ nào khớp.</div>`}
 const cfgIn=(t,r,k,v,ph,num)=>`<input type="text"${num?' inputmode="numeric"':""} data-t="${t}" data-r="${r}" data-k="${k}" value="${esc(v||"")}"${ph?` placeholder="${esc(ph)}"`:""}>`;
 const cfgK=(G,h,used)=>{const i=G.h.indexOf(h);if(i>0&&used)used.add(i);return i};
 function cfgPick(t,ri,names,used){const G=cfgTables()[t];return names.map(h=>{const k=cfgK(G,h,used);return k>0?cfgField(t,ri,k,h,G.rows[ri][k]):""}).join("")}
@@ -3077,7 +3112,7 @@ function cfgLvRow(t,i,id,used){const G=cfgTables()[t],r=G.rows[i],nm=cfgLvNames(
     if(isN)h+=cell(`Tỷ lệ M${n} (%)`,n===1?"0":`như mức ${n-1}`,n);
     h+=cell(`Trần M${n}`,n===1?"không giới hạn":`như mức ${n-1}`,n)});
   return`<div class="cfg-lvt ${isN?"c3":"c2"}">${h}</div>`}
-function cfgBodyHtml(id){const T=cfgTables(),c=cbAll().find(c=>c.id===id),g=cbCfg[id]||{},segs=g.segs||[];const ri=T.the.rows.findIndex(r=>r[0]===id);if(ri<0)return"";const U=new Set();
+function cfgBodyHtml(id){const T=cfgTables(),c=cfgCardsB().find(c=>c.id===id),g=cfgD()[id]||{},segs=g.segs||[];const ri=T.the.rows.findIndex(r=>r[0]===id);if(ri<0)return"";const U=new Set();
   const def=c&&cpCalMonth(c)?"thang":"ky";
   const segHtml=segs.map((S,k)=>`<div class="cfg-seg" data-k="${k}"><label class="note cp-lab">Tên phân khúc<input type="text" data-f="n" value="${esc(S.n||"")}" placeholder="VD Diamond, Priority"></label>
     <div class="cp-cfg2"><label class="note cp-lab">Chi tối thiểu (tr)<input type="text" inputmode="decimal" data-f="min" value="${trIn(S.min)}" placeholder="VD 10"></label>
@@ -3108,26 +3143,34 @@ function cfgBodyHtml(id){const T=cfgTables(),c=cbAll().find(c=>c.id===id),g=cbCf
     <datalist id="cfgTcL-${esc(id)}">${tcNames.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
     ${sub("nhom","Nhóm hoàn tiền","+ Thêm nhóm","Tỷ lệ và trần của nhóm theo từng mức của thẻ ở trên. Trần trống = không giới hạn.")}${sub("tc","Trần chung nhiều nhóm","+ Thêm trần chung","Một trần dùng chung cho nhiều nhóm. Nhóm nào ghi tên này ở “Nhóm trần chung” sẽ cộng chung vào trần này.")}
     <button class="x" type="button" data-card-del="1" style="margin-top:8px">Xoá thẻ khỏi danh mục</button>`}
-function cfgReopen(d){const b=d.querySelector("[data-body]");b.innerHTML=cfgBodyHtml(d.dataset.cfg);const c=cbAll().find(c=>c.id===d.dataset.cfg);if(c)d.querySelector("summary small").innerHTML=cfgChips(c)}
+function cfgChipsUp(d){const c=cfgCardsB().find(c=>c.id===d.dataset.cfg),ch=d.querySelector("[data-chips]");if(c&&ch)ch.innerHTML=cfgChips(c)}
+function cfgReopen(d){const b=d.querySelector("[data-body]");if(b)b.innerHTML=cfgBodyHtml(d.dataset.cfg);cfgChipsUp(d)}
 $("#cfgLock").addEventListener("submit",async e=>{e.preventDefault();const ok=(await hashPass($("#cfgPass").value.trim()))===PASS_HASH;$("#cfgPass").value="";$("#cfgErr").hidden=ok;if(!ok)return;
   unlocked=true;try{sessionStorage.setItem("kmt.unlock","1")}catch(err){}cfgShow();showLock();showAdmin()});
 $("#cfgLockAgain").addEventListener("click",()=>{unlocked=false;try{sessionStorage.removeItem("kmt.unlock")}catch(err){}cfgShow();showLock();showAdmin()});
-$("#cfgQ").addEventListener("input",cfgRender);
-$("#cfgList").addEventListener("toggle",e=>{const d=e.target;if(!(d.dataset&&d.dataset.cfg))return;if(d.open){cfgOpen.add(d.dataset.cfg);const b=d.querySelector("[data-body]");if(!b.innerHTML)b.innerHTML=cfgBodyHtml(d.dataset.cfg)}else cfgOpen.delete(d.dataset.cfg)},true);
-const cfgOf=el=>{const d=el.closest("[data-cfg]");return d?(cbCfg[d.dataset.cfg]=cbCfg[d.dataset.cfg]||{}):null};
-const cfgClean=()=>{for(const id in cbCfg){const g=cbCfg[id];if(g.segs&&!g.segs.length)delete g.segs;if(!Object.keys(g).length)delete cbCfg[id]}};
+$("#cfgQ").addEventListener("input",()=>{clearTimeout(cfgRender.t);cfgRender.t=setTimeout(cfgRender,150)});
+$("#cfgHide").addEventListener("change",cfgRender);$("#cfgUnc").addEventListener("change",cfgRender);
+$("#cfgBanks").addEventListener("click",e=>{const b=e.target.closest("[data-cb]");if(!b)return;cfgBank=b.dataset.cb;cfgRender()});
+$("#cfgLvs").addEventListener("click",e=>{const b=e.target.closest("[data-clv]");if(!b)return;cfgLv=b.dataset.clv;cfgRender()});
+$("#cfgSaveBtn").addEventListener("click",()=>{if(!unlocked)return;cfgSaveAll();cfgRender()});
+$("#cfgCancel").addEventListener("click",e=>{const b=e.currentTarget;if(!cfgNChg)return;if(!cfgArm(b,"Bấm lần nữa để bỏ","Huỷ"))return;b.dataset.sure="";b.textContent="Huỷ";cfgDiscard();cfgRender();toast("Đã bỏ các thay đổi chưa lưu")});
+window.addEventListener("beforeunload",e=>{if(cfgNChg){e.preventDefault();e.returnValue=""}});
+$("#cfgList").addEventListener("toggle",e=>{const d=e.target;if(d.dataset&&d.dataset.id){d.open?cbOpenIds.add(d.dataset.id):cbOpenIds.delete(d.dataset.id)}},true);
+const cfgOf=el=>{const d=el.closest("[data-cfg]"),D=cfgD();return d?(D[d.dataset.cfg]=D[d.dataset.cfg]||{}):null};
+const cfgClean=()=>{const D=cfgD();for(const id in D){const g=D[id];if(g.segs&&!g.segs.length)delete g.segs;if(!Object.keys(g).length)delete D[id]}};
 const cfgArm=(b,txt,orig)=>{if(b.dataset.sure==="1")return true;b.dataset.sure="1";b.textContent=txt;setTimeout(()=>{b.dataset.sure="";b.textContent=orig},3000);return false};
 $("#cfgList").addEventListener("click",e=>{if(!unlocked)return;const t=e.target,d=t.closest("[data-cfg]");if(!d)return;const id=d.dataset.cfg,T=cfgTables();
+  if(t.closest("[data-cfg-edit]")){if(cfgEdit.has(id))cfgEdit.delete(id);else cfgEdit.add(id);cfgRender();const n=document.querySelector(`#cfgList [data-cfg="${CSS.escape(id)}"]`);if(n)n.scrollIntoView({block:"start",behavior:"smooth"});return}
   const add=t.closest("[data-seg-add]"),del=t.closest("[data-seg-del]"),ra=t.closest("[data-row-add]"),rd=t.closest("[data-row-del]"),cd=t.closest("[data-card-del]");
   if(add){const g=cfgOf(t);(g.segs=g.segs||[]).push({n:""});cfgSave();cfgReopen(d);const ins=d.querySelectorAll(".cfg-seg input[data-f=n]");if(ins.length)ins[ins.length-1].focus();return}
   if(del){if(!cfgArm(del,"Bấm lần nữa để xoá","Xoá phân khúc"))return;const g=cfgOf(t);g.segs.splice(+del.dataset.segDel,1);cfgClean();cfgSave();cfgReopen(d);toast("Đã xoá phân khúc – khách đang chọn phân khúc này về Thông thường");return}
   if(ra){const G=T[ra.dataset.rowAdd],r=G.h.map(()=>"");r[0]=id;r[1]=ra.dataset.rowAdd==="nhom"?"Nhóm mới":"Trần chung mới";G.rows.push(r);if(cfgCommit())cfgReopen(d);return}
   if(rd){if(!cfgArm(rd,"Bấm lần nữa để xoá","Xoá dòng này"))return;const p=rd.dataset.rowDel.split(":");T[p[0]].rows.splice(+p[1],1);if(cfgCommit()){cfgReopen(d);toast("Đã xoá")}return}
   if(cd){if(!cfgArm(cd,"Bấm lần nữa – xoá thẻ và mọi nhóm của thẻ","Xoá thẻ khỏi danh mục"))return;["the","nhom","tc"].forEach(k=>T[k].rows=T[k].rows.filter(r=>r[0]!==id));
-    if(T.the.rows.length&&cfgCommit()){cfgOpen.delete(id);delete cbCfg[id];cfgSave();cfgRender();toast("Đã xoá thẻ khỏi danh mục")}else cfgT=null}});
+    if(T.the.rows.length&&cfgCommit()){cfgEdit.delete(id);delete cfgD()[id];cfgSave();cfgRender();toast("Đã xoá thẻ – bấm Lưu để áp dụng")}else{toast("Không xoá được thẻ này");cfgDiscard();cfgRender()}}});
 $("#cfgList").addEventListener("change",e=>{const t=e.target;if(!unlocked)return;const d=t.closest("[data-cfg]");if(!d)return;
   if(t.dataset.t){const T=cfgTables(),G=T[t.dataset.t],r=G.rows[+t.dataset.r];if(!r)return;const k=+t.dataset.k,old=r[k];r[k]=t.value.trim();
-    if(cfgCommit()){toast("Đã lưu");if(t.dataset.t==="the"){const sm=d.querySelector("[data-lvsum]");if(sm)sm.innerHTML=cfgLvSum(d.dataset.cfg);const H=G.h[k],m=/^Mức (\d)$/.exec(H);if(m)d.querySelectorAll(`[data-lvname="${m[1]}"]`).forEach(x=>x.textContent=t.value.trim()||H)}const st=t.closest(".cfg-seg");if(st&&k===1){const b=st.querySelector(".cfg-st");if(b)b.textContent=t.value.trim()||"(chưa đặt tên)"}}else{r[k]=old;t.value=old}return}
+    if(cfgCommit()){cfgChipsUp(d);if(t.dataset.t==="the"){const sm=d.querySelector("[data-lvsum]");if(sm)sm.innerHTML=cfgLvSum(d.dataset.cfg);const H=G.h[k],m=/^Mức (\d)$/.exec(H);if(m)d.querySelectorAll(`[data-lvname="${m[1]}"]`).forEach(x=>x.textContent=t.value.trim()||H)}const st=t.closest(".cfg-seg");if(st&&k===1){const b=st.querySelector(".cfg-st");if(b)b.textContent=t.value.trim()||"(chưa đặt tên)"}}else{r[k]=old;t.value=old}return}
   const f=t.dataset.f;if(!f)return;const g=cfgOf(t);const sg=t.closest(".cfg-seg[data-k]");
   if(sg){const S=g.segs[+sg.dataset.k];if(!S)return;
     if(f==="n"||f==="how")S[f]=t.value.trim();
@@ -3135,11 +3178,11 @@ $("#cfgList").addEventListener("change",e=>{const t=e.target;if(!unlocked)return
     else{const v=cpAmt(t.value);if(v>0)S[f]=Math.round(v*TRV);else delete S[f];t.value=trIn(S[f])}}
   else if(f==="basis"){if(t.value)g.basis=t.value;else delete g.basis}
   else if(f==="free"){const v=parseInt(t.value);if(v>=15&&v<=120)g.free=v;else{delete g.free;t.value=""}}
-  cfgClean();cfgSave();const c=cbAll().find(c=>c.id===d.dataset.cfg);if(c)d.querySelector("summary small").innerHTML=cfgChips(c);toast("Đã lưu")});
+  cfgClean();cfgSave();cfgChipsUp(d)});
 $("#cfgNewAdd").addEventListener("click",()=>{if(!unlocked)return;const id=$("#cfgNewId").value.trim().toLowerCase().replace(/\s+/g,"-"),bank=$("#cfgNewBank").value.trim(),name=$("#cfgNewName").value.trim();
   if(!id||!bank||!name){toast("Nhập đủ mã thẻ, ngân hàng, tên thẻ");return}const T=cfgTables();if(T.the.rows.some(r=>r[0]===id)){toast("Mã thẻ đã có");return}
   const r=T.the.h.map(()=>"");const set=(h,v)=>{const k=T.the.h.indexOf(h);if(k>=0)r[k]=v};set("Mã thẻ",id);set("Ngân hàng",bank);set("Tên thẻ",name);set("Trạng thái","Đang phát hành");set("Mức tin cậy","C");set("Chu kỳ","Kỳ sao kê");
-  T.the.rows.push(r);if(cfgCommit()){["#cfgNewId","#cfgNewBank","#cfgNewName"].forEach(x=>$(x).value="");$("#cfgNewBox").open=false;cfgOpen.add(id);$("#cfgQ").value=name;cfgRender();toast("Đã thêm thẻ – điền điều kiện và thêm nhóm hoàn tiền")}});
+  T.the.rows.push(r);if(cfgCommit()){["#cfgNewId","#cfgNewBank","#cfgNewName"].forEach(x=>$(x).value="");$("#cfgNewBox").open=false;cfgEdit.add(id);$("#cfgQ").value=name;cfgBank="";cfgRender();toast("Đã thêm thẻ – điền điều kiện, thêm nhóm rồi bấm Lưu")}});
 /* ---- file Excel (.xlsx) tự tạo, không cần thư viện: zip không nén + XML bảng tính ---- */
 const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC_T[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
@@ -3199,10 +3242,10 @@ $("#cfgFile").addEventListener("change",async e=>{const files=[...e.target.files
   const nm={the:"Thẻ",nhom:"Nhóm",tc:"Trần chung",lt:"Loại trừ",seg:"Chu kỳ & phân khúc"};
   cfgRsCand={next,seg:got.seg?cfgSegFrom(got.seg):null};$("#cfgRsMsg").textContent=`Đọc được: ${ks.map(k=>nm[k]).join(", ")} · ${n} thẻ${bad.length?` · bỏ qua ${bad.length} file lạ`:""}. Thay dữ liệu đang dùng?`;$("#cfgRsBox").hidden=false});
 $("#cfgRsNo").addEventListener("click",()=>{cfgRsCand=null;$("#cfgRsBox").hidden=true});
-$("#cfgRsOk").addEventListener("click",()=>{if(!cfgRsCand||!unlocked)return;cbStore=cfgRsCand.next;save(K_CB,cbStore);CB=null;cfgT=null;if(cfgRsCand.seg){cbCfg=cfgRsCand.seg;cfgSave()}
+$("#cfgRsOk").addEventListener("click",()=>{if(!cfgRsCand||!unlocked)return;cbStore=cfgRsCand.next;save(K_CB,cbStore);CB=null;cfgDiscard();if(cfgRsCand.seg){cbCfg=cfgRsCand.seg;save(K_CBCFG,cbCfg)}
   cfgRsCand=null;$("#cfgRsBox").hidden=true;cfgRender();toast("Đã phục hồi danh mục thẻ hoàn")});
 $("#cfgReset").addEventListener("click",e=>{const b=e.currentTarget;if(!unlocked||!cfgArm(b,"Bấm lần nữa để về dữ liệu gốc","Về dữ liệu gốc"))return;
-  b.dataset.sure="";b.textContent="Về dữ liệu gốc";try{localStorage.removeItem(K_CB)}catch(err){}cbStore=null;CB=null;cfgT=null;cfgRender();toast("Đã về dữ liệu hoàn tiền gốc (giữ chu kỳ & phân khúc)")});
+  b.dataset.sure="";b.textContent="Về dữ liệu gốc";try{localStorage.removeItem(K_CB)}catch(err){}cbStore=null;CB=null;cfgDiscard();cfgRender();toast("Đã về dữ liệu hoàn tiền gốc (giữ chu kỳ & phân khúc)")});
 let curView="custs";
 const custTitle=()=>cust.isMe?"Hồ sơ của tôi":(String(cust.name||"").trim()||"Khách chưa đặt tên");
 function cbMode(plan){document.querySelectorAll("#cbSeg [data-seg]").forEach(x=>x.setAttribute("aria-pressed",(x.dataset.seg==="plan")===plan));$("#cbBack").hidden=!plan;
@@ -3212,6 +3255,7 @@ function renderCrumbs(){const t=custTitle();$("#ckBack").textContent=t;$("#cbBac
 function cpPageTitle(){if(curView!=="plandetail")return;const P=cpSel(cpData());const t=P?`Kế hoạch ${cpPlanTitle(P)}`:"Kế hoạch";$("#cpH").textContent=t;$("#tbTitle").textContent=P?cpPlanTitle(P):"Kế hoạch"}
 function cpPageSet(pg){$("#cpView").dataset.page=pg;if(pg==="detail"){$("#cbBack").textContent="Danh sách kế hoạch";$("#cbBack").dataset.back="plan"}else $("#cpH").textContent="Kế hoạch chi tiêu"}
 function showTab(t){
+  if(curView==="cbcfg"&&t!=="cbcfg"&&cfgNChg){if(!confirm(`Danh mục thẻ hoàn có ${cfgNChg} thay đổi chưa lưu. Bỏ các thay đổi này?`))return;cfgDiscard()}
   if(t==="cb")t="look";
   if(t!=="plandetail"&&t!=="plan"){cpNewOpen=false;cpEditEnd=false}
   curView=t;const v=t==="plan"||t==="plandetail"||t==="look"?"cb":t;
@@ -3224,7 +3268,7 @@ function showTab(t){
   if(t==="custs")renderCustList();
   if(t==="home")renderHome();
   if(t==="cust")renderCustPage();
-  if(t==="cbcfg")cfgShow();
+  if(t==="cbcfg")cfgShow();else{const b=$("#cfgBar");if(b)b.hidden=true}
   if(v==="cb"){cbMode(t!=="look");if(t!=="look")cpPageSet(t==="plandetail"?"detail":"list");cbShowLock();if(cbOk){renderCb();if(t!=="look"){renderPlan();cpPageTitle();cpPendFind()}}}
   const tab=t==="look"?"look":["custs","cust","check","plan","plandetail"].includes(t)?"custs":t;
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
