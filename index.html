@@ -280,6 +280,10 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .td>.ic svg{width:16px;height:16px}
 .td>span.t{flex:1;min-width:0}
 .td .ring{flex:none}
+.cp-fill{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.cp-fill.on{background:var(--ok-soft);flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+.cp-fill .ctbl{margin:6px 0 4px;width:100%}
+.cp-fill b.ok{color:var(--ok)}.cp-fill b.bad{color:var(--bad)}
 .td.done>.ic{background:var(--ok-soft);color:var(--ok)}
 .td.done>span.t{color:var(--muted)}
 .td.done .ring .fg{stroke:var(--ok)}
@@ -2006,7 +2010,7 @@ function cpCardMax(c,e,ti){
     const got=Math.min(cc,amt*x.r/100);cardLeft-=got;if(x.g.share&&shLeft[x.g.share]!=null)shLeft[x.g.share]-=got;
     used.add(k);out.push({k,amt,r:x.r})}
   const t=c.tiers[ti],tot=out.reduce((a,b)=>a+b.amt,0);
-  if(cpSpendTier(c)&&t&&t.from&&tot<t.from){if(t.from-tot>Math.max(2*tot,5*TRV))return null;out.push({k:"khac",amt:t.from-tot,r:c.base||0,fill:true})}
+  if(cpSpendTier(c)&&t&&t.from&&tot<t.from){if(!(e&&e.fill!=null&&ti<=e.fill))return null;out.push({k:"khac",amt:t.from-tot,r:c.base||0,fill:true})}
   return out}
 function cpAutoNeeds(owned,budget){
   let all=[];
@@ -2118,7 +2122,7 @@ function renderPlan(){
   const nTot=Object.values(d.needs).reduce((a,v)=>a+cpTr(v),0);
   $("#cpS3").textContent=nTot?`${cbMoney(nTot)}/tháng${d.needsSrc==="auto"?" · tự tính":""}`:"chưa nhập";
   $("#cpNeedsSrc").hidden=!(d.needsSrc==="auto"&&owned.length);
-  $("#cpNeedsSrc").innerHTML=`App đã tự tính theo ${owned.length} thẻ đang có: chi tổng <b>${cbMoney(nTot)}</b>/tháng ${cpTr(d.budget)?"trong ngân sách, ưu tiên nhóm hoàn cao":"để lấy hết trần hoàn và đủ ngưỡng mức"}. Mỗi nhóm chi vừa đủ chạm trần (không chi vượt trần vì phần vượt không được hoàn), chọn mức cho tổng hoàn cao nhất; hai cách hoàn bằng nhau thì chọn cách chi ít hơn.${!cpTr(d.budget)&&nTot>50*TRV?" Con số khá lớn – nhập <b>ngân sách</b> để gói lại theo khả năng chi.":""} Sửa số bất kỳ thì app giữ số của bạn.`;
+  $("#cpNeedsSrc").innerHTML=`App đã tự tính theo ${owned.length} thẻ đang có: chi tổng <b>${cbMoney(nTot)}</b>/tháng ${cpTr(d.budget)?"trong ngân sách, ưu tiên nhóm hoàn cao":"để lấy hết trần hoàn"}. Chỉ gồm các khoản có hoàn tiền, mỗi nhóm chi vừa đủ chạm trần. Khoản chi bù chỉ để lên mức (không có hoàn riêng) chỉ được tính khi bạn chọn ở mục “Chi bù để lên mức”.${!cpTr(d.budget)&&nTot>50*TRV?" Con số khá lớn – nhập <b>ngân sách</b> để gói lại theo khả năng chi.":""} Sửa số bất kỳ thì app giữ số của bạn.`;
   $("#cpNeeds").innerHTML=CP_CATS.map(([k,n])=>`<label>${esc(n)}<input type="text" inputmode="decimal" data-cp-need="${k}" value="${d.needs[k]!=null?esc(String(d.needs[k]).replace(".",",")):""}" placeholder="0"></label>`).join("");
   renderPlanOut();
 }
@@ -2213,10 +2217,18 @@ function renderPlanOut(){
   const planHtml=owned.length?`${active.map(cardHtml).join("")}${idle.length?`<details class="grp cp-idle"><summary>Thẻ không cần dùng tháng này (${idle.length})</summary>${idle.map(cardHtml).join("")}</details>`:""}`:`<p class="note" style="margin:0">Chưa có thẻ nào trong danh sách – xem gợi ý mở thẻ bên dưới.</p>`;
   /* chi thêm để lên mức */
   const ups=[];P.cards.forEach(x=>{const r=x.res,c=x.c;if(!cpSpendTier(c))return;const nt=r.below?0:r.ti+1;const t=c.tiers[nt];if(!t||t.from==null)return;
-    const need=t.from-r.total;if(need<=0||need>Math.max(tot,5*TRV))return;
-    const sp=cpMerge(x.fix,x.sp);sp.khac=(sp.khac||0)+need;const gain=cpCalc(c,x.e,sp,x.ctx).cash-r.cash-need*(c.base||0)/100;
-    if(gain>=20000)ups.push({c,need,gain,name:t.n||"mức "+(nt+1)})});
-  const upHtml=ups.length?`<div class="cbk">Chi thêm để lên mức</div><ul class="cbl">${ups.sort((a,b)=>b.gain-a.gain).slice(0,5).map(u=>`<li><b>${esc(u.c.bank+" "+u.c.name)}</b>: chi thêm ${cbMoney(u.need)} để lên ${esc(u.name)} → tiền hoàn tăng thêm khoảng ${cbMoney(u.gain)}/${cbPer(u.c)} (mỗi 1tr chi thêm được ${cbMoney(u.gain/u.need*TRV)}). Nếu được, dồn các khoản đang quẹt thẻ khác sang thẻ này.</li>`).join("")}</ul>`:"";
+    const need=t.from-r.total;if(need<=0)return;
+    const sp=cpMerge(x.fix,x.sp);sp.khac=(sp.khac||0)+need;const after=cpCalc(c,x.e,sp,x.ctx).cash,gain=after-r.cash;
+    if(gain>=20000)ups.push({c,nt,need,gain,after,before:r.cash,name:t.n||"mức "+(nt+1)})});
+  const auto=d.needsSrc==="auto",filled=auto?P.cards.filter(x=>x.e.fill!=null):[];
+  const upHtml=ups.length||filled.length?`<div class="cbk">Chi bù để lên mức – bạn quyết định</div>
+    <p class="note" style="margin:0">Khoản chi bù là chi tiêu <b>không có hoàn riêng</b>, chỉ để tổng chi đủ ngưỡng mức. Kế hoạch ở trên <b>chưa</b> tính các khoản này. Đáng làm khi đó là khoản bạn vẫn phải chi (hoá đơn, mua sắm thường ngày); nếu chi chỉ để lên mức thì cân nhắc theo tỷ lệ bên dưới.</p>
+    ${filled.map(x=>`<div class="cp-fill on"><div><b>${esc(x.c.bank+" "+x.c.name)}</b><br><span class="note">Đang tính chi bù để lên “${esc((x.c.tiers[x.e.fill]||{}).n||"mức "+(x.e.fill+1))}”${x.sp.khac?` · chi bù ${cbMoney(x.sp.khac)}`:""}</span></div><button class="btn2" type="button" data-cp-fill="${esc(x.c.id)}" data-off="1">Bỏ chi bù</button></div>`).join("")}
+    ${ups.sort((a,b)=>b.gain/b.need-a.gain/a.need).slice(0,5).map(u=>{const pct=u.gain/u.need*100;
+      return`<div class="cp-fill"><div><b>${esc(u.c.bank+" "+u.c.name)}</b> → ${esc(u.name)}
+        <table class="ctbl"><tbody><tr><td>Chi bù (không có hoàn riêng)</td><td>${cbMoney(u.need)}</td></tr><tr><td>Tiền hoàn của thẻ</td><td>${cbMoney(u.before)} → ${cbMoney(u.after)}</td></tr><tr><td><b>Hoàn thêm</b></td><td><b>+${cbMoney(u.gain)}</b>/${cbPer(u.c)}</td></tr><tr><td>Mỗi 1tr chi bù được</td><td><b class="${pct>=3?"ok":pct>=1.5?"":"bad"}">${cbMoney(u.gain/u.need*TRV)}</b> (${cbPct(Math.round(pct*10)/10)})</td></tr></tbody></table>
+        <span class="note">${pct>=3?"Đáng cân nhắc: tỷ lệ cao hơn hầu hết thẻ hoàn cơ bản.":pct>=1.5?"Tạm được: chỉ nên làm nếu khoản chi bù là chi tiêu thật.":"Thấp: chỉ làm nếu khoản chi bù là chi tiêu bắt buộc."}</span></div>
+        <button class="btn2 acc" type="button" data-cp-fill="${esc(u.c.id)}" data-nt="${u.nt}" data-need="${u.need}">${auto?"Tính vào kế hoạch":`Thêm ${cbMoney(u.need)} vào “${esc(CP_NAME.khac||"Chi tiêu khác")}”`}</button></div>`}).join("")}`:"";
   O.innerHTML=`<div class="cbk">Kế hoạch chi tiêu tháng ${esc(cpPerTxt(per))}</div>${big}${nextHtml}<div class="cbk">Theo từng thẻ (${owned.length})</div>${owned.length>8?`<input id="cpPcQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ trong kế hoạch">`:""}${planHtml}${upHtml}
     <p class="note" style="margin:0">Ước tính theo dữ liệu tab Hoàn tiền. Kiểu chu kỳ, số ngày miễn lãi và phân khúc theo cấu hình của quản lý (Cấu hình → Danh mục thẻ hoàn); ngày sao kê theo từng khách nhập ở bước 1. Thẻ chưa đủ số giao dịch, chi tiêu tối thiểu hoặc điểm tối thiểu thì chưa được tính tiền hoàn. Kế hoạch giả định chi đều các ngày; tiền đã hoàn tính theo đúng ngày, số tiền và số giao dịch đã ghi. Phần vượt trần không được hoàn; không tính ưu đãi đối tác riêng. Luôn đối chiếu thể lệ trước khi tư vấn.</p>`;
   /* gợi ý mở thẻ mới: tính sau để màn hình hiện ngay */
@@ -2240,6 +2252,10 @@ $("#cbSeg").addEventListener("click",e=>{const b=e.target.closest("[data-seg]");
 /* nút nổi Ghi chi tiêu: chỉ hiện khi đang ở Kế hoạch; bấm thì tới ô ghi nhanh */
 function cpFabSync(){$("#cpFab").hidden=$("#v-cb").hidden||$("#cpView").hidden||!cbOk}
 $("#cpFab").addEventListener("click",()=>{const n=$(".cp-now");n.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("#cpQCard").focus(),350)});
+$("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-cp-fill]");if(!b)return;const d=cpData(),en=d.cards.find(x=>x.id===b.dataset.cpFill);if(!en)return;
+  if(b.dataset.off){delete en.fill;cpSave();renderPlan();toast("Đã bỏ chi bù");return}
+  if(d.needsSrc==="auto"){en.fill=+b.dataset.nt;cpSave();renderPlan();toast("Đã tính chi bù vào kế hoạch")}
+  else{const v=cpTr(d.needs.khac)+(+b.dataset.need);d.needs.khac=String(Math.round(v/1e4)/100);cpSave();renderPlan();toast("Đã thêm vào nhu cầu chi tiêu khác")}});
 $("#cpFind").addEventListener("input",()=>cpFillSel("#cpFind","#cpCard",cust));
 $("#cpOwnQ").addEventListener("input",()=>{$("#cpCards").innerHTML=cpCardsHtml(cust,"",$("#cpOwnQ").value)});
 $("#cpOut").addEventListener("input",e=>{if(e.target.id!=="cpPcQ")return;const q=plain(e.target.value);const all=cbAll();
