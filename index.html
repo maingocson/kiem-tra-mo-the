@@ -156,7 +156,7 @@ details.grp>summary::after{content:"＋";color:var(--muted)} details.grp[open]>s
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
 nav.tabs button{white-space:nowrap}
-nav.tabs .in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:560px}
+nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;width:100%;max-width:560px}
 nav.tabs button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-radius:10px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-selected=true]{color:var(--accent)}
@@ -467,6 +467,17 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 .cu-fn .t small{font-size:13px;color:var(--muted);line-height:1.45}
 .cu-fn .t small b{font-family:inherit;font-size:inherit;color:var(--ink)}
 .cu-fn .go{color:var(--muted);font-size:24px}
+.hm-head{display:flex;flex-direction:column;gap:2px;padding:2px 2px 0}
+.hm-head b{font-size:24px;font-weight:800;letter-spacing:-.015em}
+.hm-head small{color:var(--muted);font-size:14px}
+.hm-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.hm-st{display:flex;flex-direction:column;gap:2px;font:inherit;color:var(--ink);text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer}
+.hm-st span{font-size:13px;color:var(--muted)}
+.hm-st b{font-size:22px;font-weight:800;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.hm-st.w b{color:var(--warn)}.hm-st.a b{color:var(--accent)}
+.hm-g .cp-todo-h{margin-bottom:2px}
+.hm-empty{text-align:center;padding:22px 14px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.hm-empty b{font-size:17px}
 .cu-info{display:flex;flex-direction:column;gap:8px}
 .cu-dl{padding-top:2px;display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0;font-size:14px;line-height:1.4}
 .cu-dl dt{color:var(--muted);white-space:nowrap}
@@ -569,6 +580,13 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   </div>
 
   <!-- ===== KHÁCH HÀNG ĐÃ LƯU ===== -->
+  <!-- ===== TRANG CHỦ: việc cần làm ===== -->
+  <div class="view" id="v-home" hidden>
+    <section class="hm-head"><b id="hmHi"></b><small id="hmDate"></small></section>
+    <div class="hm-stats" id="hmStats"></div>
+    <div id="hmTodo" class="stack"></div>
+  </div>
+
   <div class="view" id="v-custs" hidden>
     <section class="stack">
       <button class="primary" id="csNewBtn" type="button">＋ Khách mới</button>
@@ -578,7 +596,6 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
         <label class="f" for="csNewPhone">Số điện thoại<input id="csNewPhone" type="tel" inputmode="tel" placeholder="Không bắt buộc" autocomplete="off"></label>
         <div class="row-btns"><button class="btn2 acc" type="submit">Tạo và mở</button><button class="btn2" type="button" id="csNewX">Huỷ</button></div>
       </form>
-      <div id="csToday"></div>
     </section>
     <section class="stack">
       <div class="sec-head"><h2>Danh sách khách</h2><span class="note" id="csCount"></span></div>
@@ -915,7 +932,8 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 
 <button class="cp-fab" id="cpFab" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Ghi chi tiêu</button>
 <nav class="tabs"><div class="in" role="tablist">
-  <button role="tab" aria-selected="true" data-tab="custs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5c1.9.8 3 2.6 3 5.5"/></svg>Khách hàng</button>
+  <button role="tab" aria-selected="true" data-tab="home" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-5.5h4V20"/></svg>Trang chủ</button>
+  <button role="tab" aria-selected="false" data-tab="custs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5c1.9.8 3 2.6 3 5.5"/></svg>Khách hàng</button>
   <button role="tab" aria-selected="false" data-tab="look" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m20.5 20.5-4.8-4.8"/></svg>Tra cứu</button>
   <button role="tab" aria-selected="false" data-tab="me" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Tôi</button>
 </div></nav>
@@ -2435,7 +2453,7 @@ $("#drawer").addEventListener("click",e=>{const b=e.target.closest("[data-go]");
   if(g==="me")showTab("me");else if(g==="custs")showTab("custs");else if(g==="rules")showTab("rules");else if(g==="cbcfg")showTab("cbcfg");
   else if(g==="upd"){showTab("check");$("#pFile").click()}
   else if(g==="bk")bkExport();else if(g==="rs")$("#bkFile").click();
-  else if(g==="back"){useMe();showTab("custs")}else if(g==="new"){showTab("custs");csNewOpen()}});
+  else if(g==="back"){useMe();showTab("home")}else if(g==="new"){showTab("custs");csNewOpen()}});
 /* Sao lưu & phục hồi toàn bộ dữ liệu trên máy (mọi khoá kmt.*) */
 const K_LASTBK="kmt.lastBackup.v1",BK_SKIP=new Set([K_LASTBK,"kmt.ghToken.v1","kmt.shared.v1"]);
 function bkKeys(){const ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("kmt.")&&!BK_SKIP.has(k))ks.push(k)}}catch(e){}return ks.sort()}
@@ -2912,13 +2930,14 @@ function renderCrumbs(){const t=custTitle();$("#ckBack").textContent=t;$("#cbBac
 function showTab(t){
   if(t==="cb")t="look";
   curView=t;const v=t==="plan"||t==="look"?"cb":t;
-  ["check","custs","cust","rules","cb","me","cbcfg"].forEach(x=>$("#v-"+x).hidden=x!==v);
-  $("#tbTitle").textContent={check:"Kiểm tra mở thẻ",plan:"Kế hoạch hoàn tiền",look:"Tra cứu",me:"Tôi",custs:"Khách hàng",cust:custTitle(),rules:"Điều kiện",cbcfg:"Danh mục thẻ hoàn"}[t]||"";
+  ["home","check","custs","cust","rules","cb","me","cbcfg"].forEach(x=>$("#v-"+x).hidden=x!==v);
+  $("#tbTitle").textContent={home:"Trang chủ",check:"Kiểm tra mở thẻ",plan:"Kế hoạch hoàn tiền",look:"Tra cứu",me:"Tôi",custs:"Khách hàng",cust:custTitle(),rules:"Điều kiện",cbcfg:"Danh mục thẻ hoàn"}[t]||"";
   $("#policyBar").hidden=t!=="check";
   renderCrumbs();
   if(t==="me")renderMe();
   if(t==="check")renderCust();
   if(t==="custs")renderCustList();
+  if(t==="home")renderHome();
   if(t==="cust")renderCustPage();
   if(t==="cbcfg")cfgShow();
   if(v==="cb"){cbMode(t==="plan");cbShowLock();if(cbOk){renderCb();if(t==="plan"){renderPlan();cpPendFind()}}}
@@ -3080,18 +3099,35 @@ function renderCustList(keep){custFlush();if(!keep)csShow=40;const q=plain($("#c
   const meRow=!q&&csF==="all"?csRowHtml({id:"me",cust:me},true):"",more=rows.length-csShow;
   $("#csList").innerHTML=meRow+(rows.length?rows.slice(0,csShow).map(x=>csRowHtml(x)).join("")+(more>0?`<button type="button" class="cs-more" data-cs-more="1">Xem thêm ${Math.min(40,more)} khách (còn ${more})</button>`:"")
     :`<p class="note cs-empty">${all.length?"Không tìm thấy khách nào.":"Chưa có khách nào. Bấm “＋ Khách mới” để tạo."}</p>`);
-  if(!keep)renderToday(all)}
-/* việc hôm nay của mọi khách: hạn thanh toán sắp tới, việc chưa xong trong kế hoạch tháng */
-function renderToday(all){const items=[],per=cpNowPer();
-  [{id:"me",cust:me},...all].forEach(x=>{const c=x.cust,nm=x.id==="me"?"Hồ sơ của tôi":(c.name||"Khách chưa đặt tên");
-    custDues(c).forEach(u=>items.push({id:x.id,ic:"due",k:u.dl,t:`<b>${esc(nm)}</b> · thanh toán sao kê ${esc(u.c.bank+" "+u.c.name)}`,s:`hạn ${cpDM(u.due)} · ${u.dl?`còn ${u.dl} ngày`:"hôm nay"}`}));
-    const ps=c.planSum;if(ps&&ps.per===per&&ps.todo&&ps.todo>(ps.done||0))items.push({id:x.id,ic:"warn",k:8,t:`<b>${esc(nm)}</b> · ${ps.todo-(ps.done||0)} việc chưa xong trong kế hoạch`,s:`${ps.done||0}/${ps.todo} việc hoàn tất · bấm để mở khách`})});
-  items.sort((a,b)=>a.k-b.k);
-  const row=a=>`<div class="td cs-td" data-open="${esc(a.id)}"><span class="ic">${TD_IC[a.ic]}</span><span class="t">${a.t}<br><span class="note">${a.s}</span></span></div>`;
-  $("#csToday").innerHTML=items.length?`<div class="today"><div class="cp-todo-h"><span class="cbk" style="margin:0">Việc hôm nay</span><span>${items.length} việc</span></div>${items.slice(0,5).map(row).join("")}${items.length>5?`<details class="grp"><summary>Xem thêm ${items.length-5} việc</summary>${items.slice(5).map(row).join("")}</details>`:""}</div>`:""}
-function openCust(id){custFlush();
+}
+/* trang chủ: việc cần làm của mọi khách, nhóm theo loại */
+function homeItems(){const all=custRecs(),per=cpNowPer(),G={due:[],plan:[],check:[]};let cash=0;
+  [{id:"me",cust:me},...all].forEach(x=>{const c=x.cust,isMe=x.id==="me",nm=isMe?"Hồ sơ của tôi":(c.name||"Khách chưa đặt tên"),ps=c.planSum,n=c.cb&&c.cb.cards?c.cb.cards.length:0;
+    custDues(c).forEach(u=>G.due.push({id:x.id,go:"plan",ic:"due",k:u.dl,nm,t:`Thanh toán sao kê ${esc(u.c.bank+" "+u.c.name)}`,s:`hạn ${cpDM(u.due)} · ${u.dl?`còn ${u.dl} ngày`:"hôm nay"}`}));
+    if(ps&&ps.per===per)cash+=ps.cash||0;
+    if(n&&ps&&ps.per===per&&ps.todo&&ps.todo>(ps.done||0))G.plan.push({id:x.id,go:"plan",ic:"warn",k:0,nm,t:`${ps.todo-(ps.done||0)} việc chưa xong trong kế hoạch`,s:`${ps.done||0}/${ps.todo} việc hoàn tất${ps.tot?` · đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)}`:""}`});
+    else if(n&&!(ps&&ps.per===per&&ps.tot))G.plan.push({id:x.id,go:"plan",ic:"warn",k:1,nm,t:`Chưa lập kế hoạch tháng ${cpPerTxt(per)}`,s:`${n} thẻ hoàn tiền`});
+    if(!isMe&&!custHasCredit(c)&&custSt(c)!=="damo")G.check.push({id:x.id,go:"check",ic:"warn",k:0,nm,t:"Chưa nhập thẻ tín dụng / CIC",s:"nhập để kiểm tra ngân hàng mở được"})});
+  G.due.sort((a,b)=>a.k-b.k);G.plan.sort((a,b)=>a.k-b.k);return{G,all,cash}}
+function renderHome(){custFlush();const{G,all,cash}=homeItems(),now=new Date(),per=cpNowPer(),h=now.getHours();
+  $("#hmHi").textContent=`${h<11?"Chào buổi sáng":h<14?"Chào buổi trưa":h<18?"Chào buổi chiều":"Chào buổi tối"}${me.name?", "+me.name.trim().split(/\s+/).pop():""}`;
+  $("#hmDate").textContent=now.toLocaleDateString("vi-VN",{weekday:"long",day:"numeric",month:"numeric",year:"numeric"});
+  const nTodo=G.due.length+G.plan.length+G.check.length;
+  $("#hmStats").innerHTML=`<button type="button" class="hm-st${nTodo?" w":""}" data-hm="todo"><span>Việc cần làm</span><b>${nTodo}</b></button>
+    <button type="button" class="hm-st${G.due.length?" w":""}" data-hm="due"><span>Hạn thanh toán 7 ngày</span><b>${G.due.length}</b></button>
+    <button type="button" class="hm-st a" data-hm="custs"><span>Khách hàng</span><b>${all.length}</b></button>
+    <button type="button" class="hm-st a" data-hm="custs"><span>Dự kiến hoàn T${+per.slice(5)}</span><b>${cash?cbMoney(cash):"–"}</b></button>`;
+  const row=a=>`<div class="td" data-open="${esc(a.id)}" data-go="${a.go}"><span class="ic">${TD_IC[a.ic]}</span><span class="t"><b>${esc(a.nm)}</b> · ${a.t}<br><span class="note">${a.s}</span></span></div>`;
+  const grp=(id,title,L)=>L.length?`<div class="today hm-g" id="hm-${id}"><div class="cp-todo-h"><span class="cbk" style="margin:0">${title}</span><span>${L.length}</span></div>${L.slice(0,6).map(row).join("")}${L.length>6?`<details class="grp"><summary>Xem thêm ${L.length-6}</summary>${L.slice(6).map(row).join("")}</details>`:""}</div>`:"";
+  $("#hmTodo").innerHTML=nTodo?grp("due","Hạn thanh toán sao kê",G.due)+grp("plan","Kế hoạch hoàn tiền tháng "+cpPerTxt(per),G.plan)+grp("check","Kiểm tra mở thẻ",G.check)
+    :`<div class="today hm-empty"><b>Không có việc cần làm</b><span class="note">Các hạn thanh toán, kế hoạch chưa xong và khách chưa kiểm tra sẽ hiện ở đây.</span><button class="btn2 acc" type="button" data-hm="custs">Mở danh sách khách</button></div>`}
+$("#v-home").addEventListener("click",e=>{if(e.target.closest("summary"))return;const s=e.target.closest("[data-hm]");
+  if(s){const k=s.dataset.hm;if(k==="custs")showTab("custs");else{const el=k==="due"?$("#hm-due"):$("#hmTodo .today");if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}return}
+  const o=e.target.closest("[data-open]");if(o)openCust(o.dataset.open,o.dataset.go)});
+function openCust(id,go){custFlush();
   if(id==="me")cust=me;else{const rec=custList().find(x=>x.id===id);if(!rec)return;cust=clone(rec.cust);cust.id=rec.id;cust.example=false}
-  cicFiles={};xState=null;$("#results").hidden=true;cpStep1Init=null;save(K_CUST,cust.isMe?{isMe:true}:cust);renderWho();showTab("cust")}
+  cicFiles={};xState=null;$("#results").hidden=true;cpStep1Init=null;save(K_CUST,cust.isMe?{isMe:true}:cust);renderWho();showTab("cust");
+  if(go==="plan"){showTab("plan");if(!cbOk)toast("Nhập mật khẩu Hoàn tiền để xem kế hoạch")}else if(go==="check"){showTab("check");if(custHasCredit(cust))runCheck(false);else $("#results").hidden=true}}
 /* trang khách */
 function renderCustPage(){const c=cust,isMe=!!c.isMe,st=CS_ST[custSt(c)];
   $("#cuAv").innerHTML=avHtml(isMe?me:{name:c.name});$("#cuName").textContent=custTitle();
@@ -3149,7 +3185,6 @@ let csQT=null;$("#csSearch").addEventListener("input",()=>{clearTimeout(csQT);cs
 $("#csSort").addEventListener("change",e=>{csSort=e.target.value;renderCustList()});
 $("#csFilter").addEventListener("click",e=>{const b=e.target.closest("[data-csf]");if(!b)return;csF=b.dataset.csf;renderCustList()});
 $("#csList").addEventListener("click",e=>{if(e.target.closest("[data-cs-more]")){const y=scrollY;csShow+=40;renderCustList(true);window.scrollTo(0,y);return}const o=e.target.closest("[data-open]");if(o)openCust(o.dataset.open)});
-$("#csToday").addEventListener("click",e=>{if(e.target.closest("summary"))return;const o=e.target.closest("[data-open]");if(o)openCust(o.dataset.open)});
 $("#csBackup").addEventListener("click",()=>{
   const list=custList();if(!list.length){toast("Chưa có khách nào để sao lưu");return}
   exportFile(JSON.stringify({app:"kiem-tra-mo-the",type:"customers",at:new Date().toISOString(),list},null,1),`khach-hang_${stamp()}.json`,"application/json");
@@ -3312,7 +3347,7 @@ async function exportPdf(btn){
 }
 
 renderCust();showPolicy();showLock();showLogo();renderWho();
-custMigrate();showTab("custs");
+custMigrate();showTab("home");
 renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 showPolicy();
