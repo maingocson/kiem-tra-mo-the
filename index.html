@@ -2475,7 +2475,13 @@ function cpRing(v,max,label,sz){sz=sz||40;const c=sz/2,w=Math.round(sz*.13),r=c-
   return`<svg class="ring" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" role="img" aria-label="${esc(label)}"><circle class="bg" cx="${c}" cy="${c}" r="${r}" fill="none" stroke-width="${w}"/>${f>0?`<circle class="fg" cx="${c}" cy="${c}" r="${r}" fill="none" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>`:""}<text x="${c}" y="${(c+fs*.36).toFixed(1)}" text-anchor="middle" font-size="${fs}">${esc(label)}</text></svg>`}
 function cpSave(){edited()}
 let cpNowAll=false,cpStep1Init=null;
-function renderPlan(){
+/* lỗi khi tính kế hoạch: hiện rõ ở chỗ Kết quả phân bổ thay vì để trống, kèm vị trí lỗi để chụp màn hình gửi lại */
+function cpErrShow(e,where){try{console.error(e)}catch(x){}const O=$("#cpOut");if(!O)return;O.hidden=false;
+  const st=String(e&&e.stack||"").split("\n").filter(Boolean).slice(0,3).map(l=>l.replace(/https?:\/\/[^\s)]*\//g,"")).join(" | ");
+  O.innerHTML=`<div class="pl-ban warn"><b>Chưa tính được kết quả phân bổ</b> – app gặp lỗi ở ${esc(where)}. Hãy chụp màn hình khung này gửi người làm app.<div class="note" style="margin-top:6px;overflow-wrap:anywhere">${esc(String(e&&e.message||e))}${st?"<br>"+esc(st):""}</div></div>`}
+function renderPlan(){try{renderPlan0()}catch(e){cpErrShow(e,"trang kế hoạch")}}
+function renderPlanOut(){try{renderPlanOut0()}catch(e){cpErrShow(e,"phần phân bổ")}}
+function renderPlan0(){
   const all=cbAll(),d=cpData(),owned=cpOwned();
   $("#cpWho").innerHTML="";$("#cpWho").hidden=true;
   const PLx=cpSel(d),pbh=cpPBHtml(d,owned);$("#cpPB").innerHTML=pbh.list;$("#cpPB").hidden=!owned.length;$("#cpPD").innerHTML=pbh.detail;$("#cpPD").hidden=!PLx;
@@ -2530,7 +2536,7 @@ function renderPlan(){
   /* vẽ lại danh sách kế hoạch để dòng đang hoạt động có số liệu vừa tính */
   if(owned.length&&!cpNewOpen&&!cpEditEnd)$("#cpPB").innerHTML=cpPBHtml(d,owned).list;
 }
-function renderPlanOut(){
+function renderPlanOut0(){
   const d=cpData(),owned=cpOwned(),all=cbAll(),O=$("#cpOut"),now=new Date(),t0=dToday(),PL=cpSel(d);
   const A0=cpActual(owned,d.hist,now),ctxs={};owned.forEach(({c})=>ctxs[c.id]=A0[c.id].ctx);
   cpShareTxt="";
