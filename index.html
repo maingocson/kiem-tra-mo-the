@@ -2002,7 +2002,7 @@ function cpCardMax(c,e,ti){
   const used=new Set(),out=[];
   for(const x of gs){const k=CP_CATS.map(z=>z[0]).find(k=>x.cats.has(k)&&!used.has(k));if(!k)continue;
     let cc=x.g.cap[ti]!=null?x.g.cap[ti]:Infinity;if(x.g.share&&shLeft[x.g.share]!=null)cc=Math.min(cc,shLeft[x.g.share]);cc=Math.min(cc,cardLeft);
-    if(cc<=0)continue;let amt=cc===Infinity?CP_NOCAP:cc/(x.r/100);amt=Math.ceil(amt/50000)*50000;
+    if(cc<=0)continue;let amt=cc===Infinity?CP_NOCAP:cc/(x.r/100);amt=Math.min(CP_AUTO_MAX,Math.ceil(amt/50000)*50000);
     const got=Math.min(cc,amt*x.r/100);cardLeft-=got;if(x.g.share&&shLeft[x.g.share]!=null)shLeft[x.g.share]-=got;
     used.add(k);out.push({k,amt,r:x.r})}
   const t=c.tiers[ti],tot=out.reduce((a,b)=>a+b.amt,0);
@@ -2023,7 +2023,7 @@ function cpAutoNeeds(owned,budget){
   if(budget>0){all.sort((a,b)=>b.r-a.r);let left=budget;all=all.map(x=>{const a=Math.min(x.amt,Math.max(0,left));left-=a;return{...x,amt:a}}).filter(x=>x.amt>0)}
   const needs={};all.forEach(x=>needs[x.k]=(needs[x.k]||0)+x.amt);
   if(needs.khac>0){const fills=all.filter(x=>x.fill).map(x=>x.amt);if(fills.length>1)needs.khac=needs.khac-fills.reduce((a,b)=>a+b,0)+Math.max(...fills)}
-  if(!(budget>0))for(const k in needs)needs[k]=Math.min(needs[k],CP_AUTO_MAX);
+  if(!(budget>0))for(const k in needs)if(k!=="khac")needs[k]=Math.min(needs[k],CP_AUTO_MAX);/* "khác" giữ nguyên: là phần chi bù cho đủ ngưỡng mức */
   return Object.fromEntries(Object.entries(needs).map(([k,v])=>[k,String(Math.round(v/1e4)/100)]))}
 function cbOf(p){if(!p.cb)p.cb={cards:[],hist:[],needs:{}};const d=p.cb;d.cards=d.cards||[];d.hist=d.hist||[];d.needs=d.needs||{};
   return d}
