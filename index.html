@@ -281,7 +281,7 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .td>span.t{flex:1;min-width:0}
 .td .ring{flex:none}
 .cp-fill{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
-.cp-fill.on{background:var(--ok-soft);flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+.cp-fill.on{background:var(--ok-soft);border-color:var(--ok)}
 .cp-fill .ctbl{margin:6px 0 4px;width:100%}
 .cp-fill b.ok{color:var(--ok)}.cp-fill b.bad{color:var(--bad)}
 .td.done>.ic{background:var(--ok-soft);color:var(--ok)}
@@ -2220,15 +2220,21 @@ function renderPlanOut(){
     const need=t.from-r.total;if(need<=0)return;
     const sp=cpMerge(x.fix,x.sp);sp.khac=(sp.khac||0)+need;const after=cpCalc(c,x.e,sp,x.ctx).cash,gain=after-r.cash;
     if(gain>=20000)ups.push({c,nt,need,gain,after,before:r.cash,name:t.n||"mức "+(nt+1)})});
-  const auto=d.needsSrc==="auto",filled=auto?P.cards.filter(x=>x.e.fill!=null):[];
-  const upHtml=ups.length||filled.length?`<div class="cbk">Chi bù để lên mức – bạn quyết định</div>
-    <p class="note" style="margin:0">Khoản chi bù là chi tiêu <b>không có hoàn riêng</b>, chỉ để tổng chi đủ ngưỡng mức. Kế hoạch ở trên <b>chưa</b> tính các khoản này. Đáng làm khi đó là khoản bạn vẫn phải chi (hoá đơn, mua sắm thường ngày); nếu chi chỉ để lên mức thì cân nhắc theo tỷ lệ bên dưới.</p>
-    ${filled.map(x=>`<div class="cp-fill on"><div><b>${esc(x.c.bank+" "+x.c.name)}</b><br><span class="note">Đang tính chi bù để lên “${esc((x.c.tiers[x.e.fill]||{}).n||"mức "+(x.e.fill+1))}”${x.sp.khac?` · chi bù ${cbMoney(x.sp.khac)}`:""}</span></div><button class="btn2" type="button" data-cp-fill="${esc(x.c.id)}" data-off="1">Bỏ chi bù</button></div>`).join("")}
-    ${ups.sort((a,b)=>b.gain/b.need-a.gain/a.need).slice(0,5).map(u=>{const pct=u.gain/u.need*100;
-      return`<div class="cp-fill"><div><b>${esc(u.c.bank+" "+u.c.name)}</b> → ${esc(u.name)}
-        <table class="ctbl"><tbody><tr><td>Chi bù (không có hoàn riêng)</td><td>${cbMoney(u.need)}</td></tr><tr><td>Tiền hoàn của thẻ</td><td>${cbMoney(u.before)} → ${cbMoney(u.after)}</td></tr><tr><td><b>Hoàn thêm</b></td><td><b>+${cbMoney(u.gain)}</b>/${cbPer(u.c)}</td></tr><tr><td>Mỗi 1tr chi bù được</td><td><b class="${pct>=3?"ok":pct>=1.5?"":"bad"}">${cbMoney(u.gain/u.need*TRV)}</b> (${cbPct(Math.round(pct*10)/10)})</td></tr></tbody></table>
-        <span class="note">${pct>=3?"Đáng cân nhắc: tỷ lệ cao hơn hầu hết thẻ hoàn cơ bản.":pct>=1.5?"Tạm được: chỉ nên làm nếu khoản chi bù là chi tiêu thật.":"Thấp: chỉ làm nếu khoản chi bù là chi tiêu bắt buộc."}</span></div>
-        <button class="btn2 acc" type="button" data-cp-fill="${esc(u.c.id)}" data-nt="${u.nt}" data-need="${u.need}">${auto?"Tính vào kế hoạch":`Thêm ${cbMoney(u.need)} vào “${esc(CP_NAME.khac||"Chi tiêu khác")}”`}</button></div>`}).join("")}`:"";
+  const auto=d.needsSrc==="auto";
+  /* giữ lại phép tính chi bù đã chọn hoặc đã bỏ để xem lại */
+  const fillBox=(u,on,old,live)=>{const pct=u.gain/u.need*100,x=P.cards.find(y=>y.c.id===u.c.id);
+    return`<div class="cp-fill${on?" on":""}"><div><b>${esc(u.c.bank+" "+u.c.name)}</b> → ${esc(u.name)}${on?` <span class="chip ok">đã tính vào kế hoạch</span>`:old?` <span class="chip ch">đã bỏ</span>`:""}
+      <table class="ctbl"><tbody><tr><td>Chi bù (không có hoàn riêng)</td><td>${cbMoney(u.need)}</td></tr><tr><td>Tiền hoàn của thẻ</td><td>${cbMoney(u.before)} → ${cbMoney(u.after)}</td></tr><tr><td><b>Hoàn thêm</b></td><td><b>+${cbMoney(u.gain)}</b>/${cbPer(u.c)}</td></tr><tr><td>Mỗi 1tr chi bù được</td><td><b class="${pct>=3?"ok":pct>=1.5?"":"bad"}">${cbMoney(u.gain/u.need*TRV)}</b> (${cbPct(Math.round(pct*10)/10)})</td></tr>${on&&x?`<tr><td>Thẻ này trong kế hoạch hiện tại</td><td>hoàn ${cbMoney(x.res.cash)}</td></tr>`:""}</tbody></table>
+      <span class="note">${on?"Số liệu lúc bạn chọn. Kế hoạch ở trên đã gồm khoản chi bù này.":old&&!live?"Số liệu lúc bạn bỏ chọn. Kế hoạch ở trên không gồm khoản này.":pct>=3?"Đáng cân nhắc: tỷ lệ cao hơn hầu hết thẻ hoàn cơ bản.":pct>=1.5?"Tạm được: chỉ nên làm nếu khoản chi bù là chi tiêu thật.":"Thấp: chỉ làm nếu khoản chi bù là chi tiêu bắt buộc."}</span></div>
+      ${on?`<button class="btn2" type="button" data-cp-fill="${esc(u.c.id)}" data-off="1">Bỏ chi bù</button>`
+        :`<button class="btn2 acc" type="button" data-cp-fill="${esc(u.c.id)}" data-nt="${u.nt}" data-need="${u.need}" data-info="${esc(JSON.stringify({nt:u.nt,need:Math.round(u.need),before:Math.round(u.before),after:Math.round(u.after),gain:Math.round(u.gain),name:u.name}))}">${auto?"Tính vào kế hoạch":`Thêm ${cbMoney(u.need)} vào “${esc(CP_NAME.khac||"Chi tiêu khác")}”`}</button>`}</div>`};
+  const fBoxes=[],seen=new Set();
+  P.cards.forEach(x=>{const fi=x.e.fillInfo;if(!fi)return;const on=auto?x.e.fill!=null:!!fi.added;if(!on&&ups.some(u=>u.c.id===x.c.id))return;seen.add(x.c.id);fBoxes.push([on?0:1,fillBox({...fi,c:x.c},on,!on)])});
+  ups.filter(u=>!seen.has(u.c.id)).sort((a,b)=>b.gain/b.need-a.gain/a.need).slice(0,5).forEach(u=>{const x=P.cards.find(y=>y.c.id===u.c.id);fBoxes.push([2,fillBox(u,false,!!(x&&x.e.fillInfo),true)])});
+  fBoxes.sort((a,b)=>a[0]-b[0]);
+  const upHtml=fBoxes.length?`<div class="cbk">Chi bù để lên mức – bạn quyết định</div>
+    <p class="note" style="margin:0">Khoản chi bù là chi tiêu <b>không có hoàn riêng</b>, chỉ để tổng chi đủ ngưỡng mức. Kế hoạch ở trên chỉ gồm khoản nào bạn đã chọn. Đáng làm khi đó là khoản bạn vẫn phải chi (hoá đơn, mua sắm thường ngày); nếu chi chỉ để lên mức thì cân nhắc theo tỷ lệ bên dưới.</p>
+    ${fBoxes.map(f=>f[1]).join("")}`:"";
   O.innerHTML=`<div class="cbk">Kế hoạch chi tiêu tháng ${esc(cpPerTxt(per))}</div>${big}${nextHtml}<div class="cbk">Theo từng thẻ (${owned.length})</div>${owned.length>8?`<input id="cpPcQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ trong kế hoạch">`:""}${planHtml}${upHtml}
     <p class="note" style="margin:0">Ước tính theo dữ liệu tab Hoàn tiền. Kiểu chu kỳ, số ngày miễn lãi và phân khúc theo cấu hình của quản lý (Cấu hình → Danh mục thẻ hoàn); ngày sao kê theo từng khách nhập ở bước 1. Thẻ chưa đủ số giao dịch, chi tiêu tối thiểu hoặc điểm tối thiểu thì chưa được tính tiền hoàn. Kế hoạch giả định chi đều các ngày; tiền đã hoàn tính theo đúng ngày, số tiền và số giao dịch đã ghi. Phần vượt trần không được hoàn; không tính ưu đãi đối tác riêng. Luôn đối chiếu thể lệ trước khi tư vấn.</p>`;
   /* gợi ý mở thẻ mới: tính sau để màn hình hiện ngay */
@@ -2253,7 +2259,10 @@ $("#cbSeg").addEventListener("click",e=>{const b=e.target.closest("[data-seg]");
 function cpFabSync(){$("#cpFab").hidden=$("#v-cb").hidden||$("#cpView").hidden||!cbOk}
 $("#cpFab").addEventListener("click",()=>{const n=$(".cp-now");n.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("#cpQCard").focus(),350)});
 $("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-cp-fill]");if(!b)return;const d=cpData(),en=d.cards.find(x=>x.id===b.dataset.cpFill);if(!en)return;
-  if(b.dataset.off){delete en.fill;cpSave();renderPlan();toast("Đã bỏ chi bù");return}
+  const fi=en.fillInfo;
+  if(b.dataset.off){if(d.needsSrc==="auto")delete en.fill;else if(fi&&fi.added){const v=Math.max(0,cpTr(d.needs.khac)-fi.need);if(v>0)d.needs.khac=String(Math.round(v/1e4)/100);else delete d.needs.khac}
+    if(fi)fi.added=false;cpSave();renderPlan();toast("Đã bỏ chi bù – vẫn giữ phép tính để xem lại");return}
+  try{en.fillInfo=JSON.parse(b.dataset.info);if(d.needsSrc!=="auto")en.fillInfo.added=true}catch(err){}
   if(d.needsSrc==="auto"){en.fill=+b.dataset.nt;cpSave();renderPlan();toast("Đã tính chi bù vào kế hoạch")}
   else{const v=cpTr(d.needs.khac)+(+b.dataset.need);d.needs.khac=String(Math.round(v/1e4)/100);cpSave();renderPlan();toast("Đã thêm vào nhu cầu chi tiêu khác")}});
 $("#cpFind").addEventListener("input",()=>cpFillSel("#cpFind","#cpCard",cust));
