@@ -2734,20 +2734,40 @@ function renderWho(){
 }
 function useMe(){if(cust.isMe)return;cust=me;cicFiles={};xState=null;$("#results").hidden=true;saveCust();renderCust();toast("Đã chuyển về hồ sơ của bạn")}
 /* khung trượt */
-function drOpen(){
+function drOpen(prep){
+  if(prep!==true||!$("#drawer").classList.contains("on")){
   bkInfo();
   $("#drAv").innerHTML=avHtml(me);$("#drName").textContent=me.name||"Chưa đặt tên";
   $("#drNow").innerHTML=cust.isMe?"Đang dùng: <b>hồ sơ của tôi</b>":`Đang tư vấn: <b>${esc(cust.name||"khách chưa đặt tên")}</b>`;
   $("#drBack").hidden=true;
-  $("#drFoot").textContent=`Kiểm Tra Mở Thẻ · ${rules.length} ngân hàng có điều kiện`;
+  $("#drFoot").textContent=`Kiểm Tra Mở Thẻ · ${rules.length} ngân hàng có điều kiện`;}
+  if(prep===true)return;
   $("#drawer").classList.add("on");$("#drBg").classList.add("on");$("#drawer").setAttribute("aria-hidden","false");
 }
 function drClose(){$("#drawer").classList.remove("on");$("#drBg").classList.remove("on");$("#drawer").setAttribute("aria-hidden","true")}
 $("#meBtn").addEventListener("click",drOpen);
 $("#drBg").addEventListener("click",drClose);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")drClose()});
-{let x0=null;const d=$("#drawer");d.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
- d.addEventListener("touchmove",e=>{if(x0!=null&&e.touches[0].clientX-x0<-60){x0=null;drClose()}},{passive:true})}
+/* vuốt như X: kéo ngang sang phải ở bất kỳ đâu trên trang để menu trái trượt theo ngón tay; kéo sang trái để đóng */
+{const D=$("#drawer"),B=$("#drBg");let g=null;
+ const W=()=>D.getBoundingClientRect().width||300;
+ const isOpen=()=>D.classList.contains("on");
+ const blocked=t=>{if(!$("#qs").hidden)return true;
+   for(let el=t;el&&el!==document.body;el=el.parentElement){if(el.matches&&el.matches("input,textarea,select,[contenteditable],input[type=range]"))return true;
+     if(el!==D&&el.scrollWidth>el.clientWidth+2){const ox=getComputedStyle(el).overflowX;if(ox==="auto"||ox==="scroll")return true}}return false};
+ const set=x=>{const w=W();x=Math.max(0,Math.min(w,x));D.style.transform=`translateX(${x-w}px)`;B.style.opacity=String(x/w)};
+ document.addEventListener("touchstart",e=>{if(e.touches.length!==1){g=null;return}const t=e.touches[0],op=isOpen();
+   if(!op&&blocked(e.target)){g=null;return}
+   g={x0:t.clientX,y0:t.clientY,op,lock:0,x:t.clientX,t0:performance.now(),vx:0,lt:performance.now(),lx:t.clientX}},{passive:true});
+ document.addEventListener("touchmove",e=>{if(!g)return;const t=e.touches[0],dx=t.clientX-g.x0,dy=t.clientY-g.y0;
+   if(!g.lock){if(Math.abs(dx)<10&&Math.abs(dy)<10)return;
+     if(Math.abs(dx)>Math.abs(dy)*1.2&&(g.op?dx<0:dx>0)){g.lock=1;D.style.transition="none";B.style.transition="none";B.classList.add("on");if(!g.op)drOpen(true)}else{g=null;return}}
+   e.preventDefault();const now=performance.now();if(now>g.lt){g.vx=(t.clientX-g.lx)/(now-g.lt);g.lt=now;g.lx=t.clientX}
+   g.x=t.clientX;set(g.op?W()+dx:dx)},{passive:false});
+ const end=()=>{if(!g)return;const G=g;g=null;if(!G.lock)return;const w=W(),dx=G.x-G.x0,pos=G.op?w+dx:dx;
+   D.style.transition="";B.style.transition="";D.style.transform="";B.style.opacity="";
+   const open=G.vx>.4?true:G.vx<-.4?false:pos>w/2;if(open)drOpen();else drClose()};
+ document.addEventListener("touchend",end);document.addEventListener("touchcancel",end)}
 $("#drawer").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(!b)return;const g=b.dataset.go;drClose();
   if(g==="me")showTab("me");else if(g==="custs")showTab("custs");else if(g==="rules")showTab("rules");else if(g==="cbcfg")showTab("cbcfg");
   else if(g==="upd"){showTab("check");$("#pFile").click()}

@@ -29,6 +29,7 @@
 ## Sao lưu & phục hồi toàn bộ
 
 - Dữ liệu chỉ nằm trong bộ nhớ của app trên máy (localStorage). **Xoá app khỏi màn hình chính là mất hết**, không khôi phục được nếu chưa sao lưu.
+- Mở **menu trái** như X: bấm ảnh đại diện góc trên, bấm icon Tôi, hoặc **vuốt ngang sang phải ở bất kỳ đâu** trên trang (menu trượt theo ngón tay, buông quá nửa hoặc vuốt nhanh thì mở). Vuốt sang trái hoặc chạm vùng tối để đóng. Vuốt trên hàng nút lọc cuộn ngang, ô nhập hay bảng rộng thì không mở menu.
 - Menu trái → **Sao lưu toàn bộ ra file**: gom hồ sơ Tôi, khách hàng, bảng điều kiện, danh sách ngân hàng, dữ liệu hoàn tiền vào một file `.json`; trên iPhone lưu vào app Tệp / iCloud Drive / gửi Zalo.
 - Menu trái → **Phục hồi từ file**: chọn file đó, xác nhận → app nạp lại và tải lại trang.
 - Menu trái và trang Tôi ghi ngày sao lưu gần nhất; chữ chuyển màu cam khi chưa sao lưu hoặc đã quá 7 ngày.
