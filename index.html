@@ -378,10 +378,12 @@ details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-detai
 .cfg-save span{flex:1;min-width:0;font-size:14px;color:var(--muted)}.cfg-save.dirty span{color:var(--warn);font-weight:700}
 .cfg-save .btn2{padding:9px 18px}.cfg-save .btn2:disabled{opacity:.45}
 #v-cbcfg:not([hidden]){padding-bottom:64px}
-.cfg-card{display:flex;flex-direction:column;gap:6px}
-.cfg-card.ed>details.cb{border-color:var(--accent)}
-.cfg-bar1{display:flex;align-items:center;gap:8px;padding:0 4px}.cfg-bar1 .note{flex:1;min-width:0}
-.cfg-ed{border:1px solid var(--accent);border-radius:14px;padding:10px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.cfg-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.cfg-card>details.cbc{border:0;border-radius:0;box-shadow:none;background:none;margin:0}
+.cfg-card.ed{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.cfg-bar1{display:flex;align-items:center;gap:8px;padding:8px 14px 10px;border-top:1px solid var(--line)}.cfg-bar1 .note{flex:1;min-width:0}
+.cfg-bar1 .btn2{padding:7px 14px;font-size:14px}
+.cfg-ed{border-top:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
 .cfg-rs{background:var(--warn-soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .pc-c.wait{color:var(--warn);font-weight:700;font-size:12px;text-align:right}
 .cp-need{background:var(--bad-soft,#fde8e8);color:var(--bad);border-radius:8px;padding:6px 8px;font-size:13px}
