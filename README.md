@@ -56,6 +56,8 @@
 Khách hàng là trung tâm của app: mỗi khách có thông tin chung, phần **Kiểm tra mở thẻ** và phần **Kế hoạch chi tiêu hoàn tiền**.
 
 - **Danh sách khách** (màn hình đầu): tìm theo tên, số điện thoại, ngân hàng; lọc theo trạng thái (Mới, Đang tư vấn, Đã mở thẻ, Theo dõi chi tiêu). Mỗi dòng tóm tắt kết quả mở thẻ và kế hoạch tháng (dự kiến hoàn, đã chi, việc đã xong). **Hồ sơ của tôi** ghim ở đầu.
+- Danh sách gọn kiểu X: mỗi khách một hàng 2–3 dòng, ảnh đại diện nhỏ, đường kẻ mảnh; hiện 40 khách mỗi lần (**Xem thêm**); sắp xếp **Gần đây / Tên A–Z / Cần làm**. Đã thử với 300 khách.
+- **Phông chữ** (trang Tôi → Hiển thị): Be Vietnam Pro (mặc định), phông hệ thống iPhone SF (gần giống X nhất – X dùng phông Chirp riêng), hoặc Inter.
 - **Việc hôm nay** (đầu danh sách): khách sắp tới hạn thanh toán sao kê trong 7 ngày (thẻ có chi tiêu trong kỳ đó) và khách còn việc chưa xong trong kế hoạch tháng. Bấm để mở khách.
 - **＋ Khách mới**: nhập tên (số điện thoại không bắt buộc) → vào thẳng trang khách.
 - **Trang khách**: 2 ô chức năng có tóm tắt – **Kiểm tra mở thẻ** (số thẻ, % hạn mức đã dùng, ngày CIC, ngân hàng mở được) và **Kế hoạch chi tiêu hoàn tiền** (dự kiến hoàn, đã chi/kế hoạch, việc cần làm, hạn thanh toán gần nhất). Mục **Thông tin khách**: tên, số điện thoại, trạng thái (để *Tự động* thì app tự xếp), ghi chú, **Xoá khách này** (bấm 2 lần).
