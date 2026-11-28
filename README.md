@@ -69,7 +69,7 @@ Khách hàng là trung tâm của app: mỗi khách có thông tin chung, phần
 
 ## Kế hoạch chi tiêu & kỳ thẻ
 
-Trang khách → **Kế hoạch chi tiêu hoàn tiền**.
+Trang khách → **Kế hoạch chi tiêu hoàn tiền** mở **trang danh sách kế hoạch** (kèm thẻ của khách và Thẻ & kỳ). Bấm một kế hoạch để mở **trang chi tiết** riêng (kết quả phân bổ, việc cần làm, ghi chi tiêu, nhu cầu chi tiêu ở cuối trang); nút ‹ Danh sách kế hoạch để quay lại. Việc "chưa xong trong kế hoạch" ở Trang chủ mở thẳng chi tiết kế hoạch đang hoạt động; nút Ghi chi tiêu ở trang danh sách cũng mở kế hoạch đang hoạt động.
 
 - **Thẻ & kỳ** (theo khách, luôn chạy liên tục): mỗi thẻ có 2 đồng hồ – **kỳ tính hoàn** (theo kỳ sao kê hoặc theo tháng, quyết định điều kiện, trần, mức) và **kỳ sao kê** (số tiền phải trả, hạn thanh toán). Nhãn *chưa xác nhận* khi quản lý chưa đặt kiểu tính hoàn ở Danh mục thẻ hoàn. Bấm thẻ để: **Đã thanh toán**, nhập **tổng sao kê ngân hàng** (app báo lệch – còn khoản chưa ghi hoặc trùng), nhập **tiền hoàn ngân hàng đã trả** của kỳ trước (app báo trả thiếu).
 - **Nhắc việc** (Trang chủ và trong kế hoạch): thanh toán trong 3 ngày tới hoặc **quá hạn** (chưa đánh dấu đã trả); kỳ tính hoàn còn ≤ 3 ngày mà chưa đủ điều kiện.
