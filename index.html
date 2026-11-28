@@ -1989,10 +1989,10 @@ function cpOptimize(owned,needs,fine,fix,ctxs){
 /* tự tính nhu cầu chi tiêu từ thẻ đang có: mỗi thẻ chi vừa đủ để lấy hết trần các nhóm hoàn cao và đủ ngưỡng mức
    (bỏ ưu đãi chỉ áp dụng vài ngày trong tuần; không dồn chi quá nhiều chỉ để lên mức);
    nhóm không có trần thì tạm tính 3tr; có ngân sách (đồng) thì cắt phần tỷ lệ thấp trước */
-const CP_NOCAP=3*TRV,CP_AUTO_MAX=10*TRV,CP_EFF=1.5;/* % hoàn tối thiểu đáng để chi thêm */
+const CP_NOCAP=3*TRV,CP_AUTO_MAX=10*TRV;
 function cpCardMax(c,e,ti){
   const rate=g=>{const v=g.r[ti];return v==null?null:v*cpDayF(g)};
-  let gs=c.groups.map((g,i)=>({g,i,cats:cpGroupCats(g),r:rate(g)})).filter(x=>x.r!=null&&x.r>(c.base||0)&&x.r>=CP_EFF&&x.cats!=="ALL"&&x.cats.size&&cpDayF(x.g)===1);
+  let gs=c.groups.map((g,i)=>({g,i,cats:cpGroupCats(g),r:rate(g)})).filter(x=>x.r!=null&&x.r>(c.base||0)&&x.cats!=="ALL"&&x.cats.size&&cpDayF(x.g)===1);
   const pickG=gs.filter(x=>x.g.pick);
   if(pickG.length){const n=cpNPick(c,ti)||1,w=x=>x.g.cap[ti]!=null?x.g.cap[ti]:CP_NOCAP*x.r/100;
     const ch=e&&e.pick&&e.pick.length?new Set(e.pick):new Set(pickG.slice().sort((a,b)=>w(b)-w(a)).slice(0,n).map(x=>x.i));
@@ -2011,9 +2011,9 @@ function cpCardMax(c,e,ti){
 function cpAutoNeeds(owned,budget){
   let all=[];
   owned.forEach(({c,e})=>{
-    const tis=cpSpendTier(c)?c.tiers.map((t,i)=>i):[Math.min(e.tier||0,c.nt-1)];let best=null,bs=-Infinity;
+    const tis=cpSpendTier(c)?c.tiers.map((t,i)=>i):[Math.min(e.tier||0,c.nt-1)];let best=null,bs=-Infinity,bt=Infinity;
     tis.forEach(ti=>{const ch=cpCardMax(c,e,ti);if(!ch)return;const sp={};ch.forEach(x=>sp[x.k]=(sp[x.k]||0)+x.amt);
-      const tot=ch.reduce((a,b)=>a+b.amt,0),sc=cpCalc(c,e,sp).cash-tot*CP_EFF/100;if(sc>bs){bs=sc;best=ch}});
+      const tot=ch.reduce((a,b)=>a+b.amt,0),sc=cpCalc(c,e,sp).cash;/* hoàn nhiều nhất; hoàn bằng nhau thì chọn cách chi ít hơn */if(sc>bs+1||(sc>=bs-1&&tot<bt)){bs=sc;bt=tot;best=ch}});
     if(best)all=all.concat(best.map(x=>({...x,card:c.id})))});
   /* một người chỉ có một nhu cầu cho mỗi loại chi tiêu: lấy thẻ hoàn cao nhất cho từng loại (nhiều thẻ cùng loại thì không cộng dồn),
      giữ phần chi bù ngưỡng của chính các thẻ được chọn */
@@ -2118,7 +2118,7 @@ function renderPlan(){
   const nTot=Object.values(d.needs).reduce((a,v)=>a+cpTr(v),0);
   $("#cpS3").textContent=nTot?`${cbMoney(nTot)}/tháng${d.needsSrc==="auto"?" · tự tính":""}`:"chưa nhập";
   $("#cpNeedsSrc").hidden=!(d.needsSrc==="auto"&&owned.length);
-  $("#cpNeedsSrc").innerHTML=`App đã tự tính theo ${owned.length} thẻ đang có: chi tổng <b>${cbMoney(nTot)}</b>/tháng ${cpTr(d.budget)?"trong ngân sách, ưu tiên nhóm hoàn cao":"để lấy hết trần hoàn và đủ ngưỡng mức"}. Chỉ tính nhóm hoàn từ ${cbPct(CP_EFF)} trở lên và chỉ chi thêm để lên mức khi mỗi 1tr chi thêm được từ ${cbMoney(CP_EFF/100*TRV)} – hoàn nhiều nhất với số chi ít nhất.${!cpTr(d.budget)&&nTot>50*TRV?" Con số khá lớn – nhập <b>ngân sách</b> để gói lại theo khả năng chi.":""} Sửa số bất kỳ thì app giữ số của bạn.`;
+  $("#cpNeedsSrc").innerHTML=`App đã tự tính theo ${owned.length} thẻ đang có: chi tổng <b>${cbMoney(nTot)}</b>/tháng ${cpTr(d.budget)?"trong ngân sách, ưu tiên nhóm hoàn cao":"để lấy hết trần hoàn và đủ ngưỡng mức"}. Mỗi nhóm chi vừa đủ chạm trần (không chi vượt trần vì phần vượt không được hoàn), chọn mức cho tổng hoàn cao nhất; hai cách hoàn bằng nhau thì chọn cách chi ít hơn.${!cpTr(d.budget)&&nTot>50*TRV?" Con số khá lớn – nhập <b>ngân sách</b> để gói lại theo khả năng chi.":""} Sửa số bất kỳ thì app giữ số của bạn.`;
   $("#cpNeeds").innerHTML=CP_CATS.map(([k,n])=>`<label>${esc(n)}<input type="text" inputmode="decimal" data-cp-need="${k}" value="${d.needs[k]!=null?esc(String(d.needs[k]).replace(".",",")):""}" placeholder="0"></label>`).join("");
   renderPlanOut();
 }
@@ -2215,7 +2215,7 @@ function renderPlanOut(){
   const ups=[];P.cards.forEach(x=>{const r=x.res,c=x.c;if(!cpSpendTier(c))return;const nt=r.below?0:r.ti+1;const t=c.tiers[nt];if(!t||t.from==null)return;
     const need=t.from-r.total;if(need<=0||need>Math.max(tot,5*TRV))return;
     const sp=cpMerge(x.fix,x.sp);sp.khac=(sp.khac||0)+need;const gain=cpCalc(c,x.e,sp,x.ctx).cash-r.cash-need*(c.base||0)/100;
-    if(gain>=20000&&gain/need*100>=CP_EFF)ups.push({c,need,gain,name:t.n||"mức "+(nt+1)})});
+    if(gain>=20000)ups.push({c,need,gain,name:t.n||"mức "+(nt+1)})});
   const upHtml=ups.length?`<div class="cbk">Chi thêm để lên mức</div><ul class="cbl">${ups.sort((a,b)=>b.gain-a.gain).slice(0,5).map(u=>`<li><b>${esc(u.c.bank+" "+u.c.name)}</b>: chi thêm ${cbMoney(u.need)} để lên ${esc(u.name)} → tiền hoàn tăng thêm khoảng ${cbMoney(u.gain)}/${cbPer(u.c)} (mỗi 1tr chi thêm được ${cbMoney(u.gain/u.need*TRV)}). Nếu được, dồn các khoản đang quẹt thẻ khác sang thẻ này.</li>`).join("")}</ul>`:"";
   O.innerHTML=`<div class="cbk">Kế hoạch chi tiêu tháng ${esc(cpPerTxt(per))}</div>${big}${nextHtml}<div class="cbk">Theo từng thẻ (${owned.length})</div>${owned.length>8?`<input id="cpPcQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ trong kế hoạch">`:""}${planHtml}${upHtml}
     <p class="note" style="margin:0">Ước tính theo dữ liệu tab Hoàn tiền. Kiểu chu kỳ, số ngày miễn lãi và phân khúc theo cấu hình của quản lý (Cấu hình → Danh mục thẻ hoàn); ngày sao kê theo từng khách nhập ở bước 1. Thẻ chưa đủ số giao dịch, chi tiêu tối thiểu hoặc điểm tối thiểu thì chưa được tính tiền hoàn. Kế hoạch giả định chi đều các ngày; tiền đã hoàn tính theo đúng ngày, số tiền và số giao dịch đã ghi. Phần vượt trần không được hoàn; không tính ưu đãi đối tác riêng. Luôn đối chiếu thể lệ trước khi tư vấn.</p>`;
