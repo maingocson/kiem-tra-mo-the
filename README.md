@@ -20,7 +20,7 @@
 
 ## Giao diện
 
-- Phong cách "sổ tay" (hướng D): nền trắng ngà, chữ có chân (Lora) cho tiêu đề và số lớn, màu xanh lá của app cho số chính và nút; màu cam đất chỉ dùng cho tiền "chờ điều kiện". Có chế độ tối theo máy.
+- Phong cách "sổ tay" (hướng D): nền trắng ngà, phông hệ thống iPhone (SF) cho chữ, tiêu đề và số lớn, màu xanh lá của app cho số chính và nút; màu cam đất chỉ dùng cho tiền "chờ điều kiện". Có chế độ tối theo máy.
 - Thanh dưới: **Khách hàng** (màn hình đầu) · **Tra cứu** (danh mục thẻ hoàn tiền, mật khẩu Hoàn tiền) · **Tôi** (mở khung trượt, giống bấm avatar).
 - Thanh trên: avatar của bạn (góc trái), logo Smart-B (góc phải).
 - Bấm avatar → khung trượt: Hồ sơ của tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
@@ -57,7 +57,7 @@ Khách hàng là trung tâm của app: mỗi khách có thông tin chung, phần
 
 - **Danh sách khách** (màn hình đầu): tìm theo tên, số điện thoại, ngân hàng; lọc theo trạng thái (Mới, Đang tư vấn, Đã mở thẻ, Theo dõi chi tiêu). Mỗi dòng tóm tắt kết quả mở thẻ và kế hoạch tháng (dự kiến hoàn, đã chi, việc đã xong). **Hồ sơ của tôi** ghim ở đầu.
 - Danh sách gọn kiểu X: mỗi khách một hàng 2–3 dòng, ảnh đại diện nhỏ, đường kẻ mảnh; hiện 40 khách mỗi lần (**Xem thêm**); sắp xếp **Gần đây / Tên A–Z / Cần làm**. Đã thử với 300 khách.
-- **Phông chữ** (trang Tôi → Hiển thị): Be Vietnam Pro (mặc định), phông hệ thống iPhone SF (gần giống X nhất – X dùng phông Chirp riêng), hoặc Inter.
+- **Phông chữ** (trang Tôi → Hiển thị): mặc định là phông hệ thống iPhone SF (gần giống X nhất – X dùng phông Chirp riêng); có thể đổi sang Be Vietnam Pro + Lora (kiểu sổ tay cũ) hoặc Inter.
 - **Việc hôm nay** (đầu danh sách): khách sắp tới hạn thanh toán sao kê trong 7 ngày (thẻ có chi tiêu trong kỳ đó) và khách còn việc chưa xong trong kế hoạch tháng. Bấm để mở khách.
 - **＋ Khách mới**: nhập tên (số điện thoại không bắt buộc) → vào thẳng trang khách.
 - **Trang khách**: 2 ô chức năng có tóm tắt – **Kiểm tra mở thẻ** (số thẻ, % hạn mức đã dùng, ngày CIC, ngân hàng mở được) và **Kế hoạch chi tiêu hoàn tiền** (dự kiến hoàn, đã chi/kế hoạch, việc cần làm, hạn thanh toán gần nhất). Mục **Thông tin khách**: tên, số điện thoại, trạng thái (để *Tự động* thì app tự xếp), ghi chú, **Xoá khách này** (bấm 2 lần).

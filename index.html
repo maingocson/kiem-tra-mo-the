@@ -19,8 +19,8 @@
   --bg:#F5F3EC; --surface:#FFFFFF; --sunk:#FAF8F3; --ink:#1E2A27; --muted:#5F6B67; --line:#E2DED3;
   --accent:#0B7A63; --accent-ink:#FFFFFF; --accent-soft:#DDF1EB; --gold:#B7861C;
   --ok:#17803D; --ok-soft:#E1F3E7; --warn:#9A5A00; --warn-soft:#FBEFD9; --bad:#BE3328; --bad-soft:#FBE4E1;
-  --serif:Lora,Georgia,"Times New Roman",serif;
-  --font:"Be Vietnam Pro",-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --serif:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
   --r:14px;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
@@ -35,9 +35,9 @@
   --ok:#4FCB7C; --ok-soft:#14301F; --warn:#E8A84A; --warn-soft:#33270F; --bad:#F07264; --bad-soft:#3A1A17; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html[data-font=sf]{--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;--serif:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+html[data-font=bvp]{--font:"Be Vietnam Pro",-apple-system,"Helvetica Neue",Arial,sans-serif;--serif:Lora,Georgia,"Times New Roman",serif}
 html[data-font=inter]{--font:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif;--serif:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif}
-html[data-font=sf] h1,html[data-font=sf] h2,html[data-font=inter] h1,html[data-font=inter] h2{letter-spacing:-.015em}
+html:not([data-font=bvp]) h1,html:not([data-font=bvp]) h2{letter-spacing:-.015em}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px calc(96px + env(safe-area-inset-bottom,0px))}
@@ -867,7 +867,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
     <section>
       <h2>Hiển thị</h2>
       <div class="panel stack">
-        <label class="f" for="meFont">Phông chữ<select id="meFont"><option value="">Be Vietnam Pro – mặc định, rõ dấu tiếng Việt</option><option value="sf">Phông hệ thống iPhone (SF) – gần giống X nhất</option><option value="inter">Inter – gọn, hiện đại</option></select></label>
+        <label class="f" for="meFont">Phông chữ<select id="meFont"><option value="">Phông hệ thống iPhone (SF) – mặc định, gần giống X nhất</option><option value="bvp">Be Vietnam Pro + Lora – kiểu sổ tay cũ</option><option value="inter">Inter – gọn, hiện đại</option></select></label>
         <p class="note" style="margin:0">X dùng phông Chirp riêng, không cho dùng ngoài. Phông hệ thống iPhone (SF) có nét gần nhất và hiện nhanh vì có sẵn trên máy.</p>
       </div>
     </section>
@@ -2468,9 +2468,9 @@ function renderMe(){
   if(!$("#meJob").options.length)$("#meJob").innerHTML=Object.entries(JOBS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
   $("#meJob").value=me.job||"hdld";$("#meBhxh").checked=!!me.bhxh;$("#meDebt").value=String(me.debtGroup||(me.badDebt?2:1));$("#meFin").value=me.finCos||0;
   meRows();
-  meCbRender();$("#meFont").value=load(K_FONT)||"";
+  meCbRender();$("#meFont").value=(v=>v==="sf"?"":v)(load(K_FONT)||"");
 }
-const K_FONT="kmt.font.v1";const fontSet=v=>{if(v)document.documentElement.dataset.font=v;else delete document.documentElement.dataset.font};fontSet(load(K_FONT)||"");
+const K_FONT="kmt.font.v1";const fontSet=v=>{if(v==="sf")v="";if(v)document.documentElement.dataset.font=v;else delete document.documentElement.dataset.font};fontSet(load(K_FONT)||"");
 $("#meFont").addEventListener("change",e=>{const v=e.target.value;fontSet(v);if(v)save(K_FONT,v);else try{localStorage.removeItem(K_FONT)}catch(err){}toast("Đã đổi phông chữ")});
 function meCbRender(){$("#meCbQ").hidden=cbOf(me).cards.length<=6;$("#meCbCards").innerHTML=cpCardsHtml(me,"Chưa có thẻ hoàn tiền nào. Gõ tên thẻ hoặc ngân hàng bên dưới để thêm.",$("#meCbQ").value);cpFillSel("#meCbFind","#meCbCard",me)}
 function meCbSave(){save(K_ME,me);if(cust.isMe)cust=me}
