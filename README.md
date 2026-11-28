@@ -20,6 +20,7 @@
 
 ## Giao diện
 
+- Phong cách "sổ tay" (hướng D): nền trắng ngà, chữ có chân (Lora) cho tiêu đề và số lớn, màu xanh lá của app cho số chính và nút; màu cam đất chỉ dùng cho tiền "chờ điều kiện". Có chế độ tối theo máy.
 - Thanh dưới: **Mở thẻ** · **Hoàn tiền** (mật khẩu riêng) · **Tôi** (mở khung trượt, giống bấm avatar).
 - Thanh trên: avatar của bạn (góc trái), logo Smart-B (góc phải).
 - Bấm avatar → khung trượt: Hồ sơ của tôi, Kiểm tra cho tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
@@ -134,6 +135,8 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - Mức tin cậy: **A** có thể lệ đầy đủ · **B** theo trang thẻ · **C** chỉ có câu quảng cáo.
 
 ### Theo dõi chi tiêu theo kế hoạch
+
+- Kết quả kế hoạch: số hoàn dự kiến lớn ở trên, các dòng Đã chi / Còn chi / Chờ đủ điều kiện / Đã được hoàn, khung **Việc cần làm** (hạn thanh toán, điều kiện còn thiếu kèm vòng tiến độ như 2/7 giao dịch, 1/3tr). Nút nổi **+ Ghi chi tiêu** đưa tới ô ghi nhanh.
 
 - Hoàn tiền → Kế hoạch: nhập thẻ đang có (bước 1) và nhu cầu chi tiêu tháng (bước 3) → app lập kế hoạch: nhóm nào quẹt thẻ nào, bao nhiêu.
 - Khi đã có thẻ, bước 3 **tự tính nhu cầu chi tiêu**: mỗi thẻ chi vừa đủ để lấy hết trần các nhóm hoàn cao và đủ ngưỡng mức (bỏ ưu đãi chỉ vài ngày/tuần, nhóm không trần tạm tính 3tr). Nhập **Ngân sách/tháng** để app chỉ chi trong ngân sách, ưu tiên nhóm hoàn cao. Sửa số bất kỳ thì app giữ số nhập tay; bấm **Tự tính theo thẻ** để tính lại.

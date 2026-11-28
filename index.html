@@ -8,17 +8,18 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mở Thẻ">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#EEF2F1">
+<meta name="theme-color" content="#F5F3EC">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Lora:ital,wght@0,600;0,700;1,500&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: một cột kiểu app iPhone, thanh tab dưới cùng; dữ liệu điều kiện đọc từ Google Sheet */
 :root{
-  --bg:#EEF2F1; --surface:#FFFFFF; --sunk:#F5F8F7; --ink:#10221F; --muted:#5A6B67; --line:#D6DFDC;
+  --bg:#F5F3EC; --surface:#FFFFFF; --sunk:#FAF8F3; --ink:#1E2A27; --muted:#5F6B67; --line:#E2DED3;
   --accent:#0B7A63; --accent-ink:#FFFFFF; --accent-soft:#DDF1EB; --gold:#B7861C;
-  --ok:#17803D; --ok-soft:#E1F3E7; --warn:#A86200; --warn-soft:#FBEFD9; --bad:#BE3328; --bad-soft:#FBE4E1;
+  --ok:#17803D; --ok-soft:#E1F3E7; --warn:#9A5A00; --warn-soft:#FBEFD9; --bad:#BE3328; --bad-soft:#FBE4E1;
+  --serif:Lora,Georgia,"Times New Roman",serif;
   --font:"Be Vietnam Pro",-apple-system,"Helvetica Neue",Arial,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
   --r:14px;
@@ -38,9 +39,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px calc(96px + env(safe-area-inset-bottom,0px))}
 header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:8px 14px}
-h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0;text-wrap:balance}
-h1 small{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
-h2{font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1 small{display:block;font-family:var(--font);font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+h2{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);margin:0}
 .view{display:flex;flex-direction:column;gap:18px}
 section{display:flex;flex-direction:column;gap:10px}
 .sec-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -238,7 +239,7 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .cbt tr.base td{color:var(--muted)}
 .cbt tr.tot td{font-weight:700;border-bottom:0}
 .cbl{margin:0;padding-left:18px;font-size:13px;display:flex;flex-direction:column;gap:4px}
-.cbk{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.cbk{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);margin-bottom:4px}
 .cbsrc a{color:var(--accent);overflow-wrap:anywhere;font-size:12px}
 .cbpick{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap}
 /* Kế hoạch hoàn tiền cho khách */
@@ -260,7 +261,32 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .cp-big div{background:var(--sunk);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column}
 .cp-big span{font-size:11px;color:var(--muted)} .cp-big strong{font-size:18px}
 .cp-big .up strong{color:var(--ok)} .cp-big .dn strong{color:var(--warn)}
-.cp-prog{height:10px;border-radius:9px;background:var(--line);overflow:hidden} .cp-prog i{display:block;height:100%;background:var(--accent);border-radius:9px}
+.cp-hero{display:flex;flex-direction:column;gap:2px;padding-bottom:4px}
+.cp-hero em{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--muted)}
+.cp-hero strong{font-family:var(--serif);font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--accent);font-variant-numeric:tabular-nums}
+.cp-hero strong small{font-size:22px}
+.cp-led{display:flex;flex-direction:column;border-bottom:1px solid var(--line);padding-bottom:6px;font-size:15px;font-variant-numeric:tabular-nums}
+.cp-led div{display:flex;gap:8px;padding:4px 0;align-items:baseline}
+.cp-led i{flex:1;border-bottom:1px dotted color-mix(in srgb,var(--muted) 60%,transparent);margin-bottom:4px;min-width:12px}
+.cp-led span.m{color:var(--muted)}
+.cp-led .w{color:var(--warn)} .cp-led .w i{border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.cp-led .u b{color:var(--ok)}
+.cp-todo{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px;display:flex;flex-direction:column}
+.cp-todo-h{display:flex;justify-content:space-between;align-items:baseline}
+.cp-todo-h span{font-size:13px;color:var(--muted)}
+.td{display:flex;gap:12px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.4}
+.cp-todo-h+.td{border-top:0}
+.td>.ic{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--warn-soft);color:var(--warn)}
+.td>.ic svg{width:16px;height:16px}
+.td>span.t{flex:1;min-width:0}
+.td .ring{flex:none}
+.ring text{font-family:var(--font);font-weight:700;fill:var(--ink)}
+.ring .bg{stroke:var(--line)} .ring .fg{stroke:var(--accent)}
+.pc .ring{margin-left:-2px}
+.cp-fab{position:fixed;z-index:21;right:max(16px,calc(50% - 264px));bottom:calc(76px + env(safe-area-inset-bottom,0px));height:52px;padding:0 20px;border-radius:26px;border:0;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent);cursor:pointer}
+.cp-fab svg{width:20px;height:20px}
+#cpView{padding-bottom:64px}
+.cp-prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden} .cp-prog i{display:block;height:100%;background:var(--accent);border-radius:9px}
 .cp-prog.over i{background:var(--warn)}
 .cp-done{font-size:12px;color:var(--muted)}
 .cp-tip{font-size:13px;background:var(--accent-soft);border-radius:10px;padding:8px 10px}
@@ -268,7 +294,7 @@ details.cbc>summary::-webkit-details-marker{display:none}
 .cp-hist td .x{font:inherit;font-size:11px;color:var(--bad);background:none;border:0;cursor:pointer;padding:0 2px}
 /* Thanh trên: avatar trái, logo phải */
 .topbar{position:sticky;top:0;z-index:15;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;padding:10px 0;margin-bottom:6px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.topbar .tb-title{font-size:18px;font-weight:800;letter-spacing:-.01em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .tb-title{font-family:var(--serif);font-size:20px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar #brandLogo{height:34px;width:auto;max-width:110px;object-fit:contain;background:#fff;border-radius:8px;padding:2px 6px}
 .av{display:inline-grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;overflow:hidden;flex:none;border:0;padding:0;font-family:inherit}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
@@ -302,7 +328,7 @@ details.cp-own,details.pc{border:1px solid var(--line);border-radius:12px;backgr
 details.cp-own>summary,details.pc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px}
 details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-details-marker{display:none}
 .cp-own-t,.pc-t{flex:1;min-width:0;display:flex;flex-direction:column}
-.cp-own-t b,.pc-t b{font-size:14px;line-height:1.25} .cp-own-t small,.pc-t small{font-size:12px;color:var(--muted)}
+.cp-own-t b,.pc-t b{font-family:var(--serif);font-size:15px;line-height:1.25} .cp-own-t small,.pc-t small{font-size:12px;color:var(--muted)}
 .cp-own-t .bk,.pc-t .bk{margin-bottom:2px;font-size:11px;align-self:flex-start}
 .cp-own.g .bk{display:none}
 .bad{color:var(--bad);font-weight:700}
@@ -317,9 +343,10 @@ details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-detai
 .cp-lab select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
 .cfg-seg{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
 .cfg-seg textarea{font:inherit;width:100%;box-sizing:border-box}
-.pc-c.wait{color:var(--muted);font-weight:600;font-size:12px;text-align:right}
+.pc-c.wait{color:var(--warn);font-weight:700;font-size:12px;text-align:right}
 .cp-need{background:var(--bad-soft,#fde8e8);color:var(--bad);border-radius:8px;padding:6px 8px;font-size:13px}
 .cp-alerts{background:var(--warn-soft);border-radius:10px;padding:8px 10px}
+.cp-todo .grp>summary{font-size:13px;color:var(--accent);font-weight:600;padding:8px 0 2px}
 .cp-alerts .cbl{margin:0}
 .cp-idle>summary{font-size:13px}
 .cp-idle[open]{display:flex;flex-direction:column;gap:6px}
@@ -751,6 +778,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <div class="dr-foot" id="drFoot"></div>
 </aside>
 
+<button class="cp-fab" id="cpFab" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Ghi chi tiêu</button>
 <nav class="tabs"><div class="in" role="tablist">
   <button role="tab" aria-selected="true" data-tab="check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>Mở thẻ</button>
   <button role="tab" aria-selected="false" data-tab="cb" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg>Hoàn tiền</button>
@@ -2004,6 +2032,11 @@ function cpCardsBind(box,getP,saveFn,after){
 const cpTr=v=>{const n=cbN(v);return n==null?0:n*TRV};
 const cpPerTxt=p=>{const m=String(p||"").match(/^(\d{4})-(\d{2})$/);return m?`${m[2]}/${m[1]}`:p};
 const cpDM=d=>String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0");
+const cpVnd=v=>(Math.round((v||0)/1000)*1000).toLocaleString("vi-VN");
+const cpTrS=v=>String(Math.round(v/1e5)/10).replace(".",",");
+/* vòng tiến độ nhỏ cho điều kiện (số giao dịch, ngưỡng chi) */
+function cpRing(v,max,label,sz){sz=sz||40;const c=sz/2,w=Math.round(sz*.13),r=c-w/2-1,C=2*Math.PI*r,f=Math.max(0,Math.min(1,max?v/max:0)),fs=+(sz*(label.length>4?.2:.27)).toFixed(1);
+  return`<svg class="ring" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" role="img" aria-label="${esc(label)}"><circle class="bg" cx="${c}" cy="${c}" r="${r}" fill="none" stroke-width="${w}"/>${f>0?`<circle class="fg" cx="${c}" cy="${c}" r="${r}" fill="none" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>`:""}<text x="${c}" y="${(c+fs*.36).toFixed(1)}" text-anchor="middle" font-size="${fs}">${esc(label)}</text></svg>`}
 function cpSave(){edited()}
 let cpNowAll=false,cpStep1Init=null;
 function renderPlan(){
@@ -2074,20 +2107,31 @@ function renderPlanOut(){
   const needTxt=(x,u)=>[u.amt?`chi thêm ít nhất ${cbMoney(u.amt)} (đã chi ${cbMoney(A[x.c.id].res.total)}/${cbMoney(u.f)})`:"",u.txn?`thêm ${u.txn} giao dịch (đã có ${A[x.c.id].n}/${x.c.minTxn})`:"",u.pts?`chi thêm cho điểm đủ ${cbMoney(cpCRule(x.c).minCash)}/kỳ`:""].filter(Boolean).join(" và ");
   const pending=P.cards.reduce((s,x)=>s+(U[x.c.id].any?x.res.cash:0),0),nPend=P.cards.filter(x=>U[x.c.id].any&&x.res.cash>0).length;
   /* cảnh báo ràng buộc cần làm ngay */
-  const alerts=[];
+  /* việc cần làm: hạn thanh toán, điều kiện chưa đủ (kèm vòng tiến độ), nhóm chưa đăng ký, sắp chạm trần năm */
+  const IC={due:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>'};
+  const ringFor=(x,sz)=>{const c=x.c,a=A[c.id],u=U[c.id];if(!u.any)return"";
+    return u.txn?cpRing(a.n,c.minTxn,`${a.n}/${c.minTxn}`,sz):u.amt?cpRing(a.res.total,u.f,`${cpTrS(a.res.total)}/${cpTrS(u.f)}tr`,sz):""};
+  const alerts=[],cap1=t=>t.charAt(0).toUpperCase()+t.slice(1);
   owned.forEach(({c,e})=>{if(!cpSk(c,e))return;const st=cpStmt(c,e,now),pv=cpStmt(c,e,new Date(st.s.getTime()-864e5));const dl=Math.ceil((pv.due-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
-    if(dl>=0&&dl<=7&&d.hist.some(h=>h.card===c.id&&(t=>t>=pv.s&&t<pv.t)(cpTxDate(h))))alerts.push(`<b>${esc(c.bank+" "+c.name)}</b>: hạn thanh toán sao kê ${cpDM(pv.close)} là <b>${cpDM(pv.due)}</b> (${dl?`còn ${dl} ngày`:"hôm nay"}) – thanh toán đủ để không mất lãi.`)});
+    if(dl>=0&&dl<=7&&d.hist.some(h=>h.card===c.id&&(t=>t>=pv.s&&t<pv.t)(cpTxDate(h))))alerts.push({ic:"due",t:`Thanh toán sao kê <b>${esc(c.bank+" "+c.name)}</b>`,s:`sao kê ${cpDM(pv.close)} · hạn ${cpDM(pv.due)} · ${dl?`còn ${dl} ngày`:"hôm nay"}`})});
   P.cards.forEach(x=>{const c=x.c,a=A[c.id],plan=Object.values(x.sp).reduce((s,v)=>s+v,0),nm=esc(c.bank+" "+c.name),u=U[c.id];
-    if(u.any&&(plan>0||a.n>0))alerts.push(plan>0?`<b>${nm}</b>: chưa đủ điều kiện – cần ${needTxt(x,u)} mới được hoàn${u.txn?" (chia nhỏ khoản chi)":""}. Chưa đủ thì cả kỳ 0đ${x.res.cash?`, nên ${cbMoney(x.res.cash)} dự kiến của thẻ này chưa chắc`:""}.`
-      :`<b>${nm}</b>: đã quẹt ${cbMoney(a.res.total)} nhưng chưa đủ điều kiện nên số này chưa được hoàn. Kế hoạch không dồn thêm vì quẹt thẻ khác lợi hơn; muốn được hoàn ở thẻ này thì cần ${needTxt(x,u)}.`);
-    if(cpCRule(c).pickReg&&!(x.e.pick&&x.e.pick.length)&&(plan>0||a.n>0))alerts.push(`<b>${nm}</b>: chưa đánh dấu nhóm đã đăng ký – đăng ký ở app ngân hàng${x.res.chosen.length?` (nên chọn: ${esc(x.res.chosen.map(i=>c.groups[i].g).join(", "))})`:""} rồi tick ở bước 1.`);
-    if(c.capY!=null&&a.ctx.yearUsed!=null&&a.ctx.yearUsed>=c.capY*0.9)alerts.push(`<b>${nm}</b>: đã nhận ${cbMoney(a.ctx.yearUsed)} / trần năm ${cbMoney(c.capY)}.`)});
-  const big=`<div class="cp-big"><div><span>Kế hoạch tháng ${esc(cpPerTxt(per))}</span><strong>${cbMoney(tot)}</strong></div><div><span>Đã chi</span><strong>${cbMoney(spent)}</strong></div>
-    <div><span>Còn chi theo kế hoạch</span><strong>${cbMoney(leftTot)}</strong></div><div class="up"><span>Hoàn dự kiến nếu chi đúng kế hoạch</span><strong>${cbMoney(P.cash)}</strong></div>${pending?`<div class="dn"><span>Trong đó chờ đủ điều kiện (${nPend} thẻ)</span><strong>${cbMoney(pending)}</strong></div>`:""}
-    ${spent?`<div class="up"><span>Đã được hoàn</span><strong>${cbMoney(cashNow)}</strong></div>`:""}${actual!=null?`<div class="${P.cash>actual?"up":""}"><span>So với tháng ${esc(cpPerTxt(last))} (${cbMoney(actual)})</span><strong>${P.cash>=actual?"+":""}${cbMoney(P.cash-actual)}</strong></div>`:""}</div>
+    if(u.any&&(plan>0||a.n>0)){const parts=[u.amt?`chi thêm <b>${cbMoney(u.amt)}</b>`:"",u.txn?`quẹt thêm <b>${u.txn} giao dịch</b>`:"",u.pts?"chi thêm cho đủ điểm tối thiểu":""].filter(Boolean).join(" và ");
+      alerts.push(plan>0?{ic:"warn",ring:ringFor(x,40),t:cap1(parts),s:`${nm} · chưa đủ thì cả kỳ 0đ${x.res.cash?` (đang chờ ${cbMoney(x.res.cash)})`:""}${u.txn?" · chia nhỏ khoản chi":""}`}
+        :{ic:"warn",ring:ringFor(x,40),t:`Đã quẹt <b>${cbMoney(a.res.total)}</b> chưa được hoàn`,s:`${nm} · muốn được hoàn cần ${parts}; kế hoạch đang ưu tiên thẻ khác lợi hơn`})}
+    if(cpCRule(c).pickReg&&!(x.e.pick&&x.e.pick.length)&&(plan>0||a.n>0))alerts.push({ic:"warn",t:`Đăng ký nhóm hoàn tiền <b>${nm}</b>`,s:`${x.res.chosen.length?`nên chọn: ${esc(x.res.chosen.map(i=>c.groups[i].g).join(", "))} · `:""}đăng ký ở app ngân hàng rồi tick ở bước 1`});
+    if(c.capY!=null&&a.ctx.yearUsed!=null&&a.ctx.yearUsed>=c.capY*0.9)alerts.push({ic:"warn",t:`<b>${nm}</b> sắp chạm trần năm`,s:`đã nhận ${cbMoney(a.ctx.yearUsed)} / ${cbMoney(c.capY)}`})});
+  const tdRow=a=>`<div class="td"><span class="ic">${IC[a.ic]}</span><span class="t">${a.t}<br><span class="note">${a.s}</span></span>${a.ring||""}</div>`;
+  const todo=alerts.length?`<div class="cp-todo"><div class="cp-todo-h"><span class="cbk" style="margin:0">Việc cần làm</span><span>${alerts.length} việc</span></div>${alerts.slice(0,4).map(tdRow).join("")}${alerts.length>4?`<details class="grp"><summary>Xem thêm ${alerts.length-4} việc</summary>${alerts.slice(4).map(tdRow).join("")}</details>`:""}</div>`:"";
+  const big=`<div class="cp-hero"><em>Nếu chi đúng kế hoạch, tháng ${esc(cpPerTxt(per))} được hoàn</em><strong>${cpVnd(P.cash)}<small>₫</small></strong></div>
+    <div class="cp-led"><div><span>Đã chi</span><i></i><b>${cbMoney(spent)}</b><span class="m">/ ${cbMoney(tot)}</span></div>
+    <div><span>Còn chi theo kế hoạch</span><i></i><b>${cbMoney(leftTot)}</b></div>
+    ${pending?`<div class="w"><span>Chờ đủ điều kiện (${nPend} thẻ)</span><i></i><b>${cbMoney(pending)}</b></div>`:""}
+    <div class="u"><span>Đã được hoàn</span><i></i><b>${cbMoney(cashNow)}</b></div>
+    ${actual!=null?`<div><span>So với tháng ${esc(cpPerTxt(last))} (${cbMoney(actual)})</span><i></i><b>${P.cash>=actual?"+":""}${cbMoney(P.cash-actual)}</b></div>`:""}</div>
     <div class="cp-prog${spent>tot?" over":""}" title="Đã chi ${pct}% kế hoạch"><i style="width:${pct}%"></i></div><div class="cp-done">Đã chi ${pct}% kế hoạch tháng · còn ${daysLeft} ngày</div>
     ${over.length?`<div class="note" style="color:var(--warn)">Vượt kế hoạch: ${over.map(k=>`${esc(CP_NAME[k]||k)} (+${cbMoney(spentCat[k]-(needs[k]||0))})`).join(", ")}.</div>`:""}
-    ${alerts.length?`<div class="cp-alerts"><div class="cbk">Cần lưu ý (${alerts.length})</div><ul class="cbl">${alerts.slice(0,4).map(a=>`<li>${a}</li>`).join("")}</ul>${alerts.length>4?`<details class="grp"><summary>Xem thêm ${alerts.length-4} lưu ý</summary><ul class="cbl">${alerts.slice(4).map(a=>`<li>${a}</li>`).join("")}</ul></details>`:""}</div>`:""}`;
+    ${todo}`;
   /* quẹt thẻ nào cho từng nhóm còn lại */
   const nextRows=Object.keys(left).sort((a,b)=>left[b]-left[a]).map(k=>{
     const use=P.cards.map(x=>({x,a:x.sp[k]||0})).filter(u=>u.a>0).sort((a,b)=>b.a-a.a);
@@ -2109,7 +2153,7 @@ function renderPlanOut(){
     const cyc=`Kỳ hoàn tiền ${cpDM(a.cur.s)}–${cpDM(new Date(a.cur.t.getTime()-864e5))}${cpBasis(c,x.e)==="thang"?" (tháng dương lịch)":""}`;
     const stTxt=sk?`<div class="note">Sao kê ${cpDM(st.close)} · hạn thanh toán ${cpDM(st.due)} · quẹt hôm nay được miễn lãi ${Math.round((st.due-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5)} ngày${cpCfg(c).free?"":" (tạm tính miễn lãi 45 ngày)"}</div>`:`<div class="note">Chưa nhập ngày sao kê của thẻ này – nhập ở bước 1 (bấm vào thẻ) để app tính kỳ và hạn thanh toán.</div>`;
     const needBox=u.any&&(plan>0||a.n>0)?`<div class="cp-need">Chưa đủ điều kiện nên chưa được hoàn: cần ${esc(needTxt(x,u))}. Chưa đủ thì cả kỳ 0đ.${plan>0?" Kế hoạch dưới đây đã tính phần chi thêm.":" Kế hoạch không dồn thêm vì thẻ khác lợi hơn."}</div>`:"";
-    return`<details class="pc"${cpOpenSet.has("pc:"+c.id)?" open":""} data-pc="${esc(c.id)}"><summary>${cbImg(c,1)}<span class="pc-t">${cbBk(c)}<b>${esc(c.name)}</b><small>${done?`đã quẹt ${cbMoney(done)} · `:""}${plan>0?`nên quẹt thêm ${cbMoney(plan)}`:"không cần quẹt thêm"}${bad?` · <span class="bad">cần lưu ý</span>`:""}</small></span>${u.any&&r.cash?`<b class="pc-c wait">chờ ĐK<br>+${cbMoney(r.cash)}</b>`:`<b class="pc-c">+${cbMoney(r.cash)}</b>`}</summary>
+    return`<details class="pc"${cpOpenSet.has("pc:"+c.id)?" open":""} data-pc="${esc(c.id)}"><summary>${cbImg(c,1)}<span class="pc-t">${cbBk(c)}<b>${esc(c.name)}</b><small>${done?`đã quẹt ${cbMoney(done)} · `:""}${plan>0?`nên quẹt thêm ${cbMoney(plan)}`:"không cần quẹt thêm"}${bad&&!(u.any&&(plan>0||a.n>0))?` · <span class="bad">cần lưu ý</span>`:""}</small></span>${u.any&&(plan>0||a.n>0)?ringFor(x,36):""}${u.any&&r.cash?`<b class="pc-c wait">chờ ĐK<br>+${cbMoney(r.cash)}</b>`:`<b class="pc-c">+${cbMoney(r.cash)}</b>`}</summary>
       <div class="pc-b"><div class="note">${esc(cyc)}${tierTxt?` · ${esc(tierTxt)}`:""}${done?` · đã được hoàn ${cbMoney(a.res.cash)}`:""}</div>${seg}${stTxt}${needBox}
       ${ls.length?`<table class="ctbl"><tbody>${ls.map(k=>{const l=r.lines.find(l=>l.k===k);return`<tr class="cp-row" data-q-card="${esc(c.id)}" data-q-cat="${k}" data-q-left="${x.sp[k]}" title="Bấm để ghi chi tiêu"><td>${esc(CP_NAME[k])}<div class="note">${l&&l.g?esc(l.g.g):"Hoàn cơ bản"}</div></td><td>${cbMoney(x.sp[k])}</td><td>${l?cbPct(Math.round(l.r*100)/100):""}</td></tr>`}).join("")}</tbody></table>`:""}
       ${tierProg}${txnProg}${a.res.warn.filter(w=>!/0đ|chưa được ghi nhận/.test(w)||!needBox).length?`<div class="note" style="color:var(--bad)">${esc(a.res.warn.filter(w=>!/0đ|chưa được ghi nhận/.test(w)||!needBox).join(" · "))}</div>`:""}
@@ -2142,7 +2186,10 @@ function renderPlanOut(){
 }
 $("#cbSeg").addEventListener("click",e=>{const b=e.target.closest("[data-seg]");if(!b)return;const p=b.dataset.seg==="plan";
   document.querySelectorAll("#cbSeg [data-seg]").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  $("#cpView").hidden=!p;$("#cbCatA").hidden=p;$("#cbCatB").hidden=p;if(p)renderPlan();else renderCb()});
+  $("#cpView").hidden=!p;$("#cbCatA").hidden=p;$("#cbCatB").hidden=p;if(p)renderPlan();else renderCb();cpFabSync()});
+/* nút nổi Ghi chi tiêu: chỉ hiện khi đang ở Kế hoạch; bấm thì tới ô ghi nhanh */
+function cpFabSync(){$("#cpFab").hidden=$("#v-cb").hidden||$("#cpView").hidden||!cbOk}
+$("#cpFab").addEventListener("click",()=>{const n=$(".cp-now");n.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("#cpQCard").focus(),350)});
 $("#cpFind").addEventListener("input",()=>cpFillSel("#cpFind","#cpCard",cust));
 $("#cpOwnQ").addEventListener("input",()=>{$("#cpCards").innerHTML=cpCardsHtml(cust,"",$("#cpOwnQ").value)});
 $("#cpOut").addEventListener("input",e=>{if(e.target.id!=="cpPcQ")return;const q=plain(e.target.value);const all=cbAll();
@@ -2309,7 +2356,7 @@ const CB_HASH="af93a1e927415b01268324206b0591c0b8ec8fc51dc16fc0eb5616b73aded122"
 let cbOk=false;try{cbOk=sessionStorage.getItem("kmt.cbUnlock")==="1"}catch(e){}
 function cbShowLock(){$("#cbLock").hidden=cbOk;$("#cbSeg").hidden=!cbOk;
   if(!cbOk){$("#cpView").hidden=true;$("#cbCatA").hidden=true;$("#cbCatB").hidden=true;setTimeout(()=>$("#cbPass").focus(),50)}
-  else{const plan=$('#cbSeg [data-seg="plan"]').getAttribute("aria-pressed")==="true";$("#cpView").hidden=!plan;$("#cbCatA").hidden=plan;$("#cbCatB").hidden=plan}}
+  else{const plan=$('#cbSeg [data-seg="plan"]').getAttribute("aria-pressed")==="true";$("#cpView").hidden=!plan;$("#cbCatA").hidden=plan;$("#cbCatB").hidden=plan}cpFabSync()}
 $("#cbLock").addEventListener("submit",async e=>{e.preventDefault();
   const ok=(await hashPass($("#cbPass").value.trim()))===CB_HASH;$("#cbPass").value="";$("#cbPassErr").hidden=ok;if(!ok)return;
   cbOk=true;try{sessionStorage.setItem("kmt.cbUnlock","1")}catch(err){}cbShowLock();renderCb();if(!$("#cpView").hidden)renderPlan();
@@ -2547,7 +2594,7 @@ function showTab(t){
   if(t==="cbcfg")cfgShow();
   if(t==="cb"){cbShowLock();if(cbOk){renderCb();if(!$("#cpView").hidden)renderPlan()}}
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
-  window.scrollTo(0,0);
+  window.scrollTo(0,0);cpFabSync();
   if(t!=="rules")wantEdit=false;
   showLock();showAdmin();
 }
