@@ -489,6 +489,8 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 #cpView[data-page=list] [data-pg=detail],#cpView[data-page=detail] [data-pg=list]{display:none!important}
 .hm-me{margin-bottom:12px}.hm-me .av{width:44px;height:44px;font-size:17px}
 .hm-bar{display:block;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;margin-top:6px}.hm-bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.tx-note{font-size:13px;color:var(--ink);font-style:italic;overflow-wrap:anywhere}
+#qsNote{font:inherit;font-size:16px;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
 .pl-hint{display:flex;gap:10px;align-items:center;background:var(--accent-soft);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.4}
 .pl-hint svg{width:26px;height:26px;flex:none;color:var(--accent)}
 .pl-chev{flex:none;font-size:22px;line-height:1;color:var(--muted);margin-left:-2px}
@@ -1013,6 +1015,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <select id="qsCat" aria-label="Nhóm chi tiêu" hidden></select>
   <input id="qsAmt" type="text" inputmode="decimal" placeholder="Số tiền vừa quẹt: 150k, 1,5tr" aria-label="Số tiền vừa quẹt" autocomplete="off">
   <label class="f" for="qsDate">Ngày quẹt<input id="qsDate" type="date"></label>
+  <input id="qsNote" type="text" maxlength="120" placeholder="Ghi chú (không bắt buộc): mua gì, ở đâu…" aria-label="Ghi chú" autocomplete="off">
   <p class="note" id="qsPer" style="margin:0"></p>
   <div class="qs-chips" id="qsChips"></div>
   <button class="primary" id="qsOk" type="button">Ghi chi tiêu</button>
@@ -2509,13 +2512,13 @@ function renderPlan0(){
   fSel.innerHTML=`<option value="">Tất cả thẻ (${nowRows.length} giao dịch)</option>`+used.map(id=>{const c=all.find(x=>x.id===id);const n=nowRows.filter(([h])=>h.card===id).length;return`<option value="${esc(id)}">${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")} (${n})</option>`}).join("");
   if(used.includes(fv))fSel.value=fv;fSel.hidden=used.length<2;
   const fr=nowRows.filter(([h])=>!fSel.value||h.card===fSel.value).sort((a,b)=>(b[0].at||"").localeCompare(a[0].at||"")||b[1]-a[1]),shown=cpNowAll?fr:fr.slice(0,10);
-  $("#cpNowList").innerHTML=fr.length?`<table class="ctbl cp-hist"><tbody>${shown.map(([h,i])=>{const c=all.find(x=>x.id===h.card);return`<tr><td>${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}<div class="note">${esc(CP_NAME[h.cat]||h.cat)}${h.at?" · "+esc(cpDM(new Date(h.at))):""}</div></td><td>${cbMoney(h.amt*TRV)} <button class="x" type="button" data-cp-hdel="${i}" aria-label="Xoá dòng">✕</button></td></tr>`}).join("")}</tbody></table>${fr.length>10?`<button class="btn2" type="button" id="cpNowMore">${cpNowAll?"Thu gọn":`Xem tất cả ${fr.length} giao dịch`}</button>`:""}`:`<p class="note" style="margin:0">Chưa ghi khoản nào trong kế hoạch này.</p>`;
+  $("#cpNowList").innerHTML=fr.length?`<table class="ctbl cp-hist"><tbody>${shown.map(([h,i])=>{const c=all.find(x=>x.id===h.card);return`<tr><td>${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}<div class="note">${esc(CP_NAME[h.cat]||h.cat)}${h.at?" · "+esc(cpDM(new Date(h.at))):""}</div>${h.note?`<div class="tx-note">${esc(h.note)}</div>`:""}</td><td>${cbMoney(h.amt*TRV)} <button class="x" type="button" data-cp-hdel="${i}" aria-label="Xoá dòng">✕</button></td></tr>`}).join("")}</tbody></table>${fr.length>10?`<button class="btn2" type="button" id="cpNowMore">${cpNowAll?"Thu gọn":`Xem tất cả ${fr.length} giao dịch`}</button>`:""}`:`<p class="note" style="margin:0">Chưa ghi khoản nào trong kế hoạch này.</p>`;
   /* 4. lịch sử */
   const pers=[...new Set(d.hist.map(h=>h.p))].sort().reverse();
   $("#cpS2").textContent=pers.length?`${pers.length} tháng · ${d.hist.length} giao dịch`:"chưa có";
   $("#cpHist").innerHTML=pers.length?pers.map(p=>{const rows=d.hist.map((h,i)=>[h,i]).filter(([h])=>h.p===p);const sum=rows.reduce((a,[h])=>a+h.amt,0);
     const byCard={};rows.forEach(([h])=>byCard[h.card]=(byCard[h.card]||0)+h.amt);
-    return`<details class="grp"><summary>Tháng ${esc(cpPerTxt(p))} · ${cbMoney(sum*TRV)} · ${rows.length} giao dịch</summary><div class="note">${Object.entries(byCard).sort((a,b)=>b[1]-a[1]).map(([id,v])=>{const c=all.find(x=>x.id===id);return`${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}: ${cbMoney(v*TRV)}`}).join(" · ")}</div><table class="ctbl cp-hist"><tbody>${rows.slice().reverse().map(([h,i])=>{const c=all.find(x=>x.id===h.card);return`<tr><td>${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}<div class="note">${esc(CP_NAME[h.cat]||h.cat)}${h.at?" · "+esc(cpDM(new Date(h.at))):""}</div></td><td>${cbMoney(h.amt*TRV)} <button class="x" type="button" data-cp-hdel="${i}" aria-label="Xoá dòng">✕</button></td></tr>`}).join("")}</tbody></table></details>`}).join(""):`<p class="note" style="margin:0">Chưa có lịch sử. Các khoản ghi ở mục Chi tiêu tháng này sẽ tự vào đây.</p>`;
+    return`<details class="grp"><summary>Tháng ${esc(cpPerTxt(p))} · ${cbMoney(sum*TRV)} · ${rows.length} giao dịch</summary><div class="note">${Object.entries(byCard).sort((a,b)=>b[1]-a[1]).map(([id,v])=>{const c=all.find(x=>x.id===id);return`${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}: ${cbMoney(v*TRV)}`}).join(" · ")}</div><table class="ctbl cp-hist"><tbody>${rows.slice().reverse().map(([h,i])=>{const c=all.find(x=>x.id===h.card);return`<tr><td>${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}<div class="note">${esc(CP_NAME[h.cat]||h.cat)}${h.at?" · "+esc(cpDM(new Date(h.at))):""}</div>${h.note?`<div class="tx-note">${esc(h.note)}</div>`:""}</td><td>${cbMoney(h.amt*TRV)} <button class="x" type="button" data-cp-hdel="${i}" aria-label="Xoá dòng">✕</button></td></tr>`}).join("")}</tbody></table></details>`}).join(""):`<p class="note" style="margin:0">Chưa có lịch sử. Các khoản ghi ở mục Chi tiêu tháng này sẽ tự vào đây.</p>`;
   /* 2. nhu cầu: tự tính theo thẻ đang có nếu chưa nhập tay */
   if(document.activeElement!==$("#cpBudget"))$("#cpBudget").value=d.budget?String(d.budget).replace(".",","):"";
   const noNeeds=!Object.values(d.needs||{}).some(v=>cpTr(v)>0)&&!(PLx&&(PLx.known||[]).length);
@@ -2731,11 +2734,11 @@ $("#cpOut").addEventListener("click",e=>{if(e.target.closest("[data-cp-auto]")){
 function cpPerInfo(card,dateStr){const o=cpOwned().find(x=>x.c.id===card),dt=dParse(dateStr)||dToday();if(!o)return"";const{c,e}=o,p=cpCycle(c,e,dt);
   let t=`Tính hoàn: kỳ ${cpDM(p.s)}–${cpDM(dAdd(p.t,-1))} (${cpBasisTxt(c).toLowerCase()})`;if(cpSk(c,e)){const st=cpStmt(c,e,dt);t+=` · Sao kê ${cpDM(st.close)}, hạn trả ${cpDM(st.due)}`}
   const PL=cpSel(cpData());if(PL&&(dKey(dt)<PL.from||dKey(dt)>PL.to))t+=" · ngoài khoảng ngày kế hoạch đang xem";return t}
-function cpLogTx(card,cat,amt,dateStr,btn){const d=cpData(),dt=dParse(dateStr)||dToday(),today=dKey(dt)===dKey(dToday());if(dt>dToday()){toast("Ngày quẹt không được sau hôm nay");return false}
+function cpLogTx(card,cat,amt,dateStr,btn,note){const d=cpData(),dt=dParse(dateStr)||dToday(),today=dKey(dt)===dKey(dToday());if(dt>dToday()){toast("Ngày quẹt không được sau hôm nay");return false}
   const a=Math.round(amt*1e4)/1e4,dup=d.hist.some(h=>h.card===card&&Math.abs(h.amt-a)<1e-6&&dKey(cpTxDate(h))===dKey(dt));
   if(dup&&btn&&btn.dataset.sure!=="1"){btn.dataset.sure="1";const o=btn.textContent;btn.textContent="Bấm lần nữa nếu là khoản khác";setTimeout(()=>{if(btn.isConnected){btn.dataset.sure="";btn.textContent=o}},4000);toast(`Đã có khoản ${cbMoney(a*TRV)} cùng thẻ, cùng ngày – có thể bị trùng`);return false}
   if(btn)btn.dataset.sure="";const at=today?new Date():new Date(dt.getFullYear(),dt.getMonth(),dt.getDate(),12);
-  d.hist.push({p:`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`,card,cat,amt:a,at:at.toISOString()});cpSave();return true}
+  d.hist.push({p:`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`,card,cat,amt:a,at:at.toISOString(),...(note&&note.trim()?{note:note.trim().slice(0,120)}:{})});cpSave();return true}
 /* bấm vào mục kế hoạch → ghi chi tiêu nhanh cho đúng thẻ và nhóm */
 let qsCur=null;
 function qsOpen(card,cat,left,any,pick){const c=cbAll().find(x=>x.id===card);if(!c)return;cat=cat||"khac";qsCur={card,cat};$("#qsCard").hidden=!pick;
@@ -2747,13 +2750,13 @@ function qsSub(cat,left){const ch=[100,200,500,1000,2000].map(v=>[v<1000?v+"k":v
   $("#qsChips").innerHTML=ch.map(([t,v])=>`<button type="button" data-v="${v}">${esc(t)}</button>`).join("");
   $("#qsAmt").value="";$("#qsDate").value=dKey(dToday());$("#qsDate").max=dKey(dToday());$("#qsPer").textContent=qsCur?cpPerInfo(qsCur.card,$("#qsDate").value):"";$("#qs").hidden=false;$("#qsBg").classList.add("on");setTimeout(()=>$("#qsAmt").focus(),50)}
 /* nút nổi Ghi chi tiêu: chọn thẻ trong khung, mặc định thẻ còn nhiều tiền cần chi nhất theo kế hoạch */
-function qsOpenPick(){const owned=cpOwned();if(!owned.length){toast("Chưa có thẻ hoàn tiền – thêm thẻ trước");return}
+function qsOpenPick(){$("#qsNote").value="";const owned=cpOwned();if(!owned.length){toast("Chưa có thẻ hoàn tiền – thêm thẻ trước");return}
   const left=id=>CP_CATS.reduce((s,[k])=>s+(qsLeft[id+"|"+k]||0),0),ord=owned.map(o=>o.c).sort((a,b)=>left(b.id)-left(a.id));
   $("#qsCard").innerHTML=ord.map(c=>`<option value="${esc(c.id)}">${esc(c.bank+" "+c.name)}${left(c.id)>0?` – còn ${cbMoney(left(c.id))}`:""}</option>`).join("");
   const id=ord[0].id,cat=(CP_CATS.find(([k])=>qsLeft[id+"|"+k]>0)||["khac"])[0];$("#qsCard").value=id;qsOpen(id,cat,0,true,true)}
 $("#qsCard").addEventListener("change",e=>{const id=e.target.value,a=$("#qsAmt").value,dt=$("#qsDate").value,cat=(CP_CATS.find(([k])=>qsLeft[id+"|"+k]>0)||["khac"])[0];qsOpen(id,cat,0,true,true);$("#qsAmt").value=a;if(dt){$("#qsDate").value=dt;$("#qsPer").textContent=cpPerInfo(id,dt)}});
 function qsClose(){$("#qs").hidden=true;$("#qsBg").classList.remove("on");qsCur=null}
-$("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-q-card]");if(!b)return;qsOpen(b.dataset.qCard,b.dataset.qCat,+b.dataset.qLeft||0,!!b.dataset.qAny)});
+$("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-q-card]");if(!b)return;$("#qsNote").value="";qsOpen(b.dataset.qCard,b.dataset.qCat,+b.dataset.qLeft||0,!!b.dataset.qAny)});
 $("#qsCat").addEventListener("change",e=>{if(!qsCur)return;qsCur.cat=e.target.value;qsSub(qsCur.cat,qsLeft[qsCur.card+"|"+qsCur.cat]||0)});
 $("#qsChips").addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(!b)return;$("#qsAmt").value=String(b.dataset.v).replace(".",",")+"tr"});
 $("#qsX").addEventListener("click",qsClose);
@@ -2762,7 +2765,7 @@ const cpQPerUp=()=>{if(!$("#cpQDate").value)$("#cpQDate").value=dKey(dToday());$
 $("#cpQCard").addEventListener("change",cpQPerUp);$("#cpQDate").addEventListener("change",cpQPerUp);$("#qsBg").addEventListener("click",qsClose);
 $("#qsAmt").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#qsOk").click()}});
 $("#qsOk").addEventListener("click",()=>{if(!qsCur)return;const amt=cpAmt($("#qsAmt").value);if(!amt||amt<=0){toast("Nhập số tiền, ví dụ 150k hoặc 1,5tr");return}
-  if(!cpLogTx(qsCur.card,qsCur.cat,amt,$("#qsDate").value,$("#qsOk")))return;qsClose();
+  if(!cpLogTx(qsCur.card,qsCur.cat,amt,$("#qsDate").value,$("#qsOk"),$("#qsNote").value))return;qsClose();
   const y=scrollY;renderPlan();window.scrollTo(0,y);toast(`Đã ghi ${cbMoney(amt*TRV)} – kế hoạch đã cập nhật`)});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&qsCur)qsClose()});
 /* nút Lập kế hoạch: tự tính nhu cầu theo thẻ (trừ khi đã nhập tay) rồi đưa tới kết quả */
