@@ -834,16 +834,16 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
       <div class="panel stack" id="cpTK" data-pg="list" hidden></div>
       <div class="panel cp-res" id="cpOut" data-pg="detail"></div>
       <div class="panel stack cp-now" data-pg="detail">
-        <div class="cbk" id="cpNowTitle">3. Chi tiêu tháng này</div>
-        <p class="note" style="margin:0">Quẹt thẻ xong thì ghi vào đây (hoặc bấm vào ô thẻ trong kế hoạch) – kế hoạch tự tính lại phần còn lại.</p>
-        <div class="cp-add">
+        <div class="cbk" id="cpNowTitle">Chi tiêu đã ghi</div>
+        <p class="note" style="margin:0">Quẹt thẻ xong bấm nút <b>＋ Ghi chi tiêu</b> (góc dưới) hoặc bấm vào ô thẻ trong kết quả phân bổ – kế hoạch tự tính lại phần còn lại.</p>
+        <div class="cp-add" hidden>
           <select id="cpQCard" class="wide" aria-label="Thẻ đã quẹt"></select>
           <select id="cpQCat" aria-label="Nhóm chi tiêu"></select>
           <input id="cpQAmt" type="text" inputmode="decimal" placeholder="Số tiền: 150k, 1,5tr" aria-label="Số tiền">
           <input id="cpQDate" type="date" aria-label="Ngày quẹt">
           <button class="btn2 acc wide" id="cpQAdd" type="button">Ghi chi tiêu</button>
         </div>
-        <p class="note" id="cpQPer" style="margin:0"></p>
+        <p class="note" id="cpQPer" style="margin:0" hidden></p>
         <select id="cpNowF" aria-label="Lọc giao dịch theo thẻ" hidden></select>
         <div id="cpNowList"></div>
       </div>
@@ -996,6 +996,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
       <h2>Hiển thị</h2>
       <div class="panel stack">
         <label class="f" for="meFont">Phông chữ<select id="meFont"><option value="">Phông hệ thống iPhone (SF) – mặc định, gần giống X nhất</option><option value="bvp">Be Vietnam Pro + Lora – kiểu sổ tay cũ</option><option value="inter">Inter – gọn, hiện đại</option></select></label>
+        <label class="switch" for="meNeedsOn"><span><span style="font-weight:600">Hiện mục “Nhu cầu chi tiêu” trong kế hoạch</span><br><span class="note">Dành cho người muốn tự chỉnh: ngân sách, số tiền từng loại chi, khoản chi biết trước, ghim thẻ. Tắt thì app tự tính theo thẻ.</span></span><input type="checkbox" id="meNeedsOn"></label>
         <p class="note" style="margin:0">X dùng phông Chirp riêng, không cho dùng ngoài. Phông hệ thống iPhone (SF) có nét gần nhất và hiện nhanh vì có sẵn trên máy.</p>
       </div>
     </section>
@@ -1008,6 +1009,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 <div class="dr-bg qs-bg" id="qsBg"></div>
 <div class="qs" id="qs" role="dialog" aria-modal="true" aria-labelledby="qsTitle" hidden>
   <div class="qs-h"><div><div class="qs-who" id="qsWho"></div><b id="qsTitle">Ghi chi tiêu</b><div class="note" id="qsSub"></div></div><button class="x" type="button" id="qsX" aria-label="Đóng">✕</button></div>
+  <select id="qsCard" aria-label="Thẻ đã quẹt" hidden></select>
   <select id="qsCat" aria-label="Nhóm chi tiêu" hidden></select>
   <input id="qsAmt" type="text" inputmode="decimal" placeholder="Số tiền vừa quẹt: 150k, 1,5tr" aria-label="Số tiền vừa quẹt" autocomplete="off">
   <label class="f" for="qsDate">Ngày quẹt<input id="qsDate" type="date"></label>
@@ -2245,7 +2247,7 @@ function cpPBHtml(d,owned){const t0=dToday(),P=cpSel(d),list=d.plans.slice().sor
   if(P){const f=dParse(P.from),to=dParse(P.to),L=dDiff(f,to)+1,dl=dDiff(t0,to)+1,st=cpStTxt[cpStOf(P)];
     const sk=cpStOf(P),act=d.plans.find(x=>cpStOf(x)==="active"&&x!==P);
     const ban=sk==="draft"?`<div class="pl-ban warn"><b>Đây là bản nháp, chưa áp dụng.</b> App chưa nhắc việc theo kế hoạch này.${act?` Kế hoạch đang hoạt động: <b>${cpPlanTitle(act)}</b>.`:""}</div>`:sk==="done"?`<div class="pl-ban"><b>Kế hoạch đã kết thúc</b> – chỉ để xem lại và đối chiếu.${act?` Đang hoạt động: <b>${cpPlanTitle(act)}</b>.`:""}</div>`:sk==="next"?`<div class="pl-ban warn"><b>Kế hoạch sắp tới</b> – bắt đầu ${dDMY(f)}, chưa tính chi tiêu hiện tại.</div>`:"";
-    info=`${ban}<div class="pl-i"><div><span class="chip ${st[1]}">${st[0]}</span> <span class="note">${L} ngày${P.status==="active"?(f>t0?` · bắt đầu sau ${dDiff(t0,f)} ngày`:` · còn ${dl} ngày`):""}</span>${P.status!=="done"?`<div class="note" style="margin-top:4px">Sửa nhu cầu chi tiêu, khoản chi biết trước, ghim thẻ ở mục “Nhu cầu chi tiêu” cuối trang.</div>`:""}</div></div>
+    info=`${ban}<div class="pl-i"><div><span class="chip ${st[1]}">${st[0]}</span> <span class="note">${L} ngày${P.status==="active"?(f>t0?` · bắt đầu sau ${dDiff(t0,f)} ngày`:` · còn ${dl} ngày`):""}</span>${P.status!=="done"&&uiOpt("needs")?`<div class="note" style="margin-top:4px">Sửa nhu cầu chi tiêu, khoản chi biết trước, ghim thẻ ở mục “Nhu cầu chi tiêu” cuối trang.</div>`:""}</div></div>
       ${P.status==="active"&&!cpEditEnd?`<div class="row-btns"><button class="btn2" type="button" data-pl-act="edit">Đổi ngày kết thúc</button>${f<=t0?`<button class="btn2" type="button" data-pl-act="endnow">Kết thúc hôm nay</button>`:`<button class="btn2" type="button" data-pl-act="unapply">Đưa về nháp</button>`}</div>`:""}
       ${P.status==="active"&&cpEditEnd?`<div class="cp-add"><input type="date" id="cpPlEnd" value="${P.to}" min="${dKey(dMax(t0,dAdd(f,CP_PLAN_MIN-1)))}" max="${dKey(dAdd(f,CP_PLAN_MAX-1))}"><button class="btn2 acc" type="button" data-pl-act="saveend">Lưu</button><button class="btn2" type="button" data-pl-act="canceledit">Huỷ</button></div><p class="note" style="margin:0">Kế hoạch kế tiếp (nếu có) tự dời ngày bắt đầu để nối liền.</p>`:""}
       ${P.status==="draft"?`<div class="row-btns"><button class="btn2 acc" type="button" data-pl-act="apply">Áp dụng kế hoạch này</button><button class="btn2 danger" type="button" data-pl-act="del">Xoá nháp</button></div>`:""}`}
@@ -2485,7 +2487,7 @@ function renderPlan0(){
   const all=cbAll(),d=cpData(),owned=cpOwned();
   $("#cpWho").innerHTML="";$("#cpWho").hidden=true;
   const PLx=cpSel(d),pbh=cpPBHtml(d,owned);$("#cpPB").innerHTML=pbh.list;$("#cpPB").hidden=!owned.length;$("#cpPD").innerHTML=pbh.detail;$("#cpPD").hidden=!PLx;
-  const plOn=!!PLx&&PLx.status!=="done";$("#cpStep3").hidden=!plOn;$("#cpMake").hidden=!plOn;
+  const plOn=!!PLx&&PLx.status!=="done";$("#cpStep3").hidden=!plOn||!uiOpt("needs");$("#cpMake").hidden=true;
   /* 1. thẻ đang có */
   const nb=new Set(owned.map(o=>o.c.bank)).size;
   $("#cpS1").textContent=owned.length?`${owned.length} thẻ · ${nb} ngân hàng`:"chưa có thẻ";
@@ -2540,13 +2542,13 @@ function renderPlanOut0(){
   const d=cpData(),owned=cpOwned(),all=cbAll(),O=$("#cpOut"),now=new Date(),t0=dToday(),PL=cpSel(d);
   const A0=cpActual(owned,d.hist,now),ctxs={};owned.forEach(({c})=>ctxs[c.id]=A0[c.id].ctx);
   cpShareTxt="";
-  if(!PL){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;O.innerHTML=owned.length?`<p class="note" style="margin:0">Tạo kế hoạch chi tiêu ở trên để app phân bổ chi tiêu tối ưu theo kỳ của từng thẻ.</p>`:`<p class="note" style="margin:0">Thêm thẻ đang có để app lập kế hoạch.</p>`;$("#cpSugBox").hidden=true;$("#cpNowTitle").textContent="3. Chi tiêu";return}
+  if(!PL){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;O.innerHTML=owned.length?`<p class="note" style="margin:0">Tạo kế hoạch chi tiêu ở trên để app phân bổ chi tiêu tối ưu theo kỳ của từng thẻ.</p>`:`<p class="note" style="margin:0">Thêm thẻ đang có để app lập kế hoạch.</p>`;$("#cpSugBox").hidden=true;$("#cpNowTitle").textContent="Chi tiêu đã ghi";return}
   const from=dParse(PL.from),to=dParse(PL.to),to1=dAdd(to,1),ws=dMax(t0,from),daysLeft=Math.max(0,dDiff(t0,to1)),plTo=to;
   const needs={};CP_CATS.forEach(([k])=>{const v=cpTr(PL.needs&&PL.needs[k]);if(v>0)needs[k]=v});
   const known=(PL.known||[]).filter(x=>x&&dParse(x.d)&&cpTr(x.amt)>0);known.forEach(x=>needs[x.cat]=(needs[x.cat]||0)+cpTr(x.amt));
   const tot=Object.values(needs).reduce((a,b)=>a+b,0);
   const spentCat={};let spent=0;d.hist.forEach(h=>{const dt=cpTxDate(h);if(dt<from||dt>=to1)return;const a=h.amt*TRV;spentCat[h.cat]=(spentCat[h.cat]||0)+a;spent+=a});
-  $("#cpNowTitle").textContent=`Ghi chi tiêu · ${cpDM(from)}–${cpDM(to)}${PL.status==="done"||to<t0?" · đã kết thúc":daysLeft?` · còn ${daysLeft} ngày`:""}`;
+  $("#cpNowTitle").textContent=`Chi tiêu đã ghi · ${cpDM(from)}–${cpDM(to)}${PL.status==="done"||to<t0?" · đã kết thúc":daysLeft?` · còn ${daysLeft} ngày`:""}`;
   /* kỳ thẻ đã chốt trong kế hoạch (kết thúc trong khoảng ngày, trước hôm nay) */
   let realized=0;const closed=[];owned.forEach(({c,e})=>cpPeriods(c,e,from,dMin(to,t0)).forEach(p=>{const end=dAdd(p.t,-1);if(end>=t0||end>to||end<from)return;const st=cpPerState(c,e,d.hist,p,A0[c.id].ctx.yearUsed);realized+=st.res.cash;closed.push({c,e,p,st})}));
   if(PL.status==="done"||to<t0){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;O.innerHTML=cpPlanDoneHtml(PL,owned,d,closed,realized,spent,tot)+cpTLHtml(owned,from,to);$("#cpSugBox").hidden=true;return}
@@ -2565,7 +2567,7 @@ function renderPlanOut0(){
     lims[vc.id]=L})});
   const leftTot=Object.values(left).reduce((a,b)=>a+b,0);
   if(!tot){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;$("#cpSugBox").hidden=true;if(cpActivePlan(d)===PL)setPlanSum({plan:PL.id,from:PL.from,to:PL.to,cards:owned.length,cash:realized,spent,tot:0,cashNow:realized});
-    O.innerHTML=`<div class="cbk">Kế hoạch ${cpPlanTitle(PL)}</div>${spent?`<p style="margin:0">Đã chi <b>${cbMoney(spent)}</b> trong kế hoạch.</p>`:""}<p class="note" style="margin:0">Kế hoạch chưa có nhu cầu chi tiêu.</p><div class="row-btns"><button class="btn2 acc" type="button" data-cp-auto="1">Tự tính theo thẻ</button><button class="btn2" type="button" data-cp-needs="1">Tự nhập nhu cầu</button></div>${cpTLHtml(owned,from,to)}`;return}
+    O.innerHTML=`<div class="cbk">Kế hoạch ${cpPlanTitle(PL)}</div>${spent?`<p style="margin:0">Đã chi <b>${cbMoney(spent)}</b> trong kế hoạch.</p>`:""}<p class="note" style="margin:0">Kế hoạch chưa có nhu cầu chi tiêu.</p><div class="row-btns"><button class="btn2 acc" type="button" data-cp-auto="1">Tự tính theo thẻ</button>${uiOpt("needs")?`<button class="btn2" type="button" data-cp-needs="1">Tự nhập nhu cầu</button>`:""}</div>${cpTLHtml(owned,from,to)}`;return}
   const P=cpOptimize(V,left,true,fix,vctx,lims);
   qsLeft={};P.cards.forEach(x=>{if(x.c.isNext)return;for(const k in x.sp)if(x.sp[k]>0)qsLeft[x.c.baseId+"|"+k]=(qsLeft[x.c.baseId+"|"+k]||0)+x.sp[k]});
   const planned={};P.cards.forEach(x=>{if(!x.c.isNext)planned[x.c.baseId]=Object.values(x.sp).reduce((s,v)=>s+v,0)});
@@ -2686,8 +2688,8 @@ $("#cbSeg").addEventListener("click",e=>{const b=e.target.closest("[data-seg]");
   $("#cpView").hidden=!p;$("#cbCatA").hidden=p;$("#cbCatB").hidden=p;if(p)renderPlan();else renderCb();cpFabSync()});
 /* nút nổi Ghi chi tiêu: chỉ hiện khi đang ở Kế hoạch; bấm thì tới ô ghi nhanh */
 function cpFabSync(){$("#cpFab").hidden=$("#v-cb").hidden||$("#cpView").hidden||!cbOk}
-$("#cpFab").addEventListener("click",()=>{if(curView==="plan"){const d=cpData(),a=cpActivePlan(d);if(!a){toast("Chưa có kế hoạch đang hoạt động – tạo kế hoạch trước");return}cpSelId=a.id;showTab("plandetail");setTimeout(()=>{$(".cp-now").scrollIntoView({behavior:"smooth",block:"center"});$("#cpQCard").focus()},120);return}
-  const n=$(".cp-now");n.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("#cpQCard").focus(),350)});
+$("#cpFab").addEventListener("click",()=>{if(curView==="plan"){const d=cpData(),a=cpActivePlan(d);if(!a){toast("Chưa có kế hoạch đang hoạt động – tạo kế hoạch trước");return}cpSelId=a.id;showTab("plandetail");setTimeout(qsOpenPick,150);return}
+  qsOpenPick()});
 $("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-cp-fill]");if(!b)return;const d=cpData(),en=d.cards.find(x=>x.id===b.dataset.cpFill);if(!en)return;
   const fi=en.fillInfo;
   if(b.dataset.off){if(d.needsSrc==="auto")delete en.fill;else if(fi&&fi.added){const v=Math.max(0,cpTr(d.needs.khac)-fi.need);if(v>0)d.needs.khac=String(Math.round(v/1e4)/100);else delete d.needs.khac}
@@ -2736,7 +2738,7 @@ function cpLogTx(card,cat,amt,dateStr,btn){const d=cpData(),dt=dParse(dateStr)||
   d.hist.push({p:`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`,card,cat,amt:a,at:at.toISOString()});cpSave();return true}
 /* bấm vào mục kế hoạch → ghi chi tiêu nhanh cho đúng thẻ và nhóm */
 let qsCur=null;
-function qsOpen(card,cat,left,any){const c=cbAll().find(x=>x.id===card);if(!c)return;cat=cat||"khac";qsCur={card,cat};
+function qsOpen(card,cat,left,any,pick){const c=cbAll().find(x=>x.id===card);if(!c)return;cat=cat||"khac";qsCur={card,cat};$("#qsCard").hidden=!pick;
   $("#qsWho").textContent=cust.isMe?"Chi tiêu của tôi":`Khách: ${cust.name||"(chưa có tên)"}`;$("#qsTitle").textContent=`${c.bank} ${c.name}`;$("#qsCat").hidden=!any;
   if(any){$("#qsCat").innerHTML=CP_CATS.map(([k,n])=>`<option value="${k}">${esc(n)}${qsLeft[card+"|"+k]>0?` – còn ${cbMoney(qsLeft[card+"|"+k])}`:""}</option>`).join("");$("#qsCat").value=cat;left=qsLeft[card+"|"+cat]||0}
   qsSub(cat,left)}
@@ -2744,6 +2746,12 @@ function qsSub(cat,left){const ch=[100,200,500,1000,2000].map(v=>[v<1000?v+"k":v
   $("#qsSub").textContent=`${$("#qsCat").hidden?(CP_NAME[cat]||cat):"Chọn nhóm chi tiêu"}${left>0?` · kế hoạch còn ${cbMoney(left)}`:""}`;
   $("#qsChips").innerHTML=ch.map(([t,v])=>`<button type="button" data-v="${v}">${esc(t)}</button>`).join("");
   $("#qsAmt").value="";$("#qsDate").value=dKey(dToday());$("#qsDate").max=dKey(dToday());$("#qsPer").textContent=qsCur?cpPerInfo(qsCur.card,$("#qsDate").value):"";$("#qs").hidden=false;$("#qsBg").classList.add("on");setTimeout(()=>$("#qsAmt").focus(),50)}
+/* nút nổi Ghi chi tiêu: chọn thẻ trong khung, mặc định thẻ còn nhiều tiền cần chi nhất theo kế hoạch */
+function qsOpenPick(){const owned=cpOwned();if(!owned.length){toast("Chưa có thẻ hoàn tiền – thêm thẻ trước");return}
+  const left=id=>CP_CATS.reduce((s,[k])=>s+(qsLeft[id+"|"+k]||0),0),ord=owned.map(o=>o.c).sort((a,b)=>left(b.id)-left(a.id));
+  $("#qsCard").innerHTML=ord.map(c=>`<option value="${esc(c.id)}">${esc(c.bank+" "+c.name)}${left(c.id)>0?` – còn ${cbMoney(left(c.id))}`:""}</option>`).join("");
+  const id=ord[0].id,cat=(CP_CATS.find(([k])=>qsLeft[id+"|"+k]>0)||["khac"])[0];$("#qsCard").value=id;qsOpen(id,cat,0,true,true)}
+$("#qsCard").addEventListener("change",e=>{const id=e.target.value,a=$("#qsAmt").value,dt=$("#qsDate").value,cat=(CP_CATS.find(([k])=>qsLeft[id+"|"+k]>0)||["khac"])[0];qsOpen(id,cat,0,true,true);$("#qsAmt").value=a;if(dt){$("#qsDate").value=dt;$("#qsPer").textContent=cpPerInfo(id,dt)}});
 function qsClose(){$("#qs").hidden=true;$("#qsBg").classList.remove("on");qsCur=null}
 $("#cpOut").addEventListener("click",e=>{const b=e.target.closest("[data-q-card]");if(!b)return;qsOpen(b.dataset.qCard,b.dataset.qCat,+b.dataset.qLeft||0,!!b.dataset.qAny)});
 $("#qsCat").addEventListener("change",e=>{if(!qsCur)return;qsCur.cat=e.target.value;qsSub(qsCur.cat,qsLeft[qsCur.card+"|"+qsCur.cat]||0)});
@@ -2873,9 +2881,11 @@ function renderMe(){
   if(!$("#meJob").options.length)$("#meJob").innerHTML=Object.entries(JOBS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
   $("#meJob").value=me.job||"hdld";$("#meBhxh").checked=!!me.bhxh;$("#meDebt").value=String(me.debtGroup||(me.badDebt?2:1));$("#meFin").value=me.finCos||0;
   meRows();
-  meCbRender();mePlanSync();$("#meFont").value=(v=>v==="sf"?"":v)(load(K_FONT)||"");
+  meCbRender();mePlanSync();$("#meFont").value=(v=>v==="sf"?"":v)(load(K_FONT)||"");$("#meNeedsOn").checked=uiOpt("needs");
 }
-const K_FONT="kmt.font.v1";const fontSet=v=>{if(v==="sf")v="";if(v)document.documentElement.dataset.font=v;else delete document.documentElement.dataset.font};fontSet(load(K_FONT)||"");
+const K_FONT="kmt.font.v1",K_UI="kmt.ui.v1";
+function uiOpt(k){const o=load("kmt.ui.v1")||{};return!!o[k]}
+$("#meNeedsOn").addEventListener("change",e=>{const o=load(K_UI)||{};o.needs=e.target.checked;save(K_UI,o);toast(o.needs?"Đã hiện mục Nhu cầu chi tiêu trong kế hoạch":"Đã ẩn mục Nhu cầu chi tiêu")});const fontSet=v=>{if(v==="sf")v="";if(v)document.documentElement.dataset.font=v;else delete document.documentElement.dataset.font};fontSet(load(K_FONT)||"");
 $("#meFont").addEventListener("change",e=>{const v=e.target.value;fontSet(v);if(v)save(K_FONT,v);else try{localStorage.removeItem(K_FONT)}catch(err){}toast("Đã đổi phông chữ")});
 function meCbRender(){$("#meCbQ").hidden=cbOf(me).cards.length<=6;$("#meCbCards").innerHTML=cpCardsHtml(me,"Chưa có thẻ hoàn tiền nào. Gõ tên thẻ hoặc ngân hàng bên dưới để thêm.",$("#meCbQ").value);cpFillSel("#meCbFind","#meCbCard",me)}
 function meCbSave(){save(K_ME,me);if(cust.isMe)cust=me}

@@ -169,9 +169,9 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - Kết quả kế hoạch: số hoàn dự kiến lớn ở trên, các dòng Đã chi / Còn chi / Chờ đủ điều kiện / Đã được hoàn, khung **Việc cần làm** (hạn thanh toán, điều kiện còn thiếu kèm vòng tiến độ như 2/7 giao dịch, 1/3tr). Nút nổi **+ Ghi chi tiêu** đưa tới ô ghi nhanh.
 
 - Hoàn tiền → Kế hoạch: nhập thẻ đang có (bước 1) và nhu cầu chi tiêu tháng (bước 3) → app lập kế hoạch: nhóm nào quẹt thẻ nào, bao nhiêu.
-- Khi đã có thẻ, bước 3 **tự tính nhu cầu chi tiêu**: mỗi thẻ chi vừa đủ để lấy hết trần các nhóm hoàn cao và đủ ngưỡng mức (bỏ ưu đãi chỉ vài ngày/tuần, nhóm không trần tạm tính 3tr). Nhập **Ngân sách/tháng** để app chỉ chi trong ngân sách, ưu tiên nhóm hoàn cao. Sửa số bất kỳ thì app giữ số nhập tay; bấm **Tự tính theo thẻ** để tính lại.
+- App **tự tính nhu cầu chi tiêu** theo thẻ: mỗi thẻ chi vừa đủ để lấy hết trần các nhóm hoàn cao và đủ ngưỡng mức. Mục **Nhu cầu chi tiêu** (ngân sách, số tiền từng loại chi, khoản chi biết trước, ghim thẻ) **mặc định ẩn**; bật ở **Tôi → Hiển thị → Hiện mục “Nhu cầu chi tiêu” trong kế hoạch** nếu muốn tự chỉnh. Không còn nút "Tính lại kế hoạch": kế hoạch tự tính lại mỗi khi mở, ghi chi tiêu, thêm/xoá thẻ hay sửa nhu cầu.
 - Nhanh nhất: trong kết quả kế hoạch, **bấm vào ô thẻ** (hoặc dòng nhóm, hay nút **＋ Ghi chi tiêu thẻ này** trong phần Theo từng thẻ – nút này cho chọn nhóm) → gõ số tiền hoặc chọn nhanh 100k/200k/500k/1tr/2tr/Còn lại → **Ghi chi tiêu**.
-- Bước 4 **Chi tiêu tháng này**: mỗi lần quẹt thẻ, chọn thẻ, nhóm, gõ số tiền (`150k`, `1,5tr`, `2tr5`, `1.200.000`) → **Ghi chi tiêu**. Kế hoạch tự tính lại cho phần còn lại của tháng: đã chi bao nhiêu %, còn chi gì ở thẻ nào, tiền hoàn đã có và dự kiến, tiến độ lên mức, nhóm đã chạm trần, nhóm vượt kế hoạch.
+- Nút nổi **＋ Ghi chi tiêu** (góc dưới) mở cùng khung ghi, có thêm ô **chọn thẻ** (mặc định thẻ còn nhiều tiền cần chi nhất) và nhóm chi tiêu; ở trang danh sách thì mở kế hoạch đang hoạt động trước. Gõ số tiền (`150k`, `1,5tr`, `2tr5`, `1.200.000`) → **Ghi chi tiêu**, kế hoạch tự tính lại phần còn lại. Mục **Chi tiêu đã ghi** trong trang chi tiết chỉ còn danh sách các khoản đã ghi.
 - Khoản đã ghi nằm chung trong lịch sử chi tiêu (bước 2), sang tháng sau dùng "Lấy theo tháng gần nhất" để lập kế hoạch mới.
 
 ## Ràng buộc được tính khi lập kế hoạch và theo dõi
