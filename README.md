@@ -16,15 +16,15 @@
 2. Lần đầu app dùng **điều kiện mẫu**. Vào tab **Điều kiện** (cần mật khẩu; mở khoá một lần là dùng được đến khi tắt app, hoặc bấm **Khoá lại**) → **Sửa điều kiện** để nhập điều kiện thật:
    - sửa từng ngân hàng, **+ Thêm ngân hàng**, hoặc **Xoá ngân hàng này** (bấm 2 lần);
    - bấm **Lưu** ở thanh dưới cùng. **Huỷ** để bỏ thay đổi.
-3. Tab **Kiểm tra**: nhập thẻ khách đang có, số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**.
+3. Tab **Khách hàng** → **＋ Khách mới** (nhập tên) → trong trang khách bấm **Kiểm tra mở thẻ**: nhập thẻ khách đang có (hoặc đọc CIC), số công ty tài chính, công việc → **Kiểm tra ngân hàng có thể mở**. Bấm **Kế hoạch chi tiêu hoàn tiền** để lập kế hoạch cho khách đó.
 
 ## Giao diện
 
 - Phong cách "sổ tay" (hướng D): nền trắng ngà, chữ có chân (Lora) cho tiêu đề và số lớn, màu xanh lá của app cho số chính và nút; màu cam đất chỉ dùng cho tiền "chờ điều kiện". Có chế độ tối theo máy.
-- Thanh dưới: **Mở thẻ** · **Hoàn tiền** (mật khẩu riêng) · **Tôi** (mở khung trượt, giống bấm avatar).
+- Thanh dưới: **Khách hàng** (màn hình đầu) · **Tra cứu** (danh mục thẻ hoàn tiền, mật khẩu Hoàn tiền) · **Tôi** (mở khung trượt, giống bấm avatar).
 - Thanh trên: avatar của bạn (góc trái), logo Smart-B (góc phải).
-- Bấm avatar → khung trượt: Hồ sơ của tôi, Kiểm tra cho tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
-- **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có (kèm nút **Kiểm tra mở thẻ mới cho tôi**); mục **Quản lý hoàn tiền chi tiêu**: chọn dòng thẻ hoàn tiền đang có trong danh mục, hạng thẻ, nhóm đã đăng ký (dùng chung với Kế hoạch hoàn tiền), nút **Lịch sử & kế hoạch chi tiêu** → **Lưu trên máy**. Đây là hồ sơ mặc định: Mở thẻ và Hoàn tiền tính theo hồ sơ này; khi tư vấn khách (Khách mới, mở khách đã lưu, đọc CIC của khách) thì tính theo khách, bấm **Về tôi** để quay lại.
+- Bấm avatar → khung trượt: Hồ sơ của tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
+- **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có (kèm nút **Kiểm tra mở thẻ mới cho tôi**); mục **Quản lý hoàn tiền chi tiêu**: chọn dòng thẻ hoàn tiền đang có trong danh mục, hạng thẻ, nhóm đã đăng ký (dùng chung với Kế hoạch hoàn tiền), nút **Lịch sử & kế hoạch chi tiêu** → **Lưu trên máy**. Hồ sơ này cũng được ghim ở đầu danh sách khách (**Hồ sơ của tôi**), mở ra có đủ 2 chức năng như một khách.
 
 ## Sao lưu & phục hồi toàn bộ
 
@@ -53,10 +53,16 @@
 
 ## Khách hàng
 
-- Tab **Kiểm tra** có ô **Tên khách hàng**, số điện thoại và ghi chú.
-- Sau khi kiểm tra, bấm **Lưu khách hàng** để lưu hồ sơ. Lưu lại lần nữa sẽ cập nhật đúng hồ sơ đó, không tạo bản trùng. Bấm **Khách mới** để nhập khách khác.
-- Tab **Khách hàng**: tìm theo tên, số điện thoại hoặc ngân hàng; **Mở** để xem lại và kiểm tra lại; **Xoá** (bấm 2 lần).
-- **Sao lưu ra file / Phục hồi từ file** (file `.json`). Phục hồi sẽ gộp vào danh sách đang có.
+Khách hàng là trung tâm của app: mỗi khách có thông tin chung, phần **Kiểm tra mở thẻ** và phần **Kế hoạch chi tiêu hoàn tiền**.
+
+- **Danh sách khách** (màn hình đầu): tìm theo tên, số điện thoại, ngân hàng; lọc theo trạng thái (Mới, Đang tư vấn, Đã mở thẻ, Theo dõi chi tiêu). Mỗi dòng tóm tắt kết quả mở thẻ và kế hoạch tháng (dự kiến hoàn, đã chi, việc đã xong). **Hồ sơ của tôi** ghim ở đầu.
+- **Việc hôm nay** (đầu danh sách): khách sắp tới hạn thanh toán sao kê trong 7 ngày (thẻ có chi tiêu trong kỳ đó) và khách còn việc chưa xong trong kế hoạch tháng. Bấm để mở khách.
+- **＋ Khách mới**: nhập tên (số điện thoại không bắt buộc) → vào thẳng trang khách.
+- **Trang khách**: 2 ô chức năng có tóm tắt – **Kiểm tra mở thẻ** (số thẻ, % hạn mức đã dùng, ngày CIC, ngân hàng mở được) và **Kế hoạch chi tiêu hoàn tiền** (dự kiến hoàn, đã chi/kế hoạch, việc cần làm, hạn thanh toán gần nhất). Mục **Thông tin khách**: tên, số điện thoại, trạng thái (để *Tự động* thì app tự xếp), ghi chú, **Xoá khách này** (bấm 2 lần).
+- Khách có thẻ tín dụng (theo CIC hoặc hồ sơ) ở ngân hàng chưa có trong kế hoạch hoàn tiền thì trang khách gợi ý: bấm tên ngân hàng → app mở kế hoạch và lọc sẵn dòng thẻ của ngân hàng đó để chọn.
+- **Tự lưu**: sửa gì cũng lưu ngay vào đúng khách đó, không cần bấm lưu. Đọc CIC ghi vào khách đang mở (tên trên CIC khác tên khách thì app nhắc).
+- Bản cũ: khách đang nhập dở chưa lưu được tự đưa vào danh sách khi mở bản mới.
+- **Sao lưu ra file / Phục hồi từ file** (cuối danh sách, file `.json`, gồm cả kế hoạch hoàn tiền của khách). Phục hồi sẽ gộp vào danh sách đang có.
 - Dữ liệu khách **chỉ lưu trên điện thoại**, không gửi lên mạng.
 
 ## Xuất PDF kết quả
