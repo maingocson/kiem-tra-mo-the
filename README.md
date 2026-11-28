@@ -24,7 +24,7 @@
 - Thanh dưới (chỉ icon): **Trang chủ** (màn hình đầu, việc cần làm) · **Khách hàng** · **Tra cứu** (danh mục thẻ hoàn tiền, mật khẩu Hoàn tiền) · **Tôi** (mở khung trượt, giống bấm avatar).
 - Thanh trên: avatar của bạn (góc trái), logo Smart-B (góc phải).
 - Bấm avatar → khung trượt: Hồ sơ của tôi, Khách hàng, Khách mới; mục **Cập nhật**: Cập nhật điều kiện mở thẻ (nạp file điều kiện mới); mục **Cấu hình**: Điều kiện mở thẻ (mật khẩu như cũ).
-- **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có (kèm nút **Kiểm tra mở thẻ mới cho tôi**); mục **Quản lý hoàn tiền chi tiêu**: chọn dòng thẻ hoàn tiền đang có trong danh mục, hạng thẻ, nhóm đã đăng ký (dùng chung với Kế hoạch hoàn tiền), nút **Lịch sử & kế hoạch chi tiêu** → **Lưu trên máy**. Hồ sơ này cũng được ghim ở đầu danh sách khách (**Hồ sơ của tôi**), mở ra có đủ 2 chức năng như một khách.
+- **Tôi**: ảnh đại diện, họ tên, việc làm, BHXH, nhóm nợ CIC, số công ty tài chính, thẻ đang có (kèm nút **Kiểm tra mở thẻ mới cho tôi**); mục **Quản lý hoàn tiền chi tiêu**: chọn dòng thẻ hoàn tiền đang có trong danh mục, hạng thẻ, nhóm đã đăng ký (dùng chung với Kế hoạch hoàn tiền), ô **Kế hoạch đang hoạt động** (ngày, dự kiến hoàn, đã chi, việc cần làm – bấm vào mở thẳng trang chi tiết để theo dõi; chưa có kế hoạch thì là nút **Lập kế hoạch chi tiêu** mở form tạo kế hoạch), nút **Danh sách kế hoạch chi tiêu** → **Lưu trên máy**. Hồ sơ này cũng được ghim ở đầu danh sách khách (**Hồ sơ của tôi**), mở ra có đủ 2 chức năng như một khách.
 
 ## Sao lưu & phục hồi toàn bộ
 

@@ -985,8 +985,9 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
           <button class="btn2 acc wide" id="meCbAdd" type="button">Thêm thẻ hoàn tiền</button>
         </div>
       </div>
+      <button class="cu-fn" type="button" id="mePlanNow" hidden><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3M8 17.5h6"/></svg></span><span class="t"><b id="mePlanT"></b><small id="mePlanS"></small></span><span class="go">›</span></button>
       <button class="primary" id="meMakePlan" type="button">Lập kế hoạch chi tiêu</button>
-      <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Lịch sử &amp; kế hoạch chi tiêu</b><small>Ghi chi tiêu theo tháng, gợi ý quẹt thẻ nào để đạt mức hoàn</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+      <button class="ma-item" id="meToCb" type="button"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="ma-t"><b>Danh sách kế hoạch chi tiêu</b><small>Mọi kế hoạch của bạn: đang hoạt động, sắp tới, nháp, đã kết thúc</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
     </section>
     <section>
       <h2>Hiển thị</h2>
@@ -2860,7 +2861,7 @@ function renderMe(){
   if(!$("#meJob").options.length)$("#meJob").innerHTML=Object.entries(JOBS).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
   $("#meJob").value=me.job||"hdld";$("#meBhxh").checked=!!me.bhxh;$("#meDebt").value=String(me.debtGroup||(me.badDebt?2:1));$("#meFin").value=me.finCos||0;
   meRows();
-  meCbRender();$("#meFont").value=(v=>v==="sf"?"":v)(load(K_FONT)||"");
+  meCbRender();mePlanSync();$("#meFont").value=(v=>v==="sf"?"":v)(load(K_FONT)||"");
 }
 const K_FONT="kmt.font.v1";const fontSet=v=>{if(v==="sf")v="";if(v)document.documentElement.dataset.font=v;else delete document.documentElement.dataset.font};fontSet(load(K_FONT)||"");
 $("#meFont").addEventListener("change",e=>{const v=e.target.value;fontSet(v);if(v)save(K_FONT,v);else try{localStorage.removeItem(K_FONT)}catch(err){}toast("Đã đổi phông chữ")});
@@ -2884,7 +2885,16 @@ $("#meAddCard").addEventListener("click",()=>{me.rows.push({bank:"",cards:1,limi
 $("#meSave").addEventListener("click",()=>{save(K_ME,me);if(cust.isMe)cust=me;renderWho();toast("Đã lưu hồ sơ của bạn trên máy")});
 $("#meCheck").addEventListener("click",()=>{save(K_ME,me);if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("check");renderCust();runCheck(true)});
 let cbGoPlan=false;
-function meGoPlan(make){if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}showTab("plan");if(cbOk){if(make)cpMake(false)}else{cbGoPlan=make?"make":"plan";toast("Nhập mật khẩu Hoàn tiền để xem kế hoạch")}}
+function meGoPlan(make){if(!cust.isMe){cust=me;cicFiles={};xState=null;saveCust()}cpNewOpen=false;cpEditEnd=false;
+  const ap=make?cpActivePlan(cbOf(me)):null;
+  if(ap){cpSelId=ap.id;showTab("plandetail")}else{if(make)cpNewOpen=true;cpSelId=null;showTab("plan");if(make&&cbOk)setTimeout(()=>{const f=$(".pl-new");if(f)f.scrollIntoView({behavior:"smooth",block:"start"})},80)}
+  if(!cbOk)toast("Nhập mật khẩu Hoàn tiền để xem kế hoạch")}
+/* trang Tôi: ô theo dõi kế hoạch đang hoạt động */
+function mePlanSync(){const d=cbOf(me),{ap,ps}=psCur(me),b=$("#mePlanNow"),t0=dToday();
+  b.hidden=!ap;$("#meMakePlan").textContent=ap?"Xem chi tiết kế hoạch đang theo dõi":"Lập kế hoạch chi tiêu";$("#meMakePlan").hidden=!!ap;
+  if(!ap)return;$("#mePlanT").textContent=`Kế hoạch ${cpPlanTitle(ap)}`;
+  $("#mePlanS").innerHTML=[`<span class="chip ok">Đang hoạt động</span> còn ${dDiff(t0,dParse(ap.to))+1} ngày`,ps&&ps.tot?`<b>dự kiến hoàn ${cbMoney(ps.cash)}</b> · đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)}`:"",ps&&ps.todo?`Việc cần làm: ${ps.done||0}/${ps.todo} hoàn tất`:"",cbOk?"":"Cần mật khẩu Hoàn tiền"].filter(Boolean).join("<br>")}
+$("#mePlanNow").addEventListener("click",()=>meGoPlan(true));
 $("#meToCb").addEventListener("click",()=>meGoPlan(false));
 $("#meMakePlan").addEventListener("click",()=>{if(!cbOf(me).cards.length){toast("Thêm thẻ hoàn tiền trước");return}meGoPlan(true)});
 $("#meAvPick").addEventListener("click",()=>$("#meAvFile").click());
@@ -2905,7 +2915,7 @@ function cbShowLock(){$("#cbLock").hidden=cbOk;$("#cbSeg").hidden=true;
 $("#cbLock").addEventListener("submit",async e=>{e.preventDefault();
   const ok=(await hashPass($("#cbPass").value.trim()))===CB_HASH;$("#cbPass").value="";$("#cbPassErr").hidden=ok;if(!ok)return;
   cbOk=true;try{sessionStorage.setItem("kmt.cbUnlock","1")}catch(err){}cbShowLock();renderCb();if(!$("#cpView").hidden){renderPlan();cpPageTitle()}
-  if(cbGoPlan){const m=cbGoPlan==="make";cbGoPlan=false;if(m)cpMake(false)}cpPendFind()});
+  cbGoPlan=false;cpPendFind()});
 
 /* ---------- Đối chiếu ---------- */
 function ownsAt(rule,s){return[rule.name,...String(rule.aliases||"").split(",")].filter(x=>bkey(x)).map(canon).some(k=>s.banks.has(k))}
