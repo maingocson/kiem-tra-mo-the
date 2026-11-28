@@ -346,6 +346,21 @@ details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-detai
 .cfg-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cfg-g .cfg-w{grid-column:1/-1}
 .cfg-g textarea{font:inherit;width:100%;box-sizing:border-box}
 .cfg-st{font-family:var(--serif);font-size:15px}
+.cfg-sec{font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 0;border-top:1px solid var(--line);padding-top:8px}
+.cfg-lvt{display:grid;grid-template-columns:24px minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center}
+.cfg-lvc{grid-template-columns:24px minmax(0,1fr) minmax(0,1fr)}.cfg-lvw{grid-column:2/4;margin-top:6px}
+.cfg-lvt.c3{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr)}
+.cfg-lvt.c2{grid-template-columns:minmax(0,1.3fr) minmax(0,1.7fr)}
+.cfg-lvt>b{font-size:11px;font-weight:700;color:var(--muted);line-height:1.2}
+.cfg-lvt input{font-size:14px;padding:8px;min-width:0;width:100%;box-sizing:border-box}
+.cfg-lv{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:800;flex:none}
+.cfg-lv.lv1{background:var(--accent-soft);color:var(--accent)}
+.cfg-lv.lv2{background:var(--warn-soft);color:var(--warn)}
+.cfg-lv.lv3{background:var(--bad-soft);color:var(--bad)}
+.cfg-lvn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;min-width:0}
+.cfg-lvn span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cfg-sum{background:var(--accent-soft);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.5;color:var(--ink)}
+.cfg-sum .w{color:var(--warn);font-weight:700}
 .cfg-rs{background:var(--warn-soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .pc-c.wait{color:var(--warn);font-weight:700;font-size:12px;text-align:right}
 .cp-need{background:var(--bad-soft,#fde8e8);color:var(--bad);border-radius:8px;padding:6px 8px;font-size:13px}
@@ -2603,7 +2618,42 @@ function cfgRender(){cfgInfo();const T=cfgTables(),q=plain($("#cfgQ").value||"")
   $("#cfgList").innerHTML=list.length?list.map(x=>{const bank=x.r[bk]||"";const hd=bank!==prev?`<div class="cp-bankh" style="--c1:${cbCol(bank)[1]}"><i></i>${esc(bank)}</div>`:"";prev=bank;
     return hd+`<details class="cp-own g" data-cfg="${esc(x.id)}"${cfgOpen.has(x.id)?" open":""}><summary>${x.c?cbImg(x.c,1):""}<span class="cp-own-t"><b>${esc(x.r[nm]||x.id)}</b><small>${x.c?cfgChips(x.c):`<span class="bad">thiếu dữ liệu</span>`}</small></span></summary><div class="cp-own-b" data-body>${cfgOpen.has(x.id)?cfgBodyHtml(x.id):""}</div></details>`}).join("")
     :`<p class="note" style="margin:0">Không có thẻ khớp.</p>`}
-function cfgBodyHtml(id){const T=cfgTables(),c=cbAll().find(c=>c.id===id),g=cbCfg[id]||{},segs=g.segs||[];const ri=T.the.rows.findIndex(r=>r[0]===id);if(ri<0)return"";
+const cfgIn=(t,r,k,v,ph,num)=>`<input type="text"${num?' inputmode="numeric"':""} data-t="${t}" data-r="${r}" data-k="${k}" value="${esc(v||"")}"${ph?` placeholder="${esc(ph)}"`:""}>`;
+const cfgK=(G,h,used)=>{const i=G.h.indexOf(h);if(i>0&&used)used.add(i);return i};
+function cfgPick(t,ri,names,used){const G=cfgTables()[t];return names.map(h=>{const k=cfgK(G,h,used);return k>0?cfgField(t,ri,k,h,G.rows[ri][k]):""}).join("")}
+function cfgRest(t,ri,used){const G=cfgTables()[t];return G.h.map((h,k)=>k===0||used.has(k)?"":cfgField(t,ri,k,h,G.rows[ri][k])).join("")}
+/* tên các mức của thẻ (mức trống tên = không có, trừ mức 1) */
+function cfgLvNames(id){const G=cfgTables().the,r=G.rows.find(r=>r[0]===id)||[];const out=[];for(let n=1;n<=3;n++){const k=G.h.indexOf(`Mức ${n}`),v=k>0?String(r[k]||"").trim():"";if(n===1||v)out.push([n,v||`Mức ${n}`]);else break}return out}
+const cfgMoney=v=>{const n=cbN(v);return n==null?"":n>=1e6?cpTrS(n)+"tr":cpVnd(n)+"đ"};
+function cfgLvSum(id){const G=cfgTables().the,r=G.rows.find(r=>r[0]===id);if(!r)return"";const val=h=>{const k=G.h.indexOf(h);return k>0?String(r[k]||"").trim():""};
+  const by=plain(val("Xếp mức theo")),lv=cfgLvNames(id),from=lv.map(([n])=>cbN(val(`Mức ${n} từ`)));
+  const spend=!/lien truoc/.test(by)&&(/tong chi/.test(by)||(!by&&(from[0]||0)>0)),prev=/lien truoc/.test(by);
+  const cap=n=>{for(let m=n;m>=1;m--){const v=cbN(val(`Trần thẻ M${m}`));if(v!=null)return v}return null};
+  const L=[];
+  if(spend||prev){if((from[0]||0)>0)L.push(`Chi dưới ${cfgMoney(from[0])}: <b>không được hoàn</b>.`);
+    lv.forEach(([n,nm],i)=>{const a=from[i]||0,b=from[i+1],c=cap(n);L.push(`<span class="cfg-lv lv${n}">${n}</span> ${esc(nm)}: chi ${b!=null?`từ ${cfgMoney(a)||"0đ"} đến dưới ${cfgMoney(b)}`:`từ ${cfgMoney(a)||"0đ"} trở lên`} → dùng cột M${n}${c!=null?`, cả thẻ tối đa ${cfgMoney(c)}`:""}.`)});
+    if(prev)L.push("Mức được xếp theo tổng chi <b>kỳ liền trước</b>.");
+    for(let i=1;i<from.length;i++)if(from[i]==null||from[i]<=(from[i-1]||0)){L.push(`<span class="w">Mức ${i+1} từ phải lớn hơn Mức ${i} từ.</span>`);break}}
+  else{L.push(`Xếp mức theo “${esc(val("Xếp mức theo")||"không ghi")}”: khách tự chọn mức khi thêm thẻ, cột “Chi từ” không dùng.`);
+    lv.forEach(([n,nm])=>{const c=cap(n);L.push(`<span class="cfg-lv lv${n}">${n}</span> ${esc(nm)} → dùng cột M${n}${c!=null?`, cả thẻ tối đa ${cfgMoney(c)}`:""}.`)})}
+  return L.join("<br>")}
+/* bảng mức của thẻ: Tên mức – Chi từ – Trần cả thẻ */
+function cfgLvCard(id,ri,used){const T=cfgTables(),G=T.the,r=G.rows[ri];
+  const cell=(k,ph,num)=>k>0?cfgIn("the",ri,k,r[k],ph,num):"<span></span>";
+  let h=`<span></span><b>Chi từ (đồng)</b><b>Trần cả thẻ (đồng)</b>`;
+  for(let n=1;n<=3;n++){const kn=cfgK(G,`Mức ${n}`,used),kf=cfgK(G,`Mức ${n} từ`,used),kc=cfgK(G,`Trần thẻ M${n}`,used);
+    h+=`<span class="cfg-lv lv${n}">${n}</span><span class="cfg-lvw">${cell(kn,n===1?"Tên mức 1, VD Dưới 10tr":`Tên mức ${n} – trống = không có`,0)}</span><span></span>${cell(kf,n===1?"0":"",1)}${cell(kc,n===1?"không giới hạn":`như mức ${n-1}`,1)}`}
+  return`<div class="cfg-lvt cfg-lvc">${h}</div><div class="cfg-sum" data-lvsum>${cfgLvSum(id)}</div>`}
+/* bảng theo mức cho một dòng Nhóm / Trần chung */
+function cfgLvRow(t,i,id,used){const G=cfgTables()[t],r=G.rows[i],nm=cfgLvNames(id),isN=t==="nhom";
+  for(let n=1;n<=3;n++){cfgK(G,isN?`Tỷ lệ M${n} (%)`:`Trần M${n}`,used);cfgK(G,`Trần M${n}`,used)}
+  const cell=(h,ph,n)=>{const k=G.h.indexOf(h);return k>0?cfgIn(t,i,k,r[k],ph,1):"<span></span>"};
+  let h=isN?`<b>Mức</b><b>Tỷ lệ (%)</b><b>Trần (đồng)</b>`:`<b>Mức</b><b>Trần chung (đồng)</b>`;
+  nm.forEach(([n,x])=>{h+=`<span class="cfg-lvn"><span class="cfg-lv lv${n}">${n}</span><span data-lvname="${n}">${esc(x)}</span></span>`;
+    if(isN)h+=cell(`Tỷ lệ M${n} (%)`,n===1?"0":`như mức ${n-1}`,n);
+    h+=cell(`Trần M${n}`,n===1?"không giới hạn":`như mức ${n-1}`,n)});
+  return`<div class="cfg-lvt ${isN?"c3":"c2"}">${h}</div>`}
+function cfgBodyHtml(id){const T=cfgTables(),c=cbAll().find(c=>c.id===id),g=cbCfg[id]||{},segs=g.segs||[];const ri=T.the.rows.findIndex(r=>r[0]===id);if(ri<0)return"";const U=new Set();
   const def=c&&cpCalMonth(c)?"thang":"ky";
   const segHtml=segs.map((S,k)=>`<div class="cfg-seg" data-k="${k}"><label class="note cp-lab">Tên phân khúc<input type="text" data-f="n" value="${esc(S.n||"")}" placeholder="VD Diamond, Priority"></label>
     <div class="cp-cfg2"><label class="note cp-lab">Chi tối thiểu (tr)<input type="text" inputmode="decimal" data-f="min" value="${trIn(S.min)}" placeholder="VD 10"></label>
@@ -2611,16 +2661,28 @@ function cfgBodyHtml(id){const T=cfgTables(),c=cbAll().find(c=>c.id===id),g=cbCf
     <label class="note cp-lab">Trần hoàn (tr)<input type="text" inputmode="decimal" data-f="cap" value="${trIn(S.cap)}" placeholder="như thẻ"></label></div>
     <label class="note cp-lab">Cách chi để được hoàn<textarea rows="2" data-f="how" placeholder="VD giữ số dư 2 tỷ, chi qua ví…">${esc(S.how||"")}</textarea></label>
     <button class="x" type="button" data-seg-del="${k}">Xoá phân khúc</button></div>`).join("");
-  const sub=(t,title,addTxt)=>{const G=T[t],rows=G.rows.map((r,i)=>[r,i]).filter(([r])=>r[0]===id);
-    return`<div class="cbk" style="margin-top:6px">${title} (${rows.length})</div>${rows.map(([r,i])=>`<div class="cfg-seg"><b class="cfg-st">${esc(r[1]||"(chưa đặt tên)")}</b><div class="cfg-g">${G.h.map((h,k)=>k===0?"":cfgField(t,i,k,h,r[k])).join("")}</div><button class="x" type="button" data-row-del="${t}:${i}">Xoá dòng này</button></div>`).join("")}<button class="btn2" type="button" data-row-add="${t}">${addTxt}</button>`};
+  const tcNames=T.tc.rows.filter(r=>r[0]===id).map(r=>r[1]).filter(Boolean);
+  const sub=(t,title,addTxt,hint)=>{const G=T[t],rows=G.rows.map((r,i)=>[r,i]).filter(([r])=>r[0]===id);
+    return`<div class="cfg-sec">${title} (${rows.length})</div>${hint?`<p class="note" style="margin:0">${hint}</p>`:""}${rows.map(([r,i])=>{const used=new Set([1]);let b=`<b class="cfg-st">${esc(r[1]||"(chưa đặt tên)")}</b><div class="cfg-g">${cfgField(t,i,1,G.h[1],r[1])}</div>`+cfgLvRow(t,i,id,used);
+      if(t==="nhom"){b+=`<div class="note" style="font-weight:700">Áp dụng khi</div><div class="cfg-g">${cfgPick(t,i,["Được chọn","Kênh","Ngày","Đơn vị bán","MCC","MCC loại trừ"],used)}</div>`;
+        const kt=cfgK(G,"Nhóm trần chung",used);if(kt>0)b+=`<div class="cfg-g"><label class="note cp-lab cfg-w">Nhóm trần chung (dùng chung trần với nhóm khác – ghi đúng tên ở mục Trần chung)<input type="text" list="cfgTcL-${esc(id)}" data-t="${t}" data-r="${i}" data-k="${kt}" value="${esc(r[kt]||"")}" placeholder="${tcNames.length?"VD "+esc(tcNames[0]):"không có"}"></label></div>`}
+      else{const kn=G.h.indexOf("Nhóm trần chung"),mem=T.nhom.rows.filter(x=>x[0]===id&&String(x[T.nhom.h.indexOf("Nhóm trần chung")]||"").trim()===String(r[kn>0?kn:1]||"").trim()).map(x=>x[1]);
+        b+=`<div class="note">Gồm các nhóm: ${mem.length?esc(mem.join(", ")):`<span class="bad">chưa có nhóm nào ghi tên này</span>`}</div>`}
+      const rest=cfgRest(t,i,used);if(rest)b+=`<div class="cfg-g">${rest}</div>`;
+      return`<div class="cfg-seg">${b}<button class="x" type="button" data-row-del="${t}:${i}">Xoá dòng này</button></div>`}).join("")}<button class="btn2" type="button" data-row-add="${t}">${addTxt}</button>`};
   return`<div class="cbk">Chu kỳ &amp; miễn lãi</div><div class="cp-cfg"><label class="note cp-lab">Tính hoàn tiền theo<select data-f="basis"><option value="">${def==="thang"?"Tháng dương lịch":"Kỳ sao kê"} (theo thể lệ)</option><option value="ky"${g.basis==="ky"?" selected":""}>Kỳ sao kê</option><option value="thang"${g.basis==="thang"?" selected":""}>Tháng dương lịch</option></select></label>
     <label class="note cp-lab">Miễn lãi (ngày)<input type="number" inputmode="numeric" min="15" max="120" list="cpFreeL" data-f="free" value="${g.free?esc(g.free):""}" placeholder="45"></label></div>
     <div class="note">Ngày sao kê do từng khách nhập khi chọn thẻ. Hạn thanh toán = ngày sao kê của khách + (số ngày miễn lãi − 30).</div>
     <div class="cbk" style="margin-top:6px">Phân khúc khách (${segs.length})</div>${segs.length?"":`<p class="note" style="margin:0">Chưa có – khách đều tính theo điều kiện thông thường. Chi tối thiểu, số GD, trần của phân khúc thay cho điều kiện thông thường (mỗi kỳ).</p>`}${segHtml}
     <button class="btn2" type="button" data-seg-add="1">+ Thêm phân khúc</button>
-    <div class="cbk" style="margin-top:6px">Điều kiện thẻ</div><p class="note" style="margin:0">Số tiền ghi bằng đồng (VD 10000000), tỷ lệ ghi % (VD 0,5). Mã thẻ: ${esc(id)}.</p>
-    <div class="cfg-g">${T.the.h.map((h,k)=>k===0?"":cfgField("the",ri,k,h,T.the.rows[ri][k])).join("")}</div>
-    ${sub("nhom","Nhóm hoàn tiền","+ Thêm nhóm")}${sub("tc","Trần chung nhiều nhóm","+ Thêm trần chung")}
+    <div class="cbk" style="margin-top:6px">Điều kiện thẻ</div><p class="note" style="margin:0">Số tiền ghi bằng đồng (VD 10000000), tỷ lệ ghi % (VD 0,5). Mã thẻ: ${esc(id)}. Số <span class="cfg-lv lv1">1</span><span class="cfg-lv lv2">2</span><span class="cfg-lv lv3">3</span> là cùng một mức ở mọi bảng bên dưới.</p>
+    <div class="cfg-sec">Thông tin thẻ</div><div class="cfg-g">${cfgPick("the",ri,["Ngân hàng","Tên thẻ","Tổ chức thẻ","Trạng thái","Mức tin cậy","Phí thường niên","Phí ngoại tệ (%)","Hiệu lực từ","Hiệu lực đến"],U)}</div>
+    <div class="cfg-sec">Các mức hoàn tiền</div><div class="cfg-g">${cfgPick("the",ri,["Xếp mức theo","Chu kỳ"],U)}</div>
+    <p class="note" style="margin:0">Mỗi dòng là một mức. Chi đạt “Chi từ” thì lên mức đó. Ô trống ở mức 2, 3 lấy theo mức trên.</p>${cfgLvCard(id,ri,U)}
+    <div class="cfg-sec">Điều kiện chung cả thẻ</div><div class="cfg-g">${cfgPick("the",ri,["Hoàn cơ bản (%)","Số GD tối thiểu","Số nhóm được chọn","Trần năm","Ngưỡng đổi điểm","Cách nhận"],U)}</div>
+    <div class="cfg-sec">Ưu đãi, ghi chú</div><div class="cfg-g">${cfgPick("the",ri,["Ưu đãi mở mới","Loại trừ riêng","Ghi chú","Nguồn"],U)}${cfgRest("the",ri,U)}</div>
+    <datalist id="cfgTcL-${esc(id)}">${tcNames.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
+    ${sub("nhom","Nhóm hoàn tiền","+ Thêm nhóm","Tỷ lệ và trần của nhóm theo từng mức của thẻ ở trên. Trần trống = không giới hạn.")}${sub("tc","Trần chung nhiều nhóm","+ Thêm trần chung","Một trần dùng chung cho nhiều nhóm. Nhóm nào ghi tên này ở “Nhóm trần chung” sẽ cộng chung vào trần này.")}
     <button class="x" type="button" data-card-del="1" style="margin-top:8px">Xoá thẻ khỏi danh mục</button>`}
 function cfgReopen(d){const b=d.querySelector("[data-body]");b.innerHTML=cfgBodyHtml(d.dataset.cfg);const c=cbAll().find(c=>c.id===d.dataset.cfg);if(c)d.querySelector("summary small").innerHTML=cfgChips(c)}
 $("#cfgLock").addEventListener("submit",async e=>{e.preventDefault();const ok=(await hashPass($("#cfgPass").value.trim()))===PASS_HASH;$("#cfgPass").value="";$("#cfgErr").hidden=ok;if(!ok)return;
@@ -2641,7 +2703,7 @@ $("#cfgList").addEventListener("click",e=>{if(!unlocked)return;const t=e.target,
     if(T.the.rows.length&&cfgCommit()){cfgOpen.delete(id);delete cbCfg[id];cfgSave();cfgRender();toast("Đã xoá thẻ khỏi danh mục")}else cfgT=null}});
 $("#cfgList").addEventListener("change",e=>{const t=e.target;if(!unlocked)return;const d=t.closest("[data-cfg]");if(!d)return;
   if(t.dataset.t){const T=cfgTables(),G=T[t.dataset.t],r=G.rows[+t.dataset.r];if(!r)return;const k=+t.dataset.k,old=r[k];r[k]=t.value.trim();
-    if(cfgCommit()){toast("Đã lưu");const st=t.closest(".cfg-seg");if(st&&k===1){const b=st.querySelector(".cfg-st");if(b)b.textContent=t.value.trim()||"(chưa đặt tên)"}}else{r[k]=old;t.value=old}return}
+    if(cfgCommit()){toast("Đã lưu");if(t.dataset.t==="the"){const sm=d.querySelector("[data-lvsum]");if(sm)sm.innerHTML=cfgLvSum(d.dataset.cfg);const H=G.h[k],m=/^Mức (\d)$/.exec(H);if(m)d.querySelectorAll(`[data-lvname="${m[1]}"]`).forEach(x=>x.textContent=t.value.trim()||H)}const st=t.closest(".cfg-seg");if(st&&k===1){const b=st.querySelector(".cfg-st");if(b)b.textContent=t.value.trim()||"(chưa đặt tên)"}}else{r[k]=old;t.value=old}return}
   const f=t.dataset.f;if(!f)return;const g=cfgOf(t);const sg=t.closest(".cfg-seg[data-k]");
   if(sg){const S=g.segs[+sg.dataset.k];if(!S)return;
     if(f==="n"||f==="how")S[f]=t.value.trim();
