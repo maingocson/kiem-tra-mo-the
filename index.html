@@ -456,7 +456,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 .chip.acc{background:var(--accent-soft);color:var(--accent)}
 .today{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px}
 .today .td{cursor:pointer;padding:8px 0;font-size:14px}
-.cu-head{display:flex!important;flex-direction:row!important;align-items:center;gap:14px;text-align:left;padding:12px 14px}
+.cu-head{display:flex;flex-direction:row;align-items:center;gap:12px;text-align:left;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .cu-head .av.s64{width:52px;height:52px;font-size:21px}
 .cu-head .t{flex:1;min-width:0}.cu-head .t b{display:block;font-family:var(--serif);font-size:22px;overflow-wrap:anywhere}.cu-head .t small{color:var(--muted);font-size:13px}
 .cu-fn{display:flex;gap:14px;align-items:center;width:100%;font:inherit;color:var(--ink);text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 14px;cursor:pointer}
@@ -467,6 +467,11 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 .cu-fn .t small{font-size:13px;color:var(--muted);line-height:1.45}
 .cu-fn .t small b{font-family:inherit;font-size:inherit;color:var(--ink)}
 .cu-fn .go{color:var(--muted);font-size:24px}
+.cu-info{display:flex;flex-direction:column;gap:8px}
+.cu-dl{padding-top:2px;display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0;font-size:14px;line-height:1.4}
+.cu-dl dt{color:var(--muted);white-space:nowrap}
+.cu-dl dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.cu-dl dd small{display:block;color:var(--muted);font-size:13px}
 .cu-link{background:var(--warn-soft);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;flex-direction:column;gap:8px}
 .cu-link .row-btns{gap:6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -599,23 +604,24 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <!-- ===== TRANG KHÁCH ===== -->
   <div class="view" id="v-cust" hidden>
     <button class="crumb" type="button" data-back="custs">Danh sách khách</button>
-    <section class="panel cu-head"><span class="av s64" id="cuAv"></span><div class="t"><b id="cuName"></b><small id="cuSub"></small></div></section>
-    <button class="cu-fn" type="button" id="cuCheck"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg></span><span class="t"><b>Kiểm tra mở thẻ</b><small id="cuCheckS"></small></span><span class="go">›</span></button>
-    <button class="cu-fn" type="button" id="cuPlan"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="t"><b>Kế hoạch chi tiêu hoàn tiền</b><small id="cuPlanS"></small></span><span class="go">›</span></button>
-    <div id="cuLink"></div>
-    <details class="panel cp-step" id="cuInfoBox">
-      <summary><span class="cbk">Thông tin khách</span><span class="cp-sum" id="cuInfoS"></span></summary>
-      <div class="stack">
+    <section class="panel cu-info">
+      <div class="cu-head"><span class="av s64" id="cuAv"></span><div class="t"><b id="cuName"></b><small id="cuSub"></small></div><button class="btn2" type="button" id="cuEdit">✎ Sửa</button></div>
+      <dl class="cu-dl" id="cuDl"></dl>
+      <div class="stack" id="cuForm" hidden>
         <label class="f" for="cuNameIn">Tên khách hàng<input id="cuNameIn" type="text" placeholder="Họ và tên" autocomplete="off"></label>
         <div class="grid2">
           <label class="f" for="cuPhone">Số điện thoại<input id="cuPhone" type="tel" inputmode="tel" placeholder="Không bắt buộc" autocomplete="off"></label>
           <label class="f" id="cuStatL" for="cuStat">Trạng thái<select id="cuStat"></select></label>
         </div>
         <label class="f" id="cuNoteL" for="cuNote">Ghi chú<textarea id="cuNote" rows="2" placeholder="VD nhu cầu, lịch hẹn, thẻ khách quan tâm…"></textarea></label>
-        <p class="note" style="margin:0">Mọi thay đổi tự lưu trên máy.</p>
-        <button class="x" type="button" id="cuDel">Xoá khách này</button>
+        <p class="note" style="margin:0">Tự lưu khi sửa. Thẻ tín dụng, công việc, BHXH, nợ… sửa trong <b>Kiểm tra mở thẻ</b>.</p>
+        <div class="row-btns"><button class="btn2 acc" type="button" id="cuDone">Xong</button></div>
       </div>
-    </details>
+    </section>
+    <button class="cu-fn" type="button" id="cuCheck"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg></span><span class="t"><b>Kiểm tra mở thẻ</b><small id="cuCheckS"></small></span><span class="go">›</span></button>
+    <button class="cu-fn" type="button" id="cuPlan"><span class="ma-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.5 5.8 4.3 0 1.3-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.3v1.5"/></svg></span><span class="t"><b>Kế hoạch chi tiêu hoàn tiền</b><small id="cuPlanS"></small></span><span class="go">›</span></button>
+    <div id="cuLink"></div>
+    <button class="x" type="button" id="cuDel" style="align-self:flex-start;margin-top:6px">Xoá khách này</button>
   </div>
 
   <!-- ===== ĐIỀU KIỆN ===== -->
@@ -2220,7 +2226,6 @@ function renderPlanOut(){
   const left={};for(const k in needs){const v=needs[k]-(spentCat[k]||0);if(v>0)left[k]=v}
   const leftTot=Object.values(left).reduce((a,b)=>a+b,0);
   const P=cpOptimize(owned,left,true,fix,ctxs);
-  setPlanSum({per,cards:owned.length,cash:P.cash,spent,tot,cashNow});
   qsLeft={};P.cards.forEach(x=>{for(const k in x.sp)if(x.sp[k]>0)qsLeft[x.c.id+"|"+k]=x.sp[k]});
   const pct=Math.min(100,Math.round(spent/tot*100)),over=Object.keys(spentCat).filter(k=>spentCat[k]>(needs[k]||0)+1);
   /* điều kiện chưa đủ theo số đã quẹt: chưa đủ thì tiền hoàn của thẻ chưa được tính là chắc chắn */
@@ -3032,7 +3037,8 @@ function saveCustomer(){
   if(!cust.id)cust.id=newCustId();cust.example=false;save(K_CUST,cust);custSync(true);showSavedTag();toast(`Đã lưu khách ${custTitle()} (app cũng tự lưu khi sửa)`);
 }
 /* tóm tắt kế hoạch tháng để hiện ở danh sách và trang khách */
-function setPlanSum(o){cust.planSum=Object.assign({at:new Date().toISOString()},o);if(cust.isMe){me=cust;save(K_ME,me)}else{save(K_CUST,cust);custSync()}}
+function setPlanSum(o){const old=cust.planSum||{},same=Object.keys(o).every(k=>old[k]===o[k])&&Object.keys(old).every(k=>k==="at"||k in o);if(same)return;
+  cust.planSum=Object.assign({at:new Date().toISOString()},o);if(cust.isMe){me=cust;save(K_ME,me)}else{save(K_CUST,cust);custSync()}}
 const CS_ST={moi:["Mới","ch"],tuvan:["Đang tư vấn","warn"],damo:["Đã mở thẻ","ok"],theodoi:["Theo dõi chi tiêu","acc"]};
 const custHasCredit=c=>!!(c.cic||(c.rows||[]).some(r=>String(r.bank||"").trim()));
 const custAutoSt=c=>c.cb&&c.cb.cards&&c.cb.cards.length?"theodoi":custHasCredit(c)?"tuvan":"moi";
@@ -3085,7 +3091,7 @@ function renderToday(all){const items=[],per=cpNowPer();
   $("#csToday").innerHTML=items.length?`<div class="today"><div class="cp-todo-h"><span class="cbk" style="margin:0">Việc hôm nay</span><span>${items.length} việc</span></div>${items.slice(0,5).map(row).join("")}${items.length>5?`<details class="grp"><summary>Xem thêm ${items.length-5} việc</summary>${items.slice(5).map(row).join("")}</details>`:""}</div>`:""}
 function openCust(id){custFlush();
   if(id==="me")cust=me;else{const rec=custList().find(x=>x.id===id);if(!rec)return;cust=clone(rec.cust);cust.id=rec.id;cust.example=false}
-  cicFiles={};xState=null;$("#results").hidden=true;cpStep1Init=null;saveCust();showTab("cust")}
+  cicFiles={};xState=null;$("#results").hidden=true;cpStep1Init=null;save(K_CUST,cust.isMe?{isMe:true}:cust);renderWho();showTab("cust")}
 /* trang khách */
 function renderCustPage(){const c=cust,isMe=!!c.isMe,st=CS_ST[custSt(c)];
   $("#cuAv").innerHTML=avHtml(isMe?me:{name:c.name});$("#cuName").textContent=custTitle();
@@ -3101,15 +3107,25 @@ function renderCustPage(){const c=cust,isMe=!!c.isMe,st=CS_ST[custSt(c)];
   const ob=new Set(cpOwnedOf(c).map(o=>canon(o.c.bank))),seen=new Set(),miss=[];let all=[];try{all=cbAll()}catch(e){}
   (c.rows||[]).forEach(r=>{const b=String(r.bank||"").trim();if(!b||!(num(r.cards)>0))return;const k=canon(b);if(ob.has(k)||seen.has(k))return;seen.add(k);if(all.some(x=>canon(x.bank)===k))miss.push(b)});
   $("#cuLink").innerHTML=miss.length?`<div class="cu-link"><span>Khách đang có thẻ tín dụng ở <b>${miss.map(esc).join(", ")}</b> (theo CIC/hồ sơ) nhưng chưa có trong kế hoạch hoàn tiền. Bấm tên ngân hàng để chọn đúng dòng thẻ:</span><div class="row-btns">${miss.map(b=>`<button class="btn2" type="button" data-cu-find="${esc(b)}">＋ ${esc(b)}</button>`).join("")}</div></div>`:"";
-  /* thông tin */
+  /* thông tin đầy đủ */
+  const rec=isMe?null:custList().find(x=>x.id===c.id),rows=(c.rows||[]).filter(r=>String(r.bank||"").trim()),dd=(k,v)=>v?`<dt>${k}</dt><dd>${v}</dd>`:"";
+  const cbNames=cpOwnedOf(c).map(o=>esc(o.c.bank+" "+o.c.name));
+  $("#cuDl").innerHTML=[isMe?"":dd("Ghi chú",esc(c.note||"–")),
+    dd("Công việc",esc(jobTxt(c.job)||"–")+` · ${c.bhxh?"có":"không"} BHXH`),
+    dd("Tín dụng",`${esc(debtTxt(c))} · ${+c.finCos||0} công ty tài chính`),
+    dd("Thẻ tín dụng",rows.length?`${fmt(s1.cards)} thẻ · HM ${fmt(s1.limit)} tr · dùng ${Math.round(s1.util)}%`+rows.map(r=>`<small>${esc(r.bank)}: ${esc(r.cards||1)} thẻ · HM ${esc(r.limit||"?")} tr · đã dùng ${esc(r.used||0)} tr</small>`).join(""):"Chưa nhập"),
+    dd("CIC",c.cic?`${c.cic.at?"ngày "+esc(String(c.cic.at)):"đã đọc"}${c.cic.rank?" · hạng "+esc(String(c.cic.rank)):""}${c.cic.score?" · "+esc(String(c.cic.score))+" điểm":""}`:"Chưa đọc CIC"),
+    dd("Thẻ hoàn tiền",cbNames.length?cbNames.join(", "):"Chưa có"),
+    rec?dd("Lưu",`tạo ${esc(fmtTime(rec.created||rec.at))}<small>sửa gần nhất ${esc(fmtTime(rec.at))}</small>`):""].join("");
   $("#cuNameIn").value=c.name||"";$("#cuPhone").value=c.phone||"";$("#cuNote").value=c.note||"";
   $("#cuStatL").hidden=isMe;$("#cuNoteL").hidden=isMe;$("#cuDel").hidden=isMe;
   $("#cuStat").innerHTML=`<option value="">Tự động: ${CS_ST[custAutoSt(c)][0]}</option>`+Object.entries(CS_ST).map(([k,v])=>`<option value="${k}"${c.status===k?" selected":""}>${v[0]}</option>`).join("");
-  $("#cuInfoS").textContent=isMe?"":(c.note?String(c.note).slice(0,30):"");
-  if(!String(c.name||"").trim()&&!isMe)$("#cuInfoBox").open=true}
+  const ed=!String(c.name||"").trim()&&!isMe;$("#cuForm").hidden=!ed;$("#cuDl").hidden=ed;$("#cuEdit").hidden=ed}
+$("#cuEdit").addEventListener("click",()=>{$("#cuForm").hidden=false;$("#cuDl").hidden=true;$("#cuEdit").hidden=true;setTimeout(()=>$("#cuNameIn").focus(),50)});
+$("#cuDone").addEventListener("click",()=>{renderCustPage();$("#cuForm").hidden=true;$("#cuDl").hidden=false;$("#cuEdit").hidden=false});
 [["#cuNameIn","name"],["#cuPhone","phone"],["#cuNote","note"]].forEach(([sel,f])=>$(sel).addEventListener("input",e=>{cust[f]=e.target.value;edited();
   $("#cuName").textContent=custTitle();$("#tbTitle").textContent=custTitle();renderCrumbs();$("#cuAv").innerHTML=avHtml(cust.isMe?me:{name:cust.name})}));
-$("#cuStat").addEventListener("change",e=>{if(e.target.value)cust.status=e.target.value;else delete cust.status;edited();renderCustPage()});
+$("#cuStat").addEventListener("change",e=>{if(e.target.value)cust.status=e.target.value;else delete cust.status;edited();const st=CS_ST[custSt(cust)];$("#cuSub").innerHTML=`${cust.phone?esc(cust.phone)+" · ":""}<span class="chip ${st[1]}">${st[0]}</span>`});
 $("#cuDel").addEventListener("click",e=>{const b=e.currentTarget;if(cust.isMe)return;
   if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Bấm lần nữa để xoá hẳn khách này";setTimeout(()=>{b.dataset.sure="";b.textContent="Xoá khách này"},3000);return}
   b.dataset.sure="";b.textContent="Xoá khách này";clearTimeout(recT);recT=null;const id=cust.id,nm=custTitle();
