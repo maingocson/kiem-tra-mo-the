@@ -154,10 +154,10 @@ Xem chính sách hoàn tiền của các thẻ tín dụng: tỷ lệ và trần
 - **Chưa đủ điều kiện thì chưa tính hoàn**: thẻ thiếu số giao dịch, thiếu chi tiêu tối thiểu hoặc điểm chưa đủ thì "Đã được hoàn" = 0, thẻ hiện "chờ ĐK", và ô "Trong đó chờ đủ điều kiện" tách riêng phần tiền hoàn chưa chắc. Cảnh báo ghi rõ cần chi thêm bao nhiêu, thêm mấy giao dịch.
 - **Chu kỳ & phân khúc** (menu trái → Cấu hình → *Chu kỳ & phân khúc thẻ hoàn tiền*, cần mật khẩu quản lý như tab Điều kiện). Cài cho từng dòng thẻ:
   - *Tính hoàn tiền theo*: kỳ sao kê hoặc tháng dương lịch (mặc định theo thể lệ).
-  - *Ngày sao kê* (1–31, 31 = cuối tháng): kỳ theo sao kê bắt đầu từ ngày hôm sau; ngày 29–31 tự dồn về cuối tháng ở tháng ngắn.
-  - *Miễn lãi* (45, 50, 55, 60 ngày…, mặc định 45): hạn thanh toán = ngày sao kê + (số ngày miễn lãi − 30). App nhắc khi còn ≤ 7 ngày tới hạn của kỳ có giao dịch.
+  - *Miễn lãi* (45, 50, 55, 60 ngày…, mặc định 45): hạn thanh toán = ngày sao kê của khách + (số ngày miễn lãi − 30). App nhắc khi còn ≤ 7 ngày tới hạn của kỳ có giao dịch.
   - *Phân khúc khách* (VD Premier, Diamond): tên, chi tối thiểu/kỳ, số giao dịch tối thiểu, trần hoàn/kỳ, cách chi để được hoàn. Các số này **thay** điều kiện thông thường của thẻ cho khách thuộc phân khúc đó.
-  - Danh sách thẻ của tôi/của khách chỉ hiện thông tin chu kỳ (không sửa được) và cho **chọn phân khúc** của khách.
+  - **Ngày sao kê do từng khách nhập** khi chọn thẻ (bước 1, bấm vào thẻ; 1–31, 31 = cuối tháng), vì nhiều ngân hàng cho đổi ngày sao kê. Kỳ theo sao kê bắt đầu từ ngày hôm sau; ngày 29–31 tự dồn về cuối tháng ở tháng ngắn. Chưa nhập thì lấy theo thể lệ nếu có.
+  - Danh sách thẻ của tôi/của khách: nhập ngày sao kê, **chọn phân khúc**; kiểu chu kỳ và số ngày miễn lãi chỉ xem, không sửa được.
   - Lưu ở khoá `kmt.cbCfg.v1`, có trong file sao lưu toàn bộ.
 - **Nhiều thẻ (50+)**: danh sách thẻ gọn theo ngân hàng, lọc nhanh; kế hoạch chỉ xét các thẻ hợp từng loại chi tiêu nên vẫn nhanh (46 thẻ, 1.000 giao dịch: ~0,1 giây); thẻ không dùng trong tháng được gom lại; giao dịch tháng này lọc theo thẻ, hiện 10 khoản mới nhất.
 
