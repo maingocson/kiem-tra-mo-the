@@ -487,6 +487,8 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
 .lv{display:inline-block;font-size:11px;font-weight:800;border-radius:99px;padding:1px 7px;margin-right:4px}
 .lv.ok{background:var(--ok-soft);color:var(--ok)}.lv.warn{background:var(--warn-soft);color:var(--warn)}.lv.bad{background:var(--bad-soft);color:var(--bad)}.lv.ch{background:var(--sunk);color:var(--muted)}
 #cpView[data-page=list] [data-pg=detail],#cpView[data-page=detail] [data-pg=list]{display:none!important}
+.hm-me{margin-bottom:12px}.hm-me .av{width:44px;height:44px;font-size:17px}
+.hm-bar{display:block;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;margin-top:6px}.hm-bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
 .pl-hint{display:flex;gap:10px;align-items:center;background:var(--accent-soft);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.4}
 .pl-hint svg{width:26px;height:26px;flex:none;color:var(--accent)}
 .pl-chev{flex:none;font-size:22px;line-height:1;color:var(--muted);margin-left:-2px}
@@ -634,6 +636,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <!-- ===== TRANG CHỦ: việc cần làm ===== -->
   <div class="view" id="v-home" hidden>
     <section class="hm-head"><b id="hmHi"></b><small id="hmDate"></small></section>
+    <div id="hmMe"></div>
     <div class="hm-stats" id="hmStats"></div>
     <div id="hmTodo" class="stack"></div>
   </div>
@@ -3514,14 +3517,26 @@ function homeItems(){const all=custRecs(),G={due:[],cond:[],plan:[],check:[]};le
     custAlerts(c,isMe?null:x.id+"|"+x.at).forEach(u=>{if(u.type==="cond")G.cond.push({id:x.id,go:"plan",ic:"warn",k:u.dl,nm,t:`${esc(u.c.bank+" "+u.c.name)}: ${esc(cpCondTxt(u.u))}`,s:`kỳ tính hoàn hết ${cpDM(u.end)} · ${u.dl>0?`còn ${u.dl+1} ngày`:"hôm nay"} · chưa đủ thì kỳ này 0đ`});
       else G.due.push({id:x.id,go:"plan",ic:"due",k:u.dl,nm,t:`${u.type==="over"?'<b class="bad">Quá hạn</b> ':""}Thanh toán sao kê ${esc(u.c.bank+" "+u.c.name)} ${cbMoney(u.amt)}`,s:`sao kê ${cpDM(u.close)} · hạn ${cpDM(u.due)} · ${u.dl<0?`quá ${-u.dl} ngày`:u.dl?`còn ${u.dl} ngày`:"hôm nay"}`})});
     const{ap,ps}=psCur(c);if(ps)cash+=ps.cash||0;
-    if(n&&!ap)G.plan.push({id:x.id,go:"plan",ic:"warn",k:1,nm,t:"Chưa có kế hoạch chi tiêu đang áp dụng",s:`${n} thẻ hoàn tiền · bấm để lập kế hoạch`});
+    if(isMe){}else if(n&&!ap)G.plan.push({id:x.id,go:"plan",ic:"warn",k:1,nm,t:"Chưa có kế hoạch chi tiêu đang áp dụng",s:`${n} thẻ hoàn tiền · bấm để lập kế hoạch`});
     else if(ps&&ps.todo>(ps.done||0))G.plan.push({id:x.id,go:"plandetail",ic:"warn",k:0,nm,t:`${ps.todo-(ps.done||0)} việc chưa xong trong kế hoạch ${cpDM(dParse(ap.from))}–${cpDM(dParse(ap.to))}`,s:`${ps.done||0}/${ps.todo} việc hoàn tất${ps.tot?` · đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)}`:""}`});
     if(!isMe&&!custHasCredit(c)&&custSt(c)!=="damo")G.check.push({id:x.id,go:"check",ic:"warn",k:0,nm,t:"Chưa nhập thẻ tín dụng / CIC",s:"nhập để kiểm tra ngân hàng mở được"})});
   G.due.sort((a,b)=>a.k-b.k);G.cond.sort((a,b)=>a.k-b.k);G.plan.sort((a,b)=>a.k-b.k);return{G,all,cash}}
+/* Trang chủ: ô "Kế hoạch chi tiêu của tôi" luôn hiện khi bạn có thẻ hoàn tiền */
+function hmMeHtml(){const d=cbOf(me),n=d.cards.length;if(!n)return"";const{ap,ps}=psCur(me),t0=dToday();let t,L=[],bar="";
+  if(ap){const f=dParse(ap.from),to=dParse(ap.to),Ld=dDiff(f,to)+1,left=dDiff(t0,to)+1;t=`Kế hoạch của tôi · ${cpDM(f)}–${cpDM(to)}`;
+    L.push(`<span class="chip ok">Đang hoạt động</span> còn ${left}/${Ld} ngày${ps&&ps.tot?` · dự kiến hoàn <b>${cbMoney(ps.cash)}</b>`:""}`);
+    if(ps&&ps.tot){const pc=Math.min(100,Math.round(ps.spent/ps.tot*100));L.push(`Đã chi ${cbMoney(ps.spent)}/${cbMoney(ps.tot)} (${pc}%)`);bar=`<span class="hm-bar"><i style="width:${pc}%"></i></span>`}
+    if(ps&&ps.todo){const r=ps.todo-(ps.done||0);L.push(r?`<b style="color:var(--warn)">${r} việc chưa xong</b> · ${ps.done||0}/${ps.todo} hoàn tất`:`Việc cần làm: ${ps.todo}/${ps.todo} hoàn tất`)}
+    if(!ps)L.push("Bấm để mở kế hoạch và cập nhật số liệu")}
+  else{const nx=d.plans.find(x=>cpStOf(x)==="next");t="Kế hoạch chi tiêu của tôi";L.push(`<b style="color:var(--warn)">Chưa có kế hoạch đang hoạt động</b>`,nx?`Kế hoạch sắp tới ${cpPlanTitle(nx)}`:`${n} thẻ hoàn tiền · bấm để lập kế hoạch`)}
+  return`<button class="cu-fn hm-me" type="button" data-hm="me"><span class="av">${avHtml(me)}</span><span class="t"><b>${t}</b><small>${L.join("<br>")}</small>${bar}</span><span class="go">›</span></button>`}
+const meT0=()=>{const mp=psCur(me);return(mp.ap&&mp.ps&&mp.ps.todo>(mp.ps.done||0))||(!mp.ap&&cbOf(me).cards.length)};
 function renderHome(){custFlush();const{G,all,cash}=homeItems(),now=new Date(),per=cpNowPer(),h=now.getHours();
   $("#hmHi").textContent=`${h<11?"Chào buổi sáng":h<14?"Chào buổi trưa":h<18?"Chào buổi chiều":"Chào buổi tối"}${me.name?", "+me.name.trim().split(/\s+/).pop():""}`;
   $("#hmDate").textContent=now.toLocaleDateString("vi-VN",{weekday:"long",day:"numeric",month:"numeric",year:"numeric"});
-  const nTodo=G.due.length+G.cond.length+G.plan.length+G.check.length;
+  $("#hmMe").innerHTML=hmMeHtml();
+  const meT=meT0()?1:0;
+  const nTodo=G.due.length+G.cond.length+G.plan.length+G.check.length+meT;
   $("#hmStats").innerHTML=`<button type="button" class="hm-st${nTodo?" w":""}" data-hm="todo"><span>Việc cần làm</span><b>${nTodo}</b></button>
     <button type="button" class="hm-st${G.due.length?" w":""}" data-hm="due"><span>Thanh toán sắp/quá hạn</span><b>${G.due.length}</b></button>
     <button type="button" class="hm-st a" data-hm="custs"><span>Khách hàng</span><b>${all.length}</b></button>
@@ -3531,7 +3546,7 @@ function renderHome(){custFlush();const{G,all,cash}=homeItems(),now=new Date(),p
   $("#hmTodo").innerHTML=nTodo?grp("due","Thanh toán sao kê",G.due)+grp("cond","Sắp hết kỳ tính hoàn, chưa đủ điều kiện",G.cond)+grp("plan","Kế hoạch chi tiêu",G.plan)+grp("check","Kiểm tra mở thẻ",G.check)
     :`<div class="today hm-empty"><b>Không có việc cần làm</b><span class="note">Hạn thanh toán, kỳ tính hoàn sắp hết, kế hoạch chưa xong và khách chưa kiểm tra sẽ hiện ở đây.</span><button class="btn2 acc" type="button" data-hm="custs">Mở danh sách khách</button></div>`}
 $("#v-home").addEventListener("click",e=>{if(e.target.closest("summary"))return;const s=e.target.closest("[data-hm]");
-  if(s){const k=s.dataset.hm;if(k==="custs")showTab("custs");else{const el=k==="due"?$("#hm-due"):$("#hmTodo .today");if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}return}
+  if(s){const k=s.dataset.hm;if(k==="me"){meGoPlan(true);return}if(k==="custs")showTab("custs");else{const el=k==="due"?$("#hm-due"):meT0()?$("#hmMe"):$("#hmTodo .today");if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}return}
   const o=e.target.closest("[data-open]");if(o)openCust(o.dataset.open,o.dataset.go)});
 function openCust(id,go){custFlush();cpSelId=null;cpNewOpen=false;cpEditEnd=false;
   if(id==="me")cust=me;else{const rec=custList().find(x=>x.id===id);if(!rec)return;cust=clone(rec.cust);cust.id=rec.id;cust.example=false}
