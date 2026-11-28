@@ -343,6 +343,10 @@ details.cp-own>summary::-webkit-details-marker,details.pc>summary::-webkit-detai
 .cp-lab select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
 .cfg-seg{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
 .cfg-seg textarea{font:inherit;width:100%;box-sizing:border-box}
+.cfg-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cfg-g .cfg-w{grid-column:1/-1}
+.cfg-g textarea{font:inherit;width:100%;box-sizing:border-box}
+.cfg-st{font-family:var(--serif);font-size:15px}
+.cfg-rs{background:var(--warn-soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .pc-c.wait{color:var(--warn);font-weight:700;font-size:12px;text-align:right}
 .cp-need{background:var(--bad-soft,#fde8e8);color:var(--bad);border-radius:8px;padding:6px 8px;font-size:13px}
 .cp-alerts{background:var(--warn-soft);border-radius:10px;padding:8px 10px}
@@ -680,15 +684,29 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <!-- ===== TÔI ===== -->
   <div class="view" id="v-cbcfg" hidden>
     <form class="panel stack" id="cfgLock" autocomplete="off">
-      <h2>Chu kỳ &amp; phân khúc thẻ hoàn tiền</h2>
+      <h2>Danh mục thẻ hoàn</h2>
       <p class="note" style="margin:0">Chỉ quản lý được sửa. Nhập mật khẩu quản lý (như tab Điều kiện).</p>
       <label class="f" for="cfgPass">Mật khẩu<input id="cfgPass" type="password" inputmode="numeric" autocomplete="off"></label>
       <div class="row-btns"><button class="btn2 acc" type="submit">Mở khoá</button><span class="note" id="cfgErr" hidden>Sai mật khẩu</span></div>
     </form>
     <div class="stack" id="cfgBody" hidden>
       <div class="panel stack">
-        <div class="row-btns" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Chu kỳ &amp; phân khúc</h2><button class="ghost" id="cfgLockAgain" type="button">Khoá lại</button></div>
-        <p class="note" style="margin:0">Cài cho từng dòng thẻ: tính hoàn theo kỳ sao kê hay tháng dương lịch, số ngày miễn lãi, và các <b>phân khúc khách</b> có yêu cầu riêng (VD khách Diamond/Priority chi tối thiểu khác, số giao dịch khác, trần khác). Ngày sao kê do từng khách tự nhập khi chọn thẻ; khách chọn phân khúc nhưng không sửa được phần này. Lưu ngay trên máy, có trong file sao lưu toàn bộ.</p>
+        <div class="row-btns" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Danh mục thẻ hoàn</h2><button class="ghost" id="cfgLockAgain" type="button">Khoá lại</button></div>
+        <p class="note" style="margin:0" id="cfgInfo"></p>
+        <div class="row-btns" style="flex-wrap:wrap">
+          <button class="btn2 acc" id="cfgXlsx" type="button">Sao lưu ra Excel</button>
+          <button class="btn2" id="cfgCsv" type="button">Sao lưu CSV</button>
+          <button class="btn2" id="cfgRs" type="button">Phục hồi từ file</button>
+          <button class="ghost" id="cfgReset" type="button">Về dữ liệu gốc</button>
+        </div>
+        <input type="file" id="cfgFile" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden>
+        <div class="cfg-rs" id="cfgRsBox" hidden><span id="cfgRsMsg"></span><div class="row-btns"><button class="btn2 acc" id="cfgRsOk" type="button">Phục hồi</button><button class="ghost" id="cfgRsNo" type="button">Huỷ</button></div></div>
+        <p class="note" style="margin:0">File Excel gồm các trang: <b>Thẻ</b>, <b>Nhóm</b>, <b>Trần chung</b>, <b>Loại trừ</b>, <b>Chu kỳ &amp; phân khúc</b> – đúng cột như dữ liệu của app. Sửa trong Excel rồi phục hồi lại được; CSV thì mỗi trang một file (chọn nhiều file một lần).</p>
+      </div>
+      <div class="panel stack">
+        <details class="grp" id="cfgNewBox"><summary>+ Thêm thẻ mới vào danh mục</summary>
+          <div class="cp-cfg2" style="margin-top:8px"><label class="note cp-lab">Mã thẻ<input id="cfgNewId" type="text" placeholder="vd tcb-abc" autocapitalize="off"></label><label class="note cp-lab">Ngân hàng<input id="cfgNewBank" type="text"></label><label class="note cp-lab">Tên thẻ<input id="cfgNewName" type="text"></label></div>
+          <button class="btn2 acc" id="cfgNewAdd" type="button" style="margin-top:8px">Thêm thẻ</button></details>
         <input id="cfgQ" class="cp-q" type="text" placeholder="Lọc thẻ: tên thẻ, ngân hàng" aria-label="Lọc thẻ">
         <div id="cfgList" class="stack"></div>
       </div>
@@ -769,7 +787,7 @@ tr.cp-row{cursor:pointer} tr.cp-row td:not(:first-child){white-space:nowrap} tr.
   <hr>
   <div class="dr-sec">Cấu hình</div>
   <button class="dr-item" type="button" data-go="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>Điều kiện mở thẻ</button>
-  <button class="dr-item" type="button" data-go="cbcfg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Chu kỳ &amp; phân khúc thẻ hoàn tiền</button>
+  <button class="dr-item" type="button" data-go="cbcfg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Danh mục thẻ hoàn</button>
   <hr>
   <div class="dr-sec">Sao lưu &amp; phục hồi</div>
   <button class="dr-item" type="button" data-go="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Sao lưu toàn bộ ra file</button>
@@ -2541,52 +2559,167 @@ $("#lockAgain").addEventListener("click",()=>{
   showLock();showAdmin();
 });
 
-/* ---------- Cấu hình chu kỳ & phân khúc thẻ hoàn tiền (chỉ quản lý) ---------- */
+/* ---------- Danh mục thẻ hoàn (chỉ quản lý): chu kỳ, miễn lãi, phân khúc, điều kiện thẻ/nhóm/trần chung; sao lưu & phục hồi Excel/CSV ---------- */
 const cfgOpen=new Set();
 function cfgSave(){save(K_CBCFG,cbCfg)}
-function cfgShow(){$("#cfgLock").hidden=unlocked;$("#cfgBody").hidden=!unlocked;if(unlocked)cfgRender();else setTimeout(()=>$("#cfgPass").focus(),50)}
+function cfgShow(){$("#cfgLock").hidden=unlocked;$("#cfgBody").hidden=!unlocked;if(unlocked){cfgT=null;cfgRender()}else setTimeout(()=>$("#cfgPass").focus(),50)}
 const trIn=v=>v?String(Math.round(v/1e4)/100).replace(".",","):"";
-function cfgRender(){const q=plain($("#cfgQ").value||"");const list=cbAll().filter(c=>!q||plain(c.bank+" "+c.name).includes(q));let prev=null;
-  $("#cfgList").innerHTML=list.length?list.map(c=>{const g=cpCfg(c),segs=g.segs||[],def=cpCalMonth(c)?"thang":"ky";
-    const hd=c.bank!==prev?`<div class="cp-bankh" style="--c1:${cbCol(c.bank)[1]}"><i></i>${esc(c.bank)}</div>`:"";prev=c.bank;
-    const chips=[cpBasis(c)==="thang"?"Tháng dương lịch":"Kỳ sao kê",`miễn lãi ${cpFree(c)} ngày`,segs.length?`${segs.length} phân khúc`:""].filter(Boolean).join(" · ");
-    const segHtml=segs.map((S,k)=>`<div class="cfg-seg" data-k="${k}"><label class="note cp-lab">Tên phân khúc<input type="text" data-f="n" value="${esc(S.n||"")}" placeholder="VD Diamond, Priority"></label>
-      <div class="cp-cfg2"><label class="note cp-lab">Chi tối thiểu (tr)<input type="text" inputmode="decimal" data-f="min" value="${trIn(S.min)}" placeholder="VD 10"></label>
-      <label class="note cp-lab">Số GD tối thiểu<input type="number" inputmode="numeric" min="0" data-f="txn" value="${S.txn!=null&&S.txn!==""?esc(S.txn):""}" placeholder="${c.minTxn||"không"}"></label>
-      <label class="note cp-lab">Trần hoàn (tr)<input type="text" inputmode="decimal" data-f="cap" value="${trIn(S.cap)}" placeholder="như thẻ"></label></div>
-      <label class="note cp-lab">Cách chi để được hoàn<textarea rows="2" data-f="how" placeholder="VD giữ số dư 2 tỷ, chi qua ví…">${esc(S.how||"")}</textarea></label>
-      <button class="x" type="button" data-seg-del="${k}">Xoá phân khúc</button></div>`).join("");
-    return hd+`<details class="cp-own g" data-cfg="${esc(c.id)}"${cfgOpen.has(c.id)?" open":""}><summary>${cbImg(c,1)}<span class="cp-own-t"><b>${esc(c.name)}</b><small>${chips}</small></span></summary>
-      <div class="cp-own-b"><div class="cp-cfg"><label class="note cp-lab">Tính hoàn tiền theo<select data-f="basis"><option value="">${def==="thang"?"Tháng dương lịch":"Kỳ sao kê"} (theo thể lệ)</option><option value="ky"${g.basis==="ky"?" selected":""}>Kỳ sao kê</option><option value="thang"${g.basis==="thang"?" selected":""}>Tháng dương lịch</option></select></label>
-      <label class="note cp-lab">Miễn lãi (ngày)<input type="number" inputmode="numeric" min="15" max="120" list="cpFreeL" data-f="free" value="${g.free?esc(g.free):""}" placeholder="45"></label></div>
-      <div class="note">Thể lệ: ${esc(c.cyc||"chưa ghi chu kỳ")}${c.minTxn?` · ${c.minTxn} giao dịch/${cbPer(c)}`:""}${c.tiers[0].from?` · chi từ ${cbMoney(c.tiers[0].from)}`:""}. Ngày sao kê do từng khách nhập khi chọn thẻ (ngân hàng cho đổi). Hạn thanh toán = ngày sao kê của khách + (số ngày miễn lãi − 30). Chi tối thiểu, số GD, trần của phân khúc thay cho điều kiện thông thường của thẻ (tính theo mỗi kỳ).</div>
-      <div class="cbk" style="margin-top:4px">Phân khúc khách (${segs.length})</div>${segs.length?"":`<p class="note" style="margin:0">Chưa có – khách đều tính theo điều kiện thông thường của thẻ.</p>`}${segHtml}
-      <button class="btn2" type="button" data-seg-add="1">+ Thêm phân khúc</button></div></details>`}).join(""):`<p class="note" style="margin:0">Không có thẻ khớp.</p>`}
+/* bảng dữ liệu dạng lưới {h:[cột], rows:[[ô]]} để sửa và ghi lại CSV đúng cấu trúc */
+function csvGrid(text){text=String(text||"").replace(/^﻿/,"");if(!text.trim())return{h:[],rows:[]};
+  const h0=text.split(/\r?\n/)[0].replace(/"[^"]*"/g,""),sep=(h0.split(";").length>h0.split(",").length)?";":",";
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===sep){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}else f+=c}
+  if(f!==""||row.length){row.push(f);rows.push(row)}
+  const h=(rows.shift()||[]).map(x=>x.trim());return{h,rows:rows.filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>h.map((_,k)=>r[k]==null?"":r[k]))}}
+const gridCsv=g=>[g.h,...g.rows].map(r=>r.map(v=>csvCell(String(v==null?"":v))).join(",")).join("\n");
+const CFG_TB=[["the","Thẻ"],["nhom","Nhóm"],["tc","Trần chung"],["lt","Loại trừ"]];
+let cfgT=null;
+function cfgTables(){if(!cfgT){const src=cbSrc();cfgT={};CFG_TB.forEach(([k])=>cfgT[k]=csvGrid(src[k]||(CB_DEF[k]||"")))}return cfgT}
+function cfgCommit(){const T=cfgTables(),next={at:new Date().toISOString()};CFG_TB.forEach(([k])=>next[k]=gridCsv(T[k]));
+  let n=0;try{n=cbBuild(next).length}catch(e){}if(!n){toast("Dữ liệu sau khi sửa không đọc được – chưa lưu");cfgT=null;return false}
+  cbStore=next;save(K_CB,next);CB=null;cfgInfo();return true}
+/* trang "Chu kỳ & phân khúc" trong file: mỗi phân khúc một dòng; thẻ chỉ có chu kỳ/miễn lãi thì một dòng trống phân khúc */
+const CFG_SEG_H=["Mã thẻ","Tính hoàn theo","Miễn lãi (ngày)","Phân khúc","Chi tối thiểu/kỳ","Số GD tối thiểu","Trần hoàn/kỳ","Cách chi"];
+function cfgSegGrid(){const rows=[];Object.keys(cbCfg).sort().forEach(id=>{const g=cbCfg[id],b=g.basis==="thang"?"Tháng dương lịch":g.basis==="ky"?"Kỳ sao kê":"",fr=g.free||"";
+  if(g.segs&&g.segs.length)g.segs.forEach(S=>rows.push([id,b,fr,S.n||"",S.min||"",S.txn!=null?S.txn:"",S.cap||"",S.how||""]));else rows.push([id,b,fr,"","","","",""])});return{h:CFG_SEG_H,rows}}
+function cfgSegFrom(grid){const ix=n=>grid.h.findIndex(h=>plain(h)===plain(n)),out={};
+  grid.rows.forEach(r=>{const id=(r[ix("Mã thẻ")]||"").trim();if(!id)return;const g=out[id]=out[id]||{};const b=plain(r[ix("Tính hoàn theo")]||"");if(/thang/.test(b))g.basis="thang";else if(/ky/.test(b))g.basis="ky";
+    const fr=parseInt(r[ix("Miễn lãi (ngày)")]);if(fr>=15&&fr<=120)g.free=fr;const n=(r[ix("Phân khúc")]||"").trim();
+    if(n){const S={n},m=cbN(r[ix("Chi tối thiểu/kỳ")]),t=parseInt(r[ix("Số GD tối thiểu")]),c=cbN(r[ix("Trần hoàn/kỳ")]),h=(r[ix("Cách chi")]||"").trim();
+      if(m>0)S.min=m<1000?m*TRV:m;if(t>=0)S.txn=t;if(c>0)S.cap=c<1000?c*TRV:c;if(h)S.how=h;(g.segs=g.segs||[]).push(S)}
+    if(!Object.keys(g).length)delete out[id]});return out}
+function cfgInfo(){const T=cfgTables();$("#cfgInfo").innerHTML=`${T.the.rows.length} thẻ · ${T.nhom.rows.length} nhóm hoàn tiền · ${cbStore&&cbStore.the?`đã sửa trên máy ${esc(String(cbStore.at||"").slice(0,10))}`:"dữ liệu gốc của app"}. Bấm vào thẻ để sửa chu kỳ, miễn lãi, phân khúc và mọi điều kiện (mức, trần, tỷ lệ từng nhóm…). Sửa xong lưu ngay; khách đang dùng thẻ sẽ tính theo điều kiện mới.`}
+const CFG_LONG=new Set(["Ưu đãi mở mới","Cách nhận","Loại trừ riêng","Ghi chú","Nguồn","Đơn vị bán","MCC","MCC loại trừ"]);
+const cfgField=(t,r,k,h,v)=>CFG_LONG.has(h)?`<label class="note cp-lab cfg-w">${esc(h)}<textarea rows="2" data-t="${t}" data-r="${r}" data-k="${k}">${esc(v)}</textarea></label>`
+  :`<label class="note cp-lab">${esc(h)}<input type="text" data-t="${t}" data-r="${r}" data-k="${k}" value="${esc(v)}"></label>`;
+function cfgChips(c){const segs=cpCfg(c).segs||[];return[cpBasis(c)==="thang"?"Tháng dương lịch":"Kỳ sao kê",`miễn lãi ${cpFree(c)} ngày`,segs.length?`${segs.length} phân khúc`:""].filter(Boolean).join(" · ")}
+function cfgRender(){cfgInfo();const T=cfgTables(),q=plain($("#cfgQ").value||""),all=cbAll();
+  const bk=T.the.h.indexOf("Ngân hàng"),nm=T.the.h.indexOf("Tên thẻ");let prev=null;
+  const list=T.the.rows.filter(r=>r[0]).map(r=>({id:r[0],r,c:all.find(c=>c.id===r[0])||null})).filter(x=>!q||plain(x.r.join(" ")).includes(q));
+  list.sort((a,b)=>String(a.r[bk]).localeCompare(String(b.r[bk])));
+  $("#cfgList").innerHTML=list.length?list.map(x=>{const bank=x.r[bk]||"";const hd=bank!==prev?`<div class="cp-bankh" style="--c1:${cbCol(bank)[1]}"><i></i>${esc(bank)}</div>`:"";prev=bank;
+    return hd+`<details class="cp-own g" data-cfg="${esc(x.id)}"${cfgOpen.has(x.id)?" open":""}><summary>${x.c?cbImg(x.c,1):""}<span class="cp-own-t"><b>${esc(x.r[nm]||x.id)}</b><small>${x.c?cfgChips(x.c):`<span class="bad">thiếu dữ liệu</span>`}</small></span></summary><div class="cp-own-b" data-body>${cfgOpen.has(x.id)?cfgBodyHtml(x.id):""}</div></details>`}).join("")
+    :`<p class="note" style="margin:0">Không có thẻ khớp.</p>`}
+function cfgBodyHtml(id){const T=cfgTables(),c=cbAll().find(c=>c.id===id),g=cbCfg[id]||{},segs=g.segs||[];const ri=T.the.rows.findIndex(r=>r[0]===id);if(ri<0)return"";
+  const def=c&&cpCalMonth(c)?"thang":"ky";
+  const segHtml=segs.map((S,k)=>`<div class="cfg-seg" data-k="${k}"><label class="note cp-lab">Tên phân khúc<input type="text" data-f="n" value="${esc(S.n||"")}" placeholder="VD Diamond, Priority"></label>
+    <div class="cp-cfg2"><label class="note cp-lab">Chi tối thiểu (tr)<input type="text" inputmode="decimal" data-f="min" value="${trIn(S.min)}" placeholder="VD 10"></label>
+    <label class="note cp-lab">Số GD tối thiểu<input type="number" inputmode="numeric" min="0" data-f="txn" value="${S.txn!=null&&S.txn!==""?esc(S.txn):""}" placeholder="${c&&c.minTxn||"không"}"></label>
+    <label class="note cp-lab">Trần hoàn (tr)<input type="text" inputmode="decimal" data-f="cap" value="${trIn(S.cap)}" placeholder="như thẻ"></label></div>
+    <label class="note cp-lab">Cách chi để được hoàn<textarea rows="2" data-f="how" placeholder="VD giữ số dư 2 tỷ, chi qua ví…">${esc(S.how||"")}</textarea></label>
+    <button class="x" type="button" data-seg-del="${k}">Xoá phân khúc</button></div>`).join("");
+  const sub=(t,title,addTxt)=>{const G=T[t],rows=G.rows.map((r,i)=>[r,i]).filter(([r])=>r[0]===id);
+    return`<div class="cbk" style="margin-top:6px">${title} (${rows.length})</div>${rows.map(([r,i])=>`<div class="cfg-seg"><b class="cfg-st">${esc(r[1]||"(chưa đặt tên)")}</b><div class="cfg-g">${G.h.map((h,k)=>k===0?"":cfgField(t,i,k,h,r[k])).join("")}</div><button class="x" type="button" data-row-del="${t}:${i}">Xoá dòng này</button></div>`).join("")}<button class="btn2" type="button" data-row-add="${t}">${addTxt}</button>`};
+  return`<div class="cbk">Chu kỳ &amp; miễn lãi</div><div class="cp-cfg"><label class="note cp-lab">Tính hoàn tiền theo<select data-f="basis"><option value="">${def==="thang"?"Tháng dương lịch":"Kỳ sao kê"} (theo thể lệ)</option><option value="ky"${g.basis==="ky"?" selected":""}>Kỳ sao kê</option><option value="thang"${g.basis==="thang"?" selected":""}>Tháng dương lịch</option></select></label>
+    <label class="note cp-lab">Miễn lãi (ngày)<input type="number" inputmode="numeric" min="15" max="120" list="cpFreeL" data-f="free" value="${g.free?esc(g.free):""}" placeholder="45"></label></div>
+    <div class="note">Ngày sao kê do từng khách nhập khi chọn thẻ. Hạn thanh toán = ngày sao kê của khách + (số ngày miễn lãi − 30).</div>
+    <div class="cbk" style="margin-top:6px">Phân khúc khách (${segs.length})</div>${segs.length?"":`<p class="note" style="margin:0">Chưa có – khách đều tính theo điều kiện thông thường. Chi tối thiểu, số GD, trần của phân khúc thay cho điều kiện thông thường (mỗi kỳ).</p>`}${segHtml}
+    <button class="btn2" type="button" data-seg-add="1">+ Thêm phân khúc</button>
+    <div class="cbk" style="margin-top:6px">Điều kiện thẻ</div><p class="note" style="margin:0">Số tiền ghi bằng đồng (VD 10000000), tỷ lệ ghi % (VD 0,5). Mã thẻ: ${esc(id)}.</p>
+    <div class="cfg-g">${T.the.h.map((h,k)=>k===0?"":cfgField("the",ri,k,h,T.the.rows[ri][k])).join("")}</div>
+    ${sub("nhom","Nhóm hoàn tiền","+ Thêm nhóm")}${sub("tc","Trần chung nhiều nhóm","+ Thêm trần chung")}
+    <button class="x" type="button" data-card-del="1" style="margin-top:8px">Xoá thẻ khỏi danh mục</button>`}
+function cfgReopen(d){const b=d.querySelector("[data-body]");b.innerHTML=cfgBodyHtml(d.dataset.cfg);const c=cbAll().find(c=>c.id===d.dataset.cfg);if(c)d.querySelector("summary small").innerHTML=cfgChips(c)}
 $("#cfgLock").addEventListener("submit",async e=>{e.preventDefault();const ok=(await hashPass($("#cfgPass").value.trim()))===PASS_HASH;$("#cfgPass").value="";$("#cfgErr").hidden=ok;if(!ok)return;
   unlocked=true;try{sessionStorage.setItem("kmt.unlock","1")}catch(err){}cfgShow();showLock();showAdmin()});
 $("#cfgLockAgain").addEventListener("click",()=>{unlocked=false;try{sessionStorage.removeItem("kmt.unlock")}catch(err){}cfgShow();showLock();showAdmin()});
 $("#cfgQ").addEventListener("input",cfgRender);
-$("#cfgList").addEventListener("toggle",e=>{const d=e.target;if(d.dataset&&d.dataset.cfg){d.open?cfgOpen.add(d.dataset.cfg):cfgOpen.delete(d.dataset.cfg)}},true);
+$("#cfgList").addEventListener("toggle",e=>{const d=e.target;if(!(d.dataset&&d.dataset.cfg))return;if(d.open){cfgOpen.add(d.dataset.cfg);const b=d.querySelector("[data-body]");if(!b.innerHTML)b.innerHTML=cfgBodyHtml(d.dataset.cfg)}else cfgOpen.delete(d.dataset.cfg)},true);
 const cfgOf=el=>{const d=el.closest("[data-cfg]");return d?(cbCfg[d.dataset.cfg]=cbCfg[d.dataset.cfg]||{}):null};
 const cfgClean=()=>{for(const id in cbCfg){const g=cbCfg[id];if(g.segs&&!g.segs.length)delete g.segs;if(!Object.keys(g).length)delete cbCfg[id]}};
-$("#cfgList").addEventListener("click",e=>{const add=e.target.closest("[data-seg-add]"),del=e.target.closest("[data-seg-del]");if(!add&&!del)return;if(!unlocked)return;const g=cfgOf(e.target);
-  if(add){(g.segs=g.segs||[]).push({n:""});cfgSave();cfgRender();const ins=document.querySelectorAll(`[data-cfg="${CSS.escape(e.target.closest("[data-cfg]")?.dataset.cfg||"")}"] .cfg-seg input[data-f=n]`);if(ins.length)ins[ins.length-1].focus();return}
-  if(del.dataset.sure!=="1"){del.dataset.sure="1";del.textContent="Bấm lần nữa để xoá";setTimeout(()=>{del.dataset.sure="";del.textContent="Xoá phân khúc"},3000);return}
-  g.segs.splice(+del.dataset.segDel,1);cfgClean();cfgSave();cfgRender();toast("Đã xoá phân khúc – khách đang chọn phân khúc này sẽ về Thông thường")});
-$("#cfgList").addEventListener("change",e=>{const t=e.target,f=t.dataset.f;if(!f||!unlocked)return;const g=cfgOf(t);if(!g)return;const sg=t.closest(".cfg-seg");
+const cfgArm=(b,txt,orig)=>{if(b.dataset.sure==="1")return true;b.dataset.sure="1";b.textContent=txt;setTimeout(()=>{b.dataset.sure="";b.textContent=orig},3000);return false};
+$("#cfgList").addEventListener("click",e=>{if(!unlocked)return;const t=e.target,d=t.closest("[data-cfg]");if(!d)return;const id=d.dataset.cfg,T=cfgTables();
+  const add=t.closest("[data-seg-add]"),del=t.closest("[data-seg-del]"),ra=t.closest("[data-row-add]"),rd=t.closest("[data-row-del]"),cd=t.closest("[data-card-del]");
+  if(add){const g=cfgOf(t);(g.segs=g.segs||[]).push({n:""});cfgSave();cfgReopen(d);const ins=d.querySelectorAll(".cfg-seg input[data-f=n]");if(ins.length)ins[ins.length-1].focus();return}
+  if(del){if(!cfgArm(del,"Bấm lần nữa để xoá","Xoá phân khúc"))return;const g=cfgOf(t);g.segs.splice(+del.dataset.segDel,1);cfgClean();cfgSave();cfgReopen(d);toast("Đã xoá phân khúc – khách đang chọn phân khúc này về Thông thường");return}
+  if(ra){const G=T[ra.dataset.rowAdd],r=G.h.map(()=>"");r[0]=id;r[1]=ra.dataset.rowAdd==="nhom"?"Nhóm mới":"Trần chung mới";G.rows.push(r);if(cfgCommit())cfgReopen(d);return}
+  if(rd){if(!cfgArm(rd,"Bấm lần nữa để xoá","Xoá dòng này"))return;const p=rd.dataset.rowDel.split(":");T[p[0]].rows.splice(+p[1],1);if(cfgCommit()){cfgReopen(d);toast("Đã xoá")}return}
+  if(cd){if(!cfgArm(cd,"Bấm lần nữa – xoá thẻ và mọi nhóm của thẻ","Xoá thẻ khỏi danh mục"))return;["the","nhom","tc"].forEach(k=>T[k].rows=T[k].rows.filter(r=>r[0]!==id));
+    if(T.the.rows.length&&cfgCommit()){cfgOpen.delete(id);delete cbCfg[id];cfgSave();cfgRender();toast("Đã xoá thẻ khỏi danh mục")}else cfgT=null}});
+$("#cfgList").addEventListener("change",e=>{const t=e.target;if(!unlocked)return;const d=t.closest("[data-cfg]");if(!d)return;
+  if(t.dataset.t){const T=cfgTables(),G=T[t.dataset.t],r=G.rows[+t.dataset.r];if(!r)return;const k=+t.dataset.k,old=r[k];r[k]=t.value.trim();
+    if(cfgCommit()){toast("Đã lưu");const st=t.closest(".cfg-seg");if(st&&k===1){const b=st.querySelector(".cfg-st");if(b)b.textContent=t.value.trim()||"(chưa đặt tên)"}}else{r[k]=old;t.value=old}return}
+  const f=t.dataset.f;if(!f)return;const g=cfgOf(t);const sg=t.closest(".cfg-seg[data-k]");
   if(sg){const S=g.segs[+sg.dataset.k];if(!S)return;
     if(f==="n"||f==="how")S[f]=t.value.trim();
     else if(f==="txn"){const v=parseInt(t.value);if(v>=0)S.txn=v;else delete S.txn}
     else{const v=cpAmt(t.value);if(v>0)S[f]=Math.round(v*TRV);else delete S[f];t.value=trIn(S[f])}}
   else if(f==="basis"){if(t.value)g.basis=t.value;else delete g.basis}
   else if(f==="free"){const v=parseInt(t.value);if(v>=15&&v<=120)g.free=v;else{delete g.free;t.value=""}}
-  cfgClean();cfgSave();
-  const d=t.closest("[data-cfg]"),c=cbAll().find(c=>c.id===d.dataset.cfg);if(c&&!sg){d.querySelector("summary small").innerHTML=[cpBasis(c)==="thang"?"Tháng dương lịch":"Kỳ sao kê",`miễn lãi ${cpFree(c)} ngày`,(cpCfg(c).segs||[]).length?`${cpCfg(c).segs.length} phân khúc`:""].filter(Boolean).join(" · ")}
-  else if(c&&sg&&f==="n"){/* tên phân khúc */}
-  toast("Đã lưu")});
+  cfgClean();cfgSave();const c=cbAll().find(c=>c.id===d.dataset.cfg);if(c)d.querySelector("summary small").innerHTML=cfgChips(c);toast("Đã lưu")});
+$("#cfgNewAdd").addEventListener("click",()=>{if(!unlocked)return;const id=$("#cfgNewId").value.trim().toLowerCase().replace(/\s+/g,"-"),bank=$("#cfgNewBank").value.trim(),name=$("#cfgNewName").value.trim();
+  if(!id||!bank||!name){toast("Nhập đủ mã thẻ, ngân hàng, tên thẻ");return}const T=cfgTables();if(T.the.rows.some(r=>r[0]===id)){toast("Mã thẻ đã có");return}
+  const r=T.the.h.map(()=>"");const set=(h,v)=>{const k=T.the.h.indexOf(h);if(k>=0)r[k]=v};set("Mã thẻ",id);set("Ngân hàng",bank);set("Tên thẻ",name);set("Trạng thái","Đang phát hành");set("Mức tin cậy","C");set("Chu kỳ","Kỳ sao kê");
+  T.the.rows.push(r);if(cfgCommit()){["#cfgNewId","#cfgNewBank","#cfgNewName"].forEach(x=>$(x).value="");$("#cfgNewBox").open=false;cfgOpen.add(id);$("#cfgQ").value=name;cfgRender();toast("Đã thêm thẻ – điền điều kiện và thêm nhóm hoàn tiền")}});
+/* ---- file Excel (.xlsx) tự tạo, không cần thư viện: zip không nén + XML bảng tính ---- */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC_T[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zipStore(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  files.forEach(([name,text])=>{const nb=enc.encode(name),data=enc.encode(text),crc=crc32(data);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,nb.length,true);
+    parts.push(new Uint8Array(h.buffer),nb,data);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,nb.length,true);c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),nb);off+=30+nb.length+data.length});
+  const cs=cen.reduce((a,b)=>a+b.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})}
+const xEsc=v=>String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"");
+const xCol=n=>{let s="";n++;while(n){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s};
+function xlsxBlob(sheets){const sh=sheets.map(([name,g],si)=>[`xl/worksheets/sheet${si+1}.xml`,`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetData>${[g.h,...g.rows].map((r,ri)=>`<row r="${ri+1}">${r.map((v,ci)=>v===""||v==null?"":`<c r="${xCol(ci)}${ri+1}" t="inlineStr"${ri===0?' s="1"':""}><is><t xml:space="preserve">${xEsc(v)}</t></is></c>`).join("")}</row>`).join("")}</sheetData></worksheet>`]);
+  return zipStore([["[Content_Types].xml",`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`],
+    ["_rels/.rels",`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ["xl/workbook.xml",`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map(([n],i)=>`<sheet name="${xEsc(n)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets></workbook>`],
+    ["xl/_rels/workbook.xml.rels",`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`],
+    ["xl/styles.xml",`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`],...sh])}
+/* đọc .xlsx: zip (không nén hoặc deflate – cần trình duyệt có DecompressionStream) → các trang thành lưới */
+async function unzip(buf){const u=new Uint8Array(buf),v=new DataView(buf);let e=-1;for(let i=u.length-22;i>=Math.max(0,u.length-65557);i--)if(v.getUint32(i,true)===0x06054b50){e=i;break}
+  if(e<0)throw new Error("zip");const n=v.getUint16(e+10,true);let p=v.getUint32(e+16,true);const out={},dec=new TextDecoder();
+  for(let k=0;k<n;k++){const m=v.getUint16(p+10,true),cs=v.getUint32(p+20,true),nl=v.getUint16(p+28,true),xl=v.getUint16(p+30,true),cl=v.getUint16(p+32,true),lo=v.getUint32(p+42,true);
+    const name=dec.decode(u.subarray(p+46,p+46+nl));const ds=lo+30+v.getUint16(lo+26,true)+v.getUint16(lo+28,true);
+    out[name]={m,raw:u.subarray(ds,ds+cs)};p+=46+nl+xl+cl}
+  const get=async name=>{const f=out[name];if(!f)return null;if(f.m===0)return dec.decode(f.raw);if(f.m!==8)throw new Error("nen");
+    if(typeof DecompressionStream==="undefined")throw new Error("cu");const st=new Blob([f.raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"));return await new Response(st).text()};
+  return{get}}
+async function xlsxRead(buf){const z=await unzip(buf),P=new DOMParser(),X=t=>P.parseFromString(t,"application/xml");
+  const wb=X(await z.get("xl/workbook.xml")),rels=X((await z.get("xl/_rels/workbook.xml.rels"))||"<r/>");
+  const rmap={};[...rels.getElementsByTagName("Relationship")].forEach(r=>rmap[r.getAttribute("Id")]=r.getAttribute("Target"));
+  const ssT=await z.get("xl/sharedStrings.xml"),ss=ssT?[...X(ssT).getElementsByTagName("si")].map(si=>[...si.getElementsByTagName("t")].map(t=>t.textContent).join("")):[];
+  const out=[];for(const s of [...wb.getElementsByTagName("sheet")]){const rid=s.getAttribute("r:id")||s.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id");
+    let tg=(rmap[rid]||"").replace(/^\//,"");if(!tg.startsWith("xl/"))tg="xl/"+tg;const txt=await z.get(tg);if(!txt)continue;
+    const rows=[];[...X(txt).getElementsByTagName("row")].forEach(r=>{const row=[];[...r.getElementsByTagName("c")].forEach(c=>{const col=(c.getAttribute("r")||"").replace(/\d+/g,"");
+      let ci=0;for(const ch of col)ci=ci*26+(ch.charCodeAt(0)-64);ci--;if(ci<0)ci=row.length;const t=c.getAttribute("t"),vv=c.getElementsByTagName("v")[0];
+      row[ci]=t==="s"?(ss[+(vv&&vv.textContent)]||""):t==="inlineStr"?[...c.getElementsByTagName("t")].map(x=>x.textContent).join(""):(vv?vv.textContent:"")});
+      rows[(+r.getAttribute("r")||rows.length+1)-1]=row});
+    const all=rows.filter(Boolean),h=(all.shift()||[]).map(x=>String(x||"").trim());out.push({name:s.getAttribute("name"),g:{h,rows:all.map(r=>h.map((_,k)=>r[k]==null?"":String(r[k]))).filter(r=>r.some(v=>v.trim()))}})}
+  return out}
+const cfgKindOf=(name,g)=>{const n=plain(name||""),hh=plain(g.h.join(","));if(hh.includes("phan khuc")&&hh.includes("tinh hoan theo"))return"seg";
+  return cbKind(g.h.join(","))||({"the":"the","nhom":"nhom","tran chung":"tc","loai tru":"lt","chu ky & phan khuc":"seg"}[n])||null};
+$("#cfgXlsx").addEventListener("click",async()=>{const T=cfgTables();const blob=xlsxBlob([...CFG_TB.map(([k,n])=>[n,T[k]]),["Chu kỳ & phân khúc",cfgSegGrid()]]);
+  const name=`danh-muc-the-hoan_${stamp()}.xlsx`;try{const file=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e&&e.name==="AbortError")return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast("Đã tải file "+name)});
+$("#cfgCsv").addEventListener("click",async()=>{const T=cfgTables(),st=stamp();for(const [k,n] of [...CFG_TB,["seg","Chu kỳ & phân khúc"]]){const g=k==="seg"?cfgSegGrid():T[k];
+  const ok=await exportCsv(gridCsv(g),`danh-muc-the-hoan_${plain(n).replace(/[^a-z0-9]+/g,"-")}_${st}.csv`);if(ok===false)break}});
+let cfgRsCand=null;
+$("#cfgRs").addEventListener("click",()=>{if(unlocked)$("#cfgFile").click()});
+$("#cfgFile").addEventListener("change",async e=>{const files=[...e.target.files];e.target.value="";if(!files.length)return;const got={},bad=[];
+  for(const f of files){try{if(/\.xlsx$/i.test(f.name)){for(const sh of await xlsxRead(await f.arrayBuffer())){const k=cfgKindOf(sh.name,sh.g);if(k)got[k]=sh.g}}
+      else{const g=csvGrid(await f.text()),k=cfgKindOf("",g);if(k)got[k]=g;else bad.push(f.name)}}
+    catch(err){bad.push(f.name);if(err&&err.message==="cu"){toast("Máy này chưa đọc được file Excel đã lưu lại – hãy dùng file CSV");return}}}
+  const ks=Object.keys(got);if(!ks.length){toast("Không nhận ra dữ liệu trong file");return}
+  const next={at:new Date().toISOString()};const T=cfgTables();CFG_TB.forEach(([k])=>next[k]=gridCsv(got[k]||T[k]));let n=0;try{n=cbBuild(next).length}catch(err){}
+  if(!n){toast("File Thẻ không có dòng hợp lệ – chưa phục hồi");return}
+  const nm={the:"Thẻ",nhom:"Nhóm",tc:"Trần chung",lt:"Loại trừ",seg:"Chu kỳ & phân khúc"};
+  cfgRsCand={next,seg:got.seg?cfgSegFrom(got.seg):null};$("#cfgRsMsg").textContent=`Đọc được: ${ks.map(k=>nm[k]).join(", ")} · ${n} thẻ${bad.length?` · bỏ qua ${bad.length} file lạ`:""}. Thay dữ liệu đang dùng?`;$("#cfgRsBox").hidden=false});
+$("#cfgRsNo").addEventListener("click",()=>{cfgRsCand=null;$("#cfgRsBox").hidden=true});
+$("#cfgRsOk").addEventListener("click",()=>{if(!cfgRsCand||!unlocked)return;cbStore=cfgRsCand.next;save(K_CB,cbStore);CB=null;cfgT=null;if(cfgRsCand.seg){cbCfg=cfgRsCand.seg;cfgSave()}
+  cfgRsCand=null;$("#cfgRsBox").hidden=true;cfgRender();toast("Đã phục hồi danh mục thẻ hoàn")});
+$("#cfgReset").addEventListener("click",e=>{const b=e.currentTarget;if(!unlocked||!cfgArm(b,"Bấm lần nữa để về dữ liệu gốc","Về dữ liệu gốc"))return;
+  b.dataset.sure="";b.textContent="Về dữ liệu gốc";try{localStorage.removeItem(K_CB)}catch(err){}cbStore=null;CB=null;cfgT=null;cfgRender();toast("Đã về dữ liệu hoàn tiền gốc (giữ chu kỳ & phân khúc)")});
 function showTab(t){
   ["check","custs","rules","cb","me","cbcfg"].forEach(v=>$("#v-"+v).hidden=v!==t);
-  $("#tbTitle").textContent={check:"Mở thẻ",cb:"Hoàn tiền",me:"Tôi",custs:"Khách hàng",rules:"Điều kiện",cbcfg:"Chu kỳ & phân khúc"}[t]||"";
+  $("#tbTitle").textContent={check:"Mở thẻ",cb:"Hoàn tiền",me:"Tôi",custs:"Khách hàng",rules:"Điều kiện",cbcfg:"Danh mục thẻ hoàn"}[t]||"";
   $("#policyBar").hidden=t!=="check";
   if(t==="me")renderMe();
   if(t==="check")renderCust();
@@ -2892,7 +3025,7 @@ renderVersions();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 showPolicy();
 /* chỉ để kiểm thử khi chạy trên máy (localhost) */
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname))window.__kmt={cpStmt,cpCalc,cpActual,cpOptimize,cpAutoNeeds,cbAll,cpCycle,cpAmt,cpGroupCats};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname))window.__kmt={xlsxBlob,xlsxRead,cfgTables,cfgSegGrid,cfgSegFrom,cfgKindOf,csvGrid,gridCsv,cpStmt,cpCalc,cpActual,cpOptimize,cpAutoNeeds,cbAll,cpCycle,cpAmt,cpGroupCats};
 })();
 </script>
 </body>
