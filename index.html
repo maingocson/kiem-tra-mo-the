@@ -2311,7 +2311,7 @@ function cpPlanDoneHtml(P,owned,d,closed,realized,spent,tot){const from=dParse(P
     ${dang.length?`<p class="note" style="margin:0">Chuyển sang kế hoạch sau (kỳ kết thúc sau ${cpDM(to)}): ${esc(dang.join("; "))}.</p>`:""}
     <p class="note" style="margin:0">Nhập tiền ngân hàng đã trả ở mục Thẻ &amp; kỳ (bấm thẻ) để đối chiếu.</p>`}
 /* ---- gửi kế hoạch cho khách (chữ, chia sẻ qua Zalo, tin nhắn…) ---- */
-let cpShareTxt="";
+let cpShareTxt="",cpClearedId=null;
 function cpShare(){if(!cpShareTxt){toast("Chưa có kế hoạch để gửi");return}
   if(navigator.share)navigator.share({title:"Kế hoạch chi tiêu hoàn tiền",text:cpShareTxt}).catch(()=>{});
   else if(navigator.clipboard)navigator.clipboard.writeText(cpShareTxt).then(()=>toast("Đã chép kế hoạch – dán vào tin nhắn gửi khách"),()=>toast("Không chép được"));}
@@ -2510,7 +2510,8 @@ function renderPlan(){
     return`<details class="grp"><summary>Tháng ${esc(cpPerTxt(p))} · ${cbMoney(sum*TRV)} · ${rows.length} giao dịch</summary><div class="note">${Object.entries(byCard).sort((a,b)=>b[1]-a[1]).map(([id,v])=>{const c=all.find(x=>x.id===id);return`${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}: ${cbMoney(v*TRV)}`}).join(" · ")}</div><table class="ctbl cp-hist"><tbody>${rows.slice().reverse().map(([h,i])=>{const c=all.find(x=>x.id===h.card);return`<tr><td>${esc(c?c.bank+" "+c.name:"(thẻ đã xoá)")}<div class="note">${esc(CP_NAME[h.cat]||h.cat)}${h.at?" · "+esc(cpDM(new Date(h.at))):""}</div></td><td>${cbMoney(h.amt*TRV)} <button class="x" type="button" data-cp-hdel="${i}" aria-label="Xoá dòng">✕</button></td></tr>`}).join("")}</tbody></table></details>`}).join(""):`<p class="note" style="margin:0">Chưa có lịch sử. Các khoản ghi ở mục Chi tiêu tháng này sẽ tự vào đây.</p>`;
   /* 2. nhu cầu: tự tính theo thẻ đang có nếu chưa nhập tay */
   if(document.activeElement!==$("#cpBudget"))$("#cpBudget").value=d.budget?String(d.budget).replace(".",","):"";
-  if(plOn&&owned.length&&(d.needsSrc==="auto"||(!d.needsSrc&&!Object.keys(d.needs).length))){
+  const noNeeds=!Object.values(d.needs||{}).some(v=>cpTr(v)>0)&&!(PLx&&(PLx.known||[]).length);
+  if(plOn&&owned.length&&(d.needsSrc==="auto"||(noNeeds&&cpClearedId!==(PLx&&PLx.id)))){
     /* nhu cầu tự tính cho 1 kỳ (~30 ngày) → nhân theo độ dài kế hoạch */
     const fac=(dDiff(dParse(PLx.from),dParse(PLx.to))+1)/30,n0=cpAutoNeeds(owned,cpTr(d.budget)/fac),n=Object.fromEntries(Object.entries(n0).map(([k,v])=>[k,String(Math.round(parseFloat(v)*fac*100)/100)]));if(JSON.stringify(n)!==JSON.stringify(d.needs)||d.needsSrc!=="auto"){d.needs=n;d.needsSrc="auto";cpSave()}}
   const nTot=Object.values(d.needs).reduce((a,v)=>a+cpTr(v),0);
@@ -2558,7 +2559,7 @@ function renderPlanOut(){
     lims[vc.id]=L})});
   const leftTot=Object.values(left).reduce((a,b)=>a+b,0);
   if(!tot){$("#cpTK").innerHTML=cpTKHtml(owned,A0,{});$("#cpTK").hidden=!owned.length;$("#cpSugBox").hidden=true;if(cpActivePlan(d)===PL)setPlanSum({plan:PL.id,from:PL.from,to:PL.to,cards:owned.length,cash:realized,spent,tot:0,cashNow:realized});
-    O.innerHTML=`<div class="cbk">Kế hoạch ${cpPlanTitle(PL)}</div>${spent?`<p style="margin:0">Đã chi <b>${cbMoney(spent)}</b> trong kế hoạch.</p>`:""}<p class="note" style="margin:0">Nhập nhu cầu chi tiêu ở bước 2 hoặc bấm "Tự tính theo thẻ".</p>${cpTLHtml(owned,from,to)}`;return}
+    O.innerHTML=`<div class="cbk">Kế hoạch ${cpPlanTitle(PL)}</div>${spent?`<p style="margin:0">Đã chi <b>${cbMoney(spent)}</b> trong kế hoạch.</p>`:""}<p class="note" style="margin:0">Kế hoạch chưa có nhu cầu chi tiêu.</p><div class="row-btns"><button class="btn2 acc" type="button" data-cp-auto="1">Tự tính theo thẻ</button><button class="btn2" type="button" data-cp-needs="1">Tự nhập nhu cầu</button></div>${cpTLHtml(owned,from,to)}`;return}
   const P=cpOptimize(V,left,true,fix,vctx,lims);
   qsLeft={};P.cards.forEach(x=>{if(x.c.isNext)return;for(const k in x.sp)if(x.sp[k]>0)qsLeft[x.c.baseId+"|"+k]=(qsLeft[x.c.baseId+"|"+k]||0)+x.sp[k]});
   const planned={};P.cards.forEach(x=>{if(!x.c.isNext)planned[x.c.baseId]=Object.values(x.sp).reduce((s,v)=>s+v,0)});
@@ -2715,7 +2716,9 @@ $("#cpQAmt").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault
 $("#cpFromHist").addEventListener("click",()=>{const d=cpData();const pers=[...new Set(d.hist.map(h=>h.p))].filter(p=>p<cpNowPer()).sort();if(!pers.length){toast("Chưa có lịch sử chi tiêu");return}
   const last=pers[pers.length-1],n={};d.hist.filter(h=>h.p===last).forEach(h=>n[h.cat]=(n[h.cat]||0)+h.amt);
   d.needs=Object.fromEntries(Object.entries(n).map(([k,v])=>[k,String(Math.round(v*100)/100)]));d.needsSrc="hist";cpSave();renderPlan();toast(`Đã lấy nhu cầu theo tháng ${cpPerTxt(last)}`)});
-$("#cpClearNeeds").addEventListener("click",()=>{const d=cpData();d.needs={};d.needsSrc="tay";cpSave();renderPlan()});
+$("#cpClearNeeds").addEventListener("click",()=>{const d=cpData(),P=cpSel(d);cpClearedId=P?P.id:null;d.needs={};d.needsSrc="tay";cpSave();renderPlan()});
+$("#cpOut").addEventListener("click",e=>{if(e.target.closest("[data-cp-auto]")){cpClearedId=null;$("#cpAuto").click();return}
+  if(e.target.closest("[data-cp-needs]")){const b=$("#cpStep3");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"})}});
 /* ghi khoản chi: chọn ngày quẹt, hiện khoản này thuộc kỳ nào (tính hoàn / sao kê), hỏi lại nếu trùng */
 function cpPerInfo(card,dateStr){const o=cpOwned().find(x=>x.c.id===card),dt=dParse(dateStr)||dToday();if(!o)return"";const{c,e}=o,p=cpCycle(c,e,dt);
   let t=`Tính hoàn: kỳ ${cpDM(p.s)}–${cpDM(dAdd(p.t,-1))} (${cpBasisTxt(c).toLowerCase()})`;if(cpSk(c,e)){const st=cpStmt(c,e,dt);t+=` · Sao kê ${cpDM(st.close)}, hạn trả ${cpDM(st.due)}`}
